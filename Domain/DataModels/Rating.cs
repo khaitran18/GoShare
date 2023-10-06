@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Infrastructure.DataModels
+namespace Domain.DataModels
 {
-    public class Rating
+    public partial class Rating
     {
         public int Id { get; set; }
         public Guid Rater { get; set; }
@@ -12,5 +12,7 @@ namespace Infrastructure.DataModels
         public short Rating1 { get; set; }
         public string? Comment { get; set; }
 
+        public virtual User RateeNavigation { get; set; } = null!;
+        public virtual User RaterNavigation { get; set; } = null!;
     }
 }

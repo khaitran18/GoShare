@@ -8,13 +8,19 @@
 
   <ItemGroup>
     <Folder Include="Commands\" />
-    <Folder Include="Common\Exceptions\" />
-    <Folder Include="Common\Behaviours\" />
-    <Folder Include="Common\Dtos\" />
     <Folder Include="Common\Mappers\" />
-    <Folder Include="Common\Validations\" />
     <Folder Include="Services\" />
-    <Folder Include="Queries\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="FluentValidation" Version="11.7.1" />
+    <PackageReference Include="MediatR" Version="12.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="7.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
 
 </Project>

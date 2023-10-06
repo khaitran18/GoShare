@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Infrastructure.DataModels
 {
-    public partial class Chat
+    public class ChatModel
     {
         public Guid Id { get; set; }
         public Guid Sender { get; set; }
@@ -11,7 +11,5 @@ namespace Infrastructure.DataModels
         public string Content { get; set; } = null!;
         public DateTime Time { get; set; }
 
-        public virtual User ReceiverNavigation { get; set; } = null!;
-        public virtual User SenderNavigation { get; set; } = null!;
     }
 }

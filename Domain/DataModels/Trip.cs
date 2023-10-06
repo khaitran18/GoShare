@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Infrastructure.DataModels
+namespace Domain.DataModels
 {
     public partial class Trip
     {

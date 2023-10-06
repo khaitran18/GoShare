@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Infrastructure.DataModels
 {
-    public class Trip
+    public class TripModel
     {
         public Guid Id { get; set; }
         public Guid DriverId { get; set; }

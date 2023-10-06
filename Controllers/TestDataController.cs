@@ -1,28 +1,45 @@
-﻿using Infrastructure.Data;
+﻿using Application.Common;
+using Application.Queries;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api_Mobile.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TestDataController : Controller
+    public class TestDataController : ControllerBase
     {
-        private readonly postgresContext context;
+        private readonly IMediator _mediator;
 
-        public TestDataController(postgresContext context)
+        public TestDataController(IMediator mediator)
         {
-            this.context = context;
+            _mediator = mediator;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index([FromQuery] TestQuery query)
         {
-            if (await Task.FromResult(context.Users.Any(u => u.Phone.Equals("0919651361"))))
+            try
             {
-                return Ok();
+                var response = await _mediator.Send(query);
+                if (!response.Error)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    var ErrorResponse = new BaseResponse<Exception>
+                    {
+                        Exception = response.Exception,
+                        Message = response.Message
+                    };
+                    return new ErrorHandling<Exception>(ErrorResponse);
+                }
             }
-            
-            else return BadRequest();
+            catch (Exception)
+            {
+                return StatusCode(500,"Please contact us for more information");
+            }
         }
     }
 }

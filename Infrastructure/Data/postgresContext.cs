@@ -2,17 +2,14 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Infrastructure.DataModels;
 using Microsoft.Extensions.Configuration;
+using Domain.DataModels;
 
 namespace Infrastructure.Data
 {
     public partial class postgresContext : DbContext
     {
         private readonly IConfiguration _configuration;
-        public postgresContext()
-        {
-        }
 
         public postgresContext(DbContextOptions<postgresContext> options, IConfiguration configuration)
             : base(options)
