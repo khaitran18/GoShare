@@ -30,6 +30,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 // Add Handler
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<IRequestHandler<TestQuery,BaseResponse<TestDto>>,TestQueryHandler>();
+builder.Services.AddScoped<IRequestHandler<GetAppfeedbacksQuery, BaseResponse<PaginatedResult<AppfeedbackDto>>>, GetAppfeedbacksHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 // Add Validator
 builder.Services.AddScoped<IValidator<TestQuery>, TestQueryValidator>();
@@ -38,13 +39,13 @@ builder.Services.AddScoped<IValidator<TestQuery>, TestQueryValidator>();
 var mapperConfig = new MapperConfiguration(cfg =>
 {
     cfg.AddProfile<TestMapper>();
+    cfg.AddProfile<AppfeedbackProfile>();
+    cfg.AddProfile<UserProfile>();
 });
 var mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 // Add Behaviour
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
-
-
 
 builder.Services.AddSwaggerGen();
 

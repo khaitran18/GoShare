@@ -10,6 +10,7 @@ namespace Infrastructure
         private readonly postgresContext _context;
         private readonly IMapper _mapper;
         private IUserRepository _userRepository;
+        private IAppfeedbackRepository _appfeedbackRepository;
 
         public UnitOfWork(postgresContext context, IMapper mapper)
         {
@@ -17,7 +18,9 @@ namespace Infrastructure
             _mapper = mapper;
         }
 
-        public IUserRepository UserRepository => _userRepository ??= new UserRepository(_context,_mapper);
+        public IUserRepository UserRepository => _userRepository ??= new UserRepository(_context, _mapper);
+        public IAppfeedbackRepository AppfeedbackRepository => _appfeedbackRepository ??= new AppfeedbackRepository(_context);
+
         public void Dispose()
         {
             _context.DisposeAsync();
