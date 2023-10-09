@@ -51,7 +51,7 @@ namespace Api_Mobile.Middlewares
                     context.Response.ContentType = "application/json";
                     var responseBody = new
                     {
-                        Message = valid.Errors.Values,
+                        Message = valid.Errors.Values.ToArray(),
                         StackTrace = ex.StackTrace
                     };
                     await context.Response.WriteAsJsonAsync(responseBody);

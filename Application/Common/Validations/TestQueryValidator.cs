@@ -10,7 +10,8 @@ namespace Application.Common.Validations
             RuleFor(query => query.phone)
                 .NotEmpty().WithMessage("Phone number must not be empty")
                 .MinimumLength(10).WithMessage("Phone number must be at least 10 numbers")
-                .NotNull().WithErrorCode("400").WithMessage("Cant detect phone number field");
+                .NotNull().WithErrorCode("400").WithMessage("Cant detect phone number field")
+                .Matches("^[0-9]*$").WithMessage("Phone must only contains number");
         }
     }
 }
