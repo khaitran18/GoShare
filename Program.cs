@@ -7,13 +7,16 @@ using Application.Queries;
 using Application.Queries.Handler;
 using AutoMapper;
 using Domain.Interfaces;
+using FirebaseAdmin;
 using FluentValidation;
+using Google.Apis.Auth.OAuth2;
 using Infrastructure;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using Application.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,9 +26,20 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
-// Add db context & Unit of work
-builder.Services.AddDbContext<postgresContext>(options => options.UseNpgsql(builder.Configuration["ConnectionStrings:GoShareAzure"]));
+// Initialize Configuration
+GoShareConfiguration.Initialize(builder.Configuration);
+
+// Add dependency injection
+builder.Services.AddDbContext<postgresContext>(options => options.UseNpgsql(GoShareConfiguration.ConnectionString("GoShareAzure")));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+// Firebase
+var credential = GoogleCredential.FromFile(GoShareConfiguration.FirebaseCredentialFile);
+FirebaseApp.Create(new AppOptions
+{
+    Credential = credential,
+    ProjectId = GoShareConfiguration.FirebaseProjectId
+});
 
 // Add Handler
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
