@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Application.Queries
 {
-    public record TestQuery: IRequest<BaseResponse<TestDto>>
+    public record TestQuery: IRequest<TestDto>
     {
         public string? phone { get; set; }
     }

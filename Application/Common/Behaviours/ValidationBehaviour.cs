@@ -18,9 +18,10 @@ namespace Application.Common.Behaviour
 
             if (validationFailures.Any())
             {
-                var error = string.Join("\r\n", validationFailures);
-                Application.Common.Exceptions.ValidationException exception = new Application.Common.Exceptions.ValidationException();
-                return (TResponse)Activator.CreateInstance(typeof(TResponse), true, error, exception);
+                //var error = string.Join("\r\n", validationFailures);
+                throw new Common.Exceptions.ValidationException(validationFailures);
+                //Exceptions.ValidationException exception = new Exceptions.ValidationException();
+                //return (TResponse)Activator.CreateInstance(typeof(TResponse), true, error, exception);
             }
             return await next();
         }

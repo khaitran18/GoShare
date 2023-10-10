@@ -1,3 +1,4 @@
+using Api_Mobile.Middlewares;
 using Application.Common;
 using Application.Common.Behaviour;
 using Application.Common.Dtos;
@@ -20,6 +21,8 @@ using Application.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//Add middlewares
+builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 // Add services to the container.
 builder.Services.AddControllers();
 
@@ -43,7 +46,7 @@ FirebaseApp.Create(new AppOptions
 
 // Add Handler
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-builder.Services.AddScoped<IRequestHandler<TestQuery,BaseResponse<TestDto>>,TestQueryHandler>();
+builder.Services.AddScoped<IRequestHandler<TestQuery,TestDto>,TestQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<GetAppfeedbacksQuery, BaseResponse<PaginatedResult<AppfeedbackDto>>>, GetAppfeedbacksHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 // Add Validator
@@ -71,6 +74,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
