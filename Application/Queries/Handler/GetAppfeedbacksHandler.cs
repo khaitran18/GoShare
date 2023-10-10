@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Application.Queries.Handler
 {
-    public class GetAppfeedbacksHandler : IRequestHandler<GetAppfeedbacksQuery, BaseResponse<PaginatedResult<AppfeedbackDto>>>
+    public class GetAppfeedbacksHandler : IRequestHandler<GetAppfeedbacksQuery, PaginatedResult<AppfeedbackDto>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -24,49 +24,51 @@ namespace Application.Queries.Handler
             //_tokenService = tokenService;
         }
 
-        public async Task<BaseResponse<PaginatedResult<AppfeedbackDto>>> Handle(GetAppfeedbacksQuery request, CancellationToken cancellationToken)
+        public async Task<PaginatedResult<AppfeedbackDto>> Handle(GetAppfeedbacksQuery request, CancellationToken cancellationToken)
         {
-            var response = new BaseResponse<PaginatedResult<AppfeedbackDto>>();
+            var response = new PaginatedResult<AppfeedbackDto>();
 
-            try
-            {
-                //ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
-                //if (claims != null)
-                //{
-                    //int.TryParse(claims.FindFirst("jti")?.Value, out int userId);
+            //try
+            //{
+            //ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
+            //if (claims != null)
+            //{
+            //int.TryParse(claims.FindFirst("jti")?.Value, out int userId);
 
-                    //var isLecturer = await _unitOfWork.UserRepository.IsUserLecturer(userId);
+            //var isLecturer = await _unitOfWork.UserRepository.IsUserLecturer(userId);
 
-                    var (appfeedbacks, totalCount) = await _unitOfWork.AppfeedbackRepository.GetAppfeedbacks(
-                        request.SortBy,
-                        request.Page,
-                        request.PageSize
-                    );
+            var (appfeedbacks, totalCount) = await _unitOfWork.AppfeedbackRepository.GetAppfeedbacks(
+                request.SortBy,
+                request.Page,
+                request.PageSize
+            );
 
-                    var feedbackDtos = _mapper.Map<List<AppfeedbackDto>>(appfeedbacks);
+            var feedbackDtos = _mapper.Map<List<AppfeedbackDto>>(appfeedbacks);
 
-                    var paginatedResult = new PaginatedResult<AppfeedbackDto>(
-                        feedbackDtos,
-                        totalCount,
-                        request.Page,
-                        request.PageSize
-                    );
+            var paginatedResult = new PaginatedResult<AppfeedbackDto>(
+                feedbackDtos,
+                totalCount,
+                request.Page,
+                request.PageSize
+            );
 
-                    response.Result = paginatedResult;
-                    response.Message = "Get feedbacks successfully!";
-                //}
-                //else
-                //{
-                //    response.Error = true;
-                //    response.Exception = new BadRequestException("Invalid credentials");
-                //}
-            }
-            catch (Exception ex)
-            {
-                response.Error = true;
-                response.Message = ex.Message;
-                response.Exception = ex;
-            }
+            response = paginatedResult;
+
+            //response.Result = paginatedResult;
+            //response.Message = "Get feedbacks successfully!";
+            //}
+            //else
+            //{
+            //    response.Error = true;
+            //    response.Exception = new BadRequestException("Invalid credentials");
+            //}
+            //}
+            //catch (Exception ex)
+            //{
+            //    response.Error = true;
+            //    response.Message = ex.Message;
+            //    response.Exception = ex;
+            //}
 
             return response;
         }

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Common.Behaviours
+namespace Application.Services
 {
     // Tạo một interface để định nghĩa các phương thức của service để gửi và nhận thông báo sử dụng Firebase Cloud Messaging
     //public interface INotificationService

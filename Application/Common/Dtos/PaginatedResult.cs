@@ -16,6 +16,10 @@ namespace Application.Common.Dtos
         public bool HasPreviousPage => Page > 1 && Page <= TotalPages;
         public bool HasNextPage => Page >= 1 && Page < TotalPages;
 
+        public PaginatedResult()
+        {
+        }
+
         public PaginatedResult(List<T> items, int totalCount, int page, int pageSize)
         {
             Items = items;

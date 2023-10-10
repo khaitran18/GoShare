@@ -47,7 +47,7 @@ FirebaseApp.Create(new AppOptions
 // Add Handler
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<IRequestHandler<TestQuery,TestDto>,TestQueryHandler>();
-builder.Services.AddScoped<IRequestHandler<GetAppfeedbacksQuery, BaseResponse<PaginatedResult<AppfeedbackDto>>>, GetAppfeedbacksHandler>();
+builder.Services.AddScoped<IRequestHandler<GetAppfeedbacksQuery, PaginatedResult<AppfeedbackDto>>, GetAppfeedbacksHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 // Add Validator
 builder.Services.AddScoped<IValidator<TestQuery>, TestQueryValidator>();

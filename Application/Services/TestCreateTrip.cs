@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Common.Behaviours
+namespace Application.Services
 {
     //// Tạo một request model cho việc tạo chuyến đi mới
     //public class CreateTripRequest

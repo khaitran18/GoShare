@@ -23,25 +23,8 @@ namespace Api_Mobile.Controllers
         [ProducesDefaultResponseType(typeof(PaginatedResult<AppfeedbackDto>))]
         public async Task<IActionResult> GetAppfeedbacks([FromQuery] GetAppfeedbacksQuery query)
         {
-            try
-            {
-                var response = await _mediator.Send(query);
-                if (!response.Error)
-                    return Ok(response);
-                else
-                {
-                    var errorResponse = new BaseResponse<Exception>
-                    {
-                        Exception = response.Exception,
-                        Message = response.Message
-                    };
-                    return new ErrorHandling<Exception>(errorResponse);
-                }
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, "Please contact us for more information");
-            }
+            var response = await _mediator.Send(query);
+            return Ok(response);
         }
     }
 }

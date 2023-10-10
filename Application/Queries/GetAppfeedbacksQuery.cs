@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Application.Queries
 {
-    public class GetAppfeedbacksQuery : IRequest<BaseResponse<PaginatedResult<AppfeedbackDto>>>
+    public class GetAppfeedbacksQuery : IRequest<PaginatedResult<AppfeedbackDto>>
     {
         public string? SortBy { get; set; }
         public int Page { get; set; } = 1;
