@@ -9,8 +9,8 @@ namespace Infrastructure
     {
         private readonly postgresContext _context;
         private readonly IMapper _mapper;
-        private IUserRepository _userRepository;
-        private IAppfeedbackRepository _appfeedbackRepository;
+        private IUserRepository? _userRepository;
+        private IAppfeedbackRepository? _appfeedbackRepository;
 
         public UnitOfWork(postgresContext context, IMapper mapper)
         {

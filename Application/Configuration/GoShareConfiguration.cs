@@ -1,9 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Configuration
 {
@@ -66,5 +61,20 @@ namespace Application.Configuration
         public static string GoogleMapsApi
             => Configuration["Google:Maps:ApiKey"]!;
         #endregion
+
+        #region
+        public static Twilio TwilioAccount => new Twilio
+        {
+            AccountSid = Configuration["Twilio:AccountSid"]!,
+            AuthToken = Configuration["Twilio:AuthToken"]!,
+            VerificationSid = Configuration["Twilio:VerificationSid"]!
+        };
+        #endregion
+
+        public static SpeedSMS SpeedSMSAccount => new SpeedSMS
+        {
+            AccessToken = Configuration["SpeedSMSAPI:AccessToken"]!,
+            DeviceId = Configuration["SpeedSMSAPI:DeviceId"]!
+        };
     }
 }

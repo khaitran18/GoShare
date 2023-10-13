@@ -1,5 +1,4 @@
 using Api_Mobile.Middlewares;
-using Application.Common;
 using Application.Common.Behaviour;
 using Application.Common.Dtos;
 using Application.Common.Mappers;
@@ -18,6 +17,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using Application.Configuration;
+using Application.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,6 +63,17 @@ var mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 // Add Behaviour
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
+
+//Add twilio
+builder.Services.AddSingleton<Application.Configuration.Twilio>();
+builder.Services.AddScoped<ITwilioVerification, TwilioVerification>();
+//builder.Services.AddSingleton<IVerification>(new Verification(builder.Configuration.GetSection("Twilio").Get<Application.Common.Dtos.Twilio>()));
+builder.Services.AddSingleton<ITwilioVerification>(new TwilioVerification(GoShareConfiguration.TwilioAccount));
+
+//Add SpeedSMSAPI
+builder.Services.AddSingleton<SpeedSMS>();
+builder.Services.AddScoped<ISpeedSMSAPI, SpeedSMSAPI>();
+builder.Services.AddSingleton<ISpeedSMSAPI>(new SpeedSMSAPI(GoShareConfiguration.SpeedSMSAccount));
 
 builder.Services.AddSwaggerGen();
 

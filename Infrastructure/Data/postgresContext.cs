@@ -9,9 +9,9 @@ namespace Infrastructure.Data
 {
     public partial class postgresContext : DbContext
     {
-        private readonly IConfiguration _configuration;
+        private readonly IConfiguration? _configuration;
 
-        public postgresContext(DbContextOptions<postgresContext> options, IConfiguration configuration)
+        public postgresContext(DbContextOptions<postgresContext> options, IConfiguration? configuration)
             : base(options)
         {
             _configuration = configuration;
@@ -29,7 +29,7 @@ namespace Infrastructure.Data
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseNpgsql(_configuration["ConnectionStrings:GoShareAzure"]);
+                optionsBuilder.UseNpgsql(_configuration?["ConnectionStrings:GoShareAzure"]!);
             }
         }
 

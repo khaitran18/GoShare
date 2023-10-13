@@ -1,4 +1,6 @@
 ﻿using Application.Common.Exceptions;
+using Domain.DataModels;
+using Twilio.Exceptions;
 
 namespace Api_Mobile.Middlewares
 {
@@ -52,6 +54,17 @@ namespace Api_Mobile.Middlewares
                     var responseBody = new
                     {
                         Message = valid.Errors.Values.ToArray(),
+                        StackTrace = ex.StackTrace
+                    };
+                    await context.Response.WriteAsJsonAsync(responseBody);
+                }
+                else if (ex is TwilioException tw)
+                {
+                    context.Response.StatusCode = 503;
+                    context.Response.ContentType = "application/json";
+                    var responseBody = new
+                    {
+                        Message = "Twilio exception",
                         StackTrace = ex.StackTrace
                     };
                     await context.Response.WriteAsJsonAsync(responseBody);
