@@ -11,6 +11,8 @@ namespace Infrastructure
         private readonly IMapper _mapper;
         private IUserRepository _userRepository;
         private IAppfeedbackRepository _appfeedbackRepository;
+        private ITripRepository _tripRepository;
+        private ILocationRepository _locationRepository;
 
         public UnitOfWork(postgresContext context, IMapper mapper)
         {
@@ -20,6 +22,8 @@ namespace Infrastructure
 
         public IUserRepository UserRepository => _userRepository ??= new UserRepository(_context, _mapper);
         public IAppfeedbackRepository AppfeedbackRepository => _appfeedbackRepository ??= new AppfeedbackRepository(_context);
+        public ITripRepository TripRepository => _tripRepository ??= new TripRepository(_context);
+        public ILocationRepository LocationRepository => _locationRepository ??= new LocationRepository(_context);
 
         public void Dispose()
         {

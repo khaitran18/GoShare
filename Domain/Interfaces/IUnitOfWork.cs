@@ -4,6 +4,8 @@
     {
         IUserRepository UserRepository { get; }
         IAppfeedbackRepository AppfeedbackRepository { get; }
+        ITripRepository TripRepository { get; }
+        ILocationRepository LocationRepository { get; }
         Task Save();
     }
 }

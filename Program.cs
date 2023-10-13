@@ -18,6 +18,10 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using Application.Configuration;
+using Application.Commands;
+using Application.Commands.Handler;
+using Hangfire;
+using Hangfire.PostgreSql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +40,16 @@ GoShareConfiguration.Initialize(builder.Configuration);
 builder.Services.AddDbContext<postgresContext>(options => options.UseNpgsql(GoShareConfiguration.ConnectionString("GoShareAzure")));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+//Hangfire
+builder.Services.AddHangfire(config => config
+    .UsePostgreSqlStorage(c => c.UseNpgsqlConnection(GoShareConfiguration.ConnectionString("GoShareAzure")))
+    .UseFilter(new AutomaticRetryAttribute { Attempts = 5 }));
+builder.Services.AddHangfireServer(options =>
+{
+    options.WorkerCount = Environment.ProcessorCount * 5;
+    options.Queues = new[] { "critical", "default" };
+});
+
 // Firebase
 var credential = GoogleCredential.FromFile(GoShareConfiguration.FirebaseCredentialFile);
 FirebaseApp.Create(new AppOptions
@@ -46,8 +60,9 @@ FirebaseApp.Create(new AppOptions
 
 // Add Handler
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-builder.Services.AddScoped<IRequestHandler<TestQuery,TestDto>,TestQueryHandler>();
+builder.Services.AddScoped<IRequestHandler<TestQuery, TestDto>, TestQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<GetAppfeedbacksQuery, PaginatedResult<AppfeedbackDto>>, GetAppfeedbacksHandler>();
+builder.Services.AddScoped<IRequestHandler<CreateTripCommand, TripDto>, CreateTripHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 // Add Validator
 builder.Services.AddScoped<IValidator<TestQuery>, TestQueryValidator>();
@@ -58,6 +73,7 @@ var mapperConfig = new MapperConfiguration(cfg =>
     cfg.AddProfile<TestMapper>();
     cfg.AddProfile<AppfeedbackProfile>();
     cfg.AddProfile<UserProfile>();
+    cfg.AddProfile<TripProfile>();
 });
 var mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
@@ -78,6 +94,8 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
+
+app.UseHangfireDashboard();
 
 app.UseAuthorization();
 
