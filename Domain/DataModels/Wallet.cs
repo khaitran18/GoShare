@@ -3,15 +3,21 @@ using System.Collections.Generic;
 
 namespace Domain.DataModels
 {
-    public partial class Appfeedback
+    public partial class Wallet
     {
+        public Wallet()
+        {
+            Wallettransactions = new HashSet<Wallettransaction>();
+        }
+
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
-        public string Title { get; set; } = null!;
-        public string Content { get; set; } = null!;
+        public double Balance { get; set; }
+        public short Type { get; set; }
         public DateTime CreateTime { get; set; }
         public DateTime UpdatedTime { get; set; }
 
         public virtual User User { get; set; } = null!;
+        public virtual ICollection<Wallettransaction> Wallettransactions { get; set; }
     }
 }

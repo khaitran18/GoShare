@@ -12,8 +12,8 @@ namespace Infrastructure.Repositories
 {
     public class AppfeedbackRepository : BaseRepository<Appfeedback>, IAppfeedbackRepository
     {
-        private readonly postgresContext _context;
-        public AppfeedbackRepository(postgresContext context) : base(context)
+        private readonly GoShareContext _context;
+        public AppfeedbackRepository(GoShareContext context) : base(context)
         {
             _context = context;
         }
@@ -40,10 +40,10 @@ namespace Infrastructure.Repositories
                     //    query = query.OrderByDescending(a => a.Content.Length);
                     //    break;
                     case "time":
-                        query = query.OrderBy(a => a.Time);
+                        query = query.OrderBy(a => a.CreateTime);
                         break;
                     case "time_desc":
-                        query = query.OrderByDescending(a => a.Time);
+                        query = query.OrderByDescending(a => a.CreateTime);
                         break;
                     //case "username":
                     //    query = query.OrderBy(a => a.User.Name);
