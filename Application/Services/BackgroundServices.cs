@@ -1,6 +1,9 @@
-﻿using Application.Common.Exceptions;
+﻿using Application.Common.Dtos;
+using Application.Common.Exceptions;
 using Application.Common.Utilities.Google;
+using Application.Common.Utilities.Google.Firebase;
 using Domain.DataModels;
+using Domain.Enumerations;
 using Domain.Interfaces;
 using MediatR;
 using System;
@@ -158,7 +161,7 @@ namespace Application.Services
                 throw new NotFoundException(nameof(Trip), tripId);
             }
 
-            var origin = await trip.StartLocation;
+            var origin = trip.StartLocation;
 
             var radius = 1.0; //km
             var maxRadius = 5.0; //km
@@ -176,13 +179,15 @@ namespace Application.Services
                 {
                     foreach (var driver in drivers)
                     {
-                        var distance = await GoogleMapsApiUtilities.ComputeDistanceMatrixAsync(origin, driver.Location);
-
-                        // If this driver is nearer, update nearestDriver and shortestDistance
-                        if (distance < shortestDistance)
+                        var currentLocation = driver.Locations.FirstOrDefault(l => l.Type == LocationType.CURRENT_LOCATION);
+                        if (currentLocation != null)
                         {
-                            nearestDriver = driver;
-                            shortestDistance = distance;
+                            var distance = await GoogleMapsApiUtilities.ComputeDistanceMatrixAsync(origin, currentLocation);
+                            if (distance < shortestDistance)
+                            {
+                                nearestDriver = driver;
+                                shortestDistance = distance;
+                            }
                         }
                     }
 
@@ -210,77 +215,56 @@ namespace Application.Services
 
         private async Task<bool> NotifyDriverAndAwaitResponse(User driver, Trip trip)
         {
-            var notification = new Notification
-            {
-                Title = "New trip request",
-                Body = $"Do you want to accept a trip from {trip.StartLocation.Address} to {trip.Destination.Address}?",
-                Data = new Dictionary<string, string>
-        {
-            { "tripId", trip.Id.ToString() },
-            { "action", "accept" }
-        }
-            };
+            await FirebaseUtilities.SendNotificationToDeviceAsync(driver.DeviceToken,
+                "New trip request",
+                $"Do you want to accept a trip from { trip.StartLocation.Address} to { trip.EndLocation.Address}?",
+                new Dictionary<string, string> 
+                { 
+                    { "tripId", trip.Id.ToString() }
+                });
 
-            await SendNotificationAsync(driver.DeviceToken, notification);
-
-            await Task.Delay(TimeSpan.FromMinutes(DriverResponseTime));
+            await Task.Delay(TimeSpan.FromMinutes(2));
             var updatedTrip = await _unitOfWork.TripRepository.GetByIdAsync(trip.Id);
 
-            return updatedTrip.Status == "Going" && updatedTrip.Driver.Id == driver.Id;
+            return updatedTrip.Status == TripStatus.GOING && updatedTrip.Driver.Id == driver.Id;
         }
 
         private async Task NotifyPassengerAndFinishTripSetup(Trip trip, User driver)
         {
-            // Update the trip status, driver information, and price
-            trip.Status = "Going";
-            trip.Driver = driver;
-            trip.Price = CalculatePrice(trip); // Implement your price calculation logic
+            trip.Status = TripStatus.GOING; 
+            trip.DriverId = driver.Id; 
+            //trip.Price = CalculatePrice(trip);
 
-            // Notify the passenger
-            var passengerNotification = new Notification
-            {
-                Title = "Your trip is confirmed",
-                Body = $"Your driver is {driver.Name} and they are on the way.",
-                Data = new Dictionary<string, string>
-        {
-            { "tripId", trip.Id.ToString() },
-            { "action", "view" }
-        }
-            };
+            await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
+                "Your trip is confirmed",
+                $"Your driver is {driver.Name} and they are on the way.",
+                new Dictionary<string, string>
+                {
+                    { "tripId", trip.Id.ToString() }
+                });
 
-            await SendNotificationAsync(trip.Passenger.DeviceToken, passengerNotification);
-
-            // Update the trip in the database
             await _unitOfWork.TripRepository.UpdateAsync(trip);
         }
 
         private async Task HandleTimeoutScenario(Trip trip)
         {
-            // Update the trip status to timed out
-            await _mediator.Send(new UpdateTripCommand(trip.Id, null, "TimedOut"));
+            trip.Status = TripStatus.TIMEDOUT;
 
-            // Notify the passenger about the timeout
-            var passengerNotification = new Notification
-            {
-                Title = "Your trip request has timed out",
-                Body = $"We are sorry, we could not find any driver for your trip.",
-                Data = new Dictionary<string, string>
-        {
-            { "tripId", trip.Id.ToString() },
-            { "action", "cancel" }
-        }
-            };
+            await _unitOfWork.TripRepository.UpdateAsync(trip);
 
-            await SendNotificationAsync(trip.Passenger.DeviceToken, passengerNotification);
+            await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
+                "Your trip request has timed out",
+                $"We are sorry, we could not find any driver for your trip.",
+                new Dictionary<string, string>
+                {
+                    { "tripId", trip.Id.ToString() }
+                });
         }
 
-        private decimal CalculatePrice(Trip trip)
-        {
-            // Implement your price calculation logic here
-            // You can calculate the price based on distance, time, or any other factors
-            // and return the calculated price as a decimal.
-            // Example: return 15.00M;
-        }
+        //private decimal CalculatePrice(Trip trip)
+        //{
+            
+        //}
 
     }
 }

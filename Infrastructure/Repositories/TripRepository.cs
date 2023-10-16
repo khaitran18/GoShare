@@ -12,8 +12,8 @@ namespace Infrastructure.Repositories
 {
     public class TripRepository : BaseRepository<Trip>, ITripRepository
     {
-        private readonly postgresContext _context;
-        public TripRepository(postgresContext context) : base(context)
+        private readonly GoShareContext _context;
+        public TripRepository(GoShareContext context) : base(context)
         {
             _context = context;
         }

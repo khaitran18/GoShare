@@ -28,19 +28,19 @@ namespace Application.Commands.Handlers
 
         public async Task<TripDto> Handle(CreateTripCommand request, CancellationToken cancellationToken)
         {
-            var startLatitude = double.Parse(request.StartLatitude!);
-            var startLongitude = double.Parse(request.StartLongitude!);
-            var endLatitude = double.Parse(request.EndLatitude!);
-            var endLongitude = double.Parse(request.EndLongitude!);
+            var startLatitude = decimal.Parse(request.StartLatitude!);
+            var startLongitude = decimal.Parse(request.StartLongitude!);
+            var endLatitude = decimal.Parse(request.EndLatitude!);
+            var endLongitude = decimal.Parse(request.EndLongitude!);
 
             var origin = new Location
             {
                 Id = Guid.NewGuid(),
                 //UserId = request.PassengerId,
                 Latitude = startLatitude,
-                Longitude = startLongitude,
+                Longtitude = startLongitude,
                 Type = LocationType.CURRENT_LOCATION,
-                CreatedTime = DateTime.Now,
+                CreateTime = DateTime.Now,
                 UpdatedTime = DateTime.Now
             };
 
@@ -51,9 +51,9 @@ namespace Application.Commands.Handlers
                 Id = Guid.NewGuid(),
                 //UserId = request.PassengerId,
                 Latitude = endLatitude,
-                Longitude = endLongitude,
+                Longtitude = endLongitude,
                 Type = LocationType.PAST_DESTINATION,
-                CreatedTime = DateTime.Now,
+                CreateTime = DateTime.Now,
                 UpdatedTime = DateTime.Now
             };
 

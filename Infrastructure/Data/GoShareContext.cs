@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Configuration;
 using Domain.DataModels;
+using Application.Configuration;
 
 namespace Infrastructure.Data
 {
@@ -38,7 +39,7 @@ namespace Infrastructure.Data
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseNpgsql(_configuration?["ConnectionStrings:GoShareAzure"]!);
+                optionsBuilder.UseNpgsql(GoShareConfiguration.ConnectionString("ConnectionStrings:GoShareAzure"));
             }
         }
 
@@ -420,6 +421,10 @@ namespace Infrastructure.Data
                 entity.Property(e => e.Id)
                     .ValueGeneratedNever()
                     .HasColumnName("id");
+
+                entity.Property(e => e.Name)
+                    .HasMaxLength(50)
+                    .HasColumnName("name");
 
                 entity.Property(e => e.AvatarUrl)
                     .HasColumnType("character varying")

@@ -2,6 +2,7 @@
 using Domain.Enumerations;
 using Domain.Interfaces;
 using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +13,8 @@ namespace Infrastructure.Repositories
 {
     public class LocationRepository : BaseRepository<Location>, ILocationRepository
     {
-        private readonly postgresContext _context;
-        public LocationRepository(postgresContext context) : base(context)
+        private readonly GoShareContext _context;
+        public LocationRepository(GoShareContext context) : base(context)
         {
             _context = context;
         }

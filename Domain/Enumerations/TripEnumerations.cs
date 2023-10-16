@@ -12,6 +12,7 @@ namespace Domain.Enumerations
         GOING_TO_PICKUP = 1,
         GOING = 2,
         COMPLETED = 3,
-        CANCELED = 4
+        CANCELED = 4,
+        TIMEDOUT = 5
     }
 }

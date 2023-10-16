@@ -1,4 +1,5 @@
 ﻿using Application.Configuration;
+using Domain.DataModels;
 using GoogleMapsApi.Entities.DistanceMatrix.Response;
 using Newtonsoft.Json;
 using System;
@@ -20,12 +21,12 @@ namespace Application.Common.Utilities.Google
         /// <param name="destination"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public static async Task<double> ComputeDistanceMatrixAsync(string origin, string destination)
+        public static async Task<double> ComputeDistanceMatrixAsync(Location origin, Location destination)
         {
             IEnumerable<KeyValuePair<string, string>> parameters = new List<KeyValuePair<string, string>>()
             {
-                new KeyValuePair<string, string>("origins", origin),
-                new KeyValuePair<string, string>("destinations", destination),
+                new KeyValuePair<string, string>("origins", origin.ToString()),
+                new KeyValuePair<string, string>("destinations", destination.ToString()),
                 new KeyValuePair<string, string>("units", "metric"),
                 new KeyValuePair<string, string>("mode", "driving"),
                 new KeyValuePair<string, string>("key", GoShareConfiguration.GoogleMapsApi)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Enumerations;
+using System;
 using System.Collections.Generic;
 
 namespace Domain.DataModels
@@ -19,6 +20,7 @@ namespace Domain.DataModels
         }
 
         public Guid Id { get; set; }
+        public string Name { get; set; }
         public string Phone { get; set; } = null!;
         public bool Isdriver { get; set; }
         public bool Isverify { get; set; }
@@ -26,7 +28,7 @@ namespace Domain.DataModels
         public string AvatarUrl { get; set; } = null!;
         public string DeviceToken { get; set; } = null!;
         public Guid? GuardianId { get; set; }
-        public short Status { get; set; }
+        public UserStatus Status { get; set; }
         public DateTime CreateTime { get; set; }
         public DateTime UpdatedTime { get; set; }
 

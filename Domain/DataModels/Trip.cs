@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Enumerations;
+using System;
 using System.Collections.Generic;
 
 namespace Domain.DataModels
@@ -20,7 +21,7 @@ namespace Domain.DataModels
         public DateTime EndTime { get; set; }
         public DateTime PickupTime { get; set; }
         public double Price { get; set; }
-        public short Status { get; set; }
+        public TripStatus Status { get; set; }
         public DateTime CreateTime { get; set; }
         public DateTime UpdatedTime { get; set; }
 

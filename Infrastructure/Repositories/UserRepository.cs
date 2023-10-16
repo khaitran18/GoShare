@@ -18,19 +18,25 @@ namespace Infrastructure.Repositories
             _mapper = mapper;
         }
 
-        public async Task<List<User>> GetActiveDriversWithinRadius(ILocationRepository origin, double radius)
+        public async Task<List<User>> GetActiveDriversWithinRadius(Location origin, double radius)
         {
-            var result = new List<User>();
-            var users = await _context.Users.ToListAsync();
+            var result = new List<User>(); 
+            var users = await _context.Users
+                .Include(u => u.Locations)
+                .ToListAsync();
 
             foreach (User user in users)
             {
-                if (user.IsDriver && user.Status == UserStatus.ACTIVE)
+                if (user.Isdriver && user.Status == UserStatus.ACTIVE)
                 {
-                    double distance = GetDistance(user.Location, origin);
-                    if (distance <= radius)
+                    var currentLocation = user.Locations.FirstOrDefault(l => l.Type == LocationType.CURRENT_LOCATION);
+                    if (currentLocation != null)
                     {
-                        result.Add(user);
+                        double distance = GetDistance(currentLocation, origin);
+                        if (distance <= radius)
+                        {
+                            result.Add(user);
+                        }
                     }
                 }
             }
@@ -40,10 +46,10 @@ namespace Infrastructure.Repositories
         private double GetDistance(Location loc1, Location loc2)
         {
             const double R = 6371; //km
-            double lat1 = loc1.Latitude * Math.PI / 180;
-            double lat2 = loc2.Latitude * Math.PI / 180;
-            double lon1 = loc1.Longitude * Math.PI / 180;
-            double lon2 = loc2.Longitude * Math.PI / 180;
+            double lat1 = (double)loc1.Latitude * Math.PI / 180;
+            double lat2 = (double)loc2.Latitude * Math.PI / 180;
+            double lon1 = (double)loc1.Longtitude * Math.PI / 180;
+            double lon2 = (double)loc2.Longtitude * Math.PI / 180;
             double dLat = lat2 - lat1;
             double dLon = lon2 - lon1;
             double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) + Math.Cos(lat1) * Math.Cos(lat2) * Math.Sin(dLon / 2) * Math.Sin(dLon / 2);

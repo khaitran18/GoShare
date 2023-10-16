@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Enumerations;
+using System;
 using System.Collections.Generic;
 
 namespace Domain.DataModels
@@ -16,12 +17,17 @@ namespace Domain.DataModels
         public string? Address { get; set; }
         public decimal Latitude { get; set; }
         public decimal Longtitude { get; set; }
-        public short Type { get; set; }
+        public LocationType Type { get; set; }
         public DateTime CreateTime { get; set; }
         public DateTime UpdatedTime { get; set; }
 
         public virtual User User { get; set; } = null!;
         public virtual ICollection<Trip> TripEndLocations { get; set; }
         public virtual ICollection<Trip> TripStartLocations { get; set; }
+
+        public override string ToString()
+        {
+            return Latitude + "%2C" + Longtitude;
+        }
     }
 }
