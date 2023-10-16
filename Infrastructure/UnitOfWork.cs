@@ -7,14 +7,14 @@ namespace Infrastructure
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly postgresContext _context;
+        private readonly GoShareContext _context;
         private readonly IMapper _mapper;
         private IUserRepository _userRepository;
         private IAppfeedbackRepository _appfeedbackRepository;
         private ITripRepository _tripRepository;
         private ILocationRepository _locationRepository;
 
-        public UnitOfWork(postgresContext context, IMapper mapper)
+        public UnitOfWork(GoShareContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;

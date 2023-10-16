@@ -37,7 +37,7 @@ builder.Services.AddEndpointsApiExplorer();
 GoShareConfiguration.Initialize(builder.Configuration);
 
 // Add dependency injection
-builder.Services.AddDbContext<postgresContext>(options => options.UseNpgsql(GoShareConfiguration.ConnectionString("GoShareAzure")));
+builder.Services.AddDbContext<GoShareContext>(options => options.UseNpgsql(GoShareConfiguration.ConnectionString("GoShareAzure")));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 //Hangfire

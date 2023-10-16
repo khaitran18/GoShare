@@ -9,10 +9,10 @@ namespace Infrastructure.Repositories
 {
     public class UserRepository : BaseRepository<User>, IUserRepository
     {
-        private readonly postgresContext _context;
+        private readonly GoShareContext _context;
         private readonly IMapper _mapper;
 
-        public UserRepository(postgresContext context, IMapper mapper) : base(context)
+        public UserRepository(GoShareContext context, IMapper mapper) : base(context)
         {
             _context = context;
             _mapper = mapper;

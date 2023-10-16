@@ -11,7 +11,7 @@ namespace Domain.DataModels
         public string Content { get; set; } = null!;
         public DateTime Time { get; set; }
 
-        public virtual User ReceiverNavigation { get; set; } = null!;
-        public virtual User SenderNavigation { get; set; } = null!;
+        public virtual Fee ReceiverNavigation { get; set; } = null!;
+        public virtual Fee SenderNavigation { get; set; } = null!;
     }
 }

@@ -3,12 +3,14 @@ using System.Collections.Generic;
 
 namespace Domain.DataModels
 {
-    public partial class Carimage
+    public partial class Driverdocument
     {
         public Guid Id { get; set; }
         public Guid CarId { get; set; }
-        public short TypeId { get; set; }
-        public string Link { get; set; } = null!;
+        public short Type { get; set; }
+        public string Url { get; set; } = null!;
+        public DateTime CreateTime { get; set; }
+        public DateTime UpdateTime { get; set; }
 
         public virtual Car Car { get; set; } = null!;
     }

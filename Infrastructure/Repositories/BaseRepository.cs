@@ -6,9 +6,9 @@ namespace Infrastructure.Repositories
 {
     public class BaseRepository<T> : IBaseRepository<T> where T : class
     {
-        private readonly postgresContext _context;
+        private readonly GoShareContext _context;
 
-        public BaseRepository(postgresContext context)
+        public BaseRepository(GoShareContext context)
         {
             _context = context;
         }
