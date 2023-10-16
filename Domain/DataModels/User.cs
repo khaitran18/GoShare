@@ -24,13 +24,22 @@ namespace Domain.DataModels
         public string Phone { get; set; } = null!;
         public bool Isdriver { get; set; }
         public bool Isverify { get; set; }
-        public string DisabledReason { get; set; } = null!;
-        public string AvatarUrl { get; set; } = null!;
-        public string DeviceToken { get; set; } = null!;
+        public string? DisabledReason { get; set; }
+        public string? AvatarUrl { get; set; }
+        public string? DeviceToken { get; set; }
         public Guid? GuardianId { get; set; }
         public UserStatus Status { get; set; }
         public DateTime CreateTime { get; set; }
         public DateTime UpdatedTime { get; set; }
+        public string? RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpiryTime { get; set; }
+        public short? Gender { get; set; }
+        public string? Passcode { get; set; }
+        public string Otp { get; set; } = null!;
+        public DateTime OtpExpiryTime { get; set; }
+        public DateTime Birth { get; set; }
+        public string? PasscodeResetToken { get; set; }
+        public DateTime? PasscodeResetTokenExpiryTime { get; set; }
 
         public virtual User? Guardian { get; set; }
         public virtual ICollection<Appfeedback> Appfeedbacks { get; set; }

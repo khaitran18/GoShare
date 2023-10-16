@@ -9,7 +9,7 @@ namespace Application.Service
 {
     public interface ITokenService
     {
-        public string GenerateJWTToken((int userId, string userName, string roles) userDetails);
+        public string GenerateJWTToken(Guid id, string phone, string? name);
 
         public string GenerateRefreshToken();
 
@@ -20,6 +20,7 @@ namespace Application.Service
         /// <param name="jwtToken"></param>
         /// <returns></returns>
         public ClaimsPrincipal? ValidateToken(string jwtToken);
+        public DateTime CreateRefreshTokenExpiryTime();
     }
     public class TokenService : ITokenService
     {
@@ -27,27 +28,27 @@ namespace Application.Service
         private readonly string _issuer;
         private readonly string _audience;
         private readonly string _expiryMinutes;
+        private readonly string _refreshTokenExpiryTime;
 
-        public TokenService(string key, string issuer, string audience, string expiryMinutes)
+        public TokenService(string key, string expiryMinutes, string refreshTokenExpiryTime, string issuer, string audience)
         {
             _key = key;
+            _expiryMinutes = expiryMinutes;
+            _refreshTokenExpiryTime = refreshTokenExpiryTime;
             _issuer = issuer;
             _audience = audience;
-            _expiryMinutes = expiryMinutes;
         }
 
-        public string GenerateJWTToken((int userId, string userName, string roles) userDetails)
+        public string GenerateJWTToken(Guid id, string phone, string? name)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key));
             var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-            var (userId, userName, roles) = userDetails;
-
             var claims = new List<Claim>()
             {
-                new Claim(JwtRegisteredClaimNames.Sub, userName),
-                new Claim(JwtRegisteredClaimNames.Jti, userId.ToString()),
-                new Claim("username", userName),
-                new Claim(ClaimTypes.Role,roles)
+                new Claim("id", id.ToString()),
+                new Claim("phone", phone),
+                new Claim("name", name!),
+ //               new Claim(ClaimTypes.Role,roles)
             };
 
             var token = new JwtSecurityToken(
@@ -72,6 +73,11 @@ namespace Application.Service
             }
         }
 
+        public DateTime CreateRefreshTokenExpiryTime()
+        {
+            return DateTime.Now.AddMinutes(Convert.ToDouble(_refreshTokenExpiryTime));
+        }
+
         public ClaimsPrincipal? ValidateToken(string jwtToken)
         {
             if (jwtToken == "")
@@ -88,9 +94,7 @@ namespace Application.Service
             IdentityModelEventSource.ShowPII = true;
             SecurityToken validatedToken;
             TokenValidationParameters validationParameters = new TokenValidationParameters();
-
             validationParameters.ValidateLifetime = true;
-
             validationParameters.ValidAudience = _audience.ToLower();
             validationParameters.ValidIssuer = _issuer.ToLower();
             validationParameters.IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key));

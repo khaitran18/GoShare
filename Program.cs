@@ -22,6 +22,13 @@ using Application.Commands;
 using Application.Commands.Handlers;
 using Hangfire;
 using Hangfire.PostgreSql;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Application.Service;
+using Application.Commands;
+using Application.Commands.Handlers;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +42,36 @@ builder.Services.AddEndpointsApiExplorer();
 
 // Initialize Configuration
 GoShareConfiguration.Initialize(builder.Configuration);
+
+
+//JWT Config
+
+var _key = GoShareConfiguration.jwt.key;
+var _expirtyMinutes = GoShareConfiguration.jwt.expiryTime;
+var _refreshTokenExpirtyMinutes = GoShareConfiguration.jwt.refreshTokenExpiryTime;
+var _issuer = GoShareConfiguration.jwt.issuer;
+var _audience = GoShareConfiguration.jwt.audience;
+
+builder.Services.AddAuthentication(x =>
+{
+    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(x =>
+{
+    x.RequireHttpsMetadata = false;
+    x.SaveToken = true;
+    x.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key)),
+        ClockSkew = TimeSpan.FromMinutes(Convert.ToDouble(_expirtyMinutes))
+    };
+});
+builder.Services.AddSingleton<ITokenService>(new TokenService(_key,_expirtyMinutes,_refreshTokenExpirtyMinutes,_issuer,_audience));
 
 // Add dependency injection
 builder.Services.AddDbContext<GoShareContext>(options => options.UseNpgsql(GoShareConfiguration.ConnectionString("GoShareAzure")));
@@ -63,7 +100,15 @@ builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<IRequestHandler<TestQuery, TestDto>, TestQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<GetAppfeedbacksQuery, PaginatedResult<AppfeedbackDto>>, GetAppfeedbacksHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateTripCommand, TripDto>, CreateTripHandler>();
+builder.Services.AddScoped<IRequestHandler<AuthCommand,TokenResponse>, AuthCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<RegisterCommand,Task>, RegisterCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<VerifyCommand, string>, VerifyCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<ResendOtpCommand, Task>, ResendOtpCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<SetPasscodeCommand, Task>, SetPasscodeCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<RefreshTokenCommand, string>, RefreshTokenCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<RevokeCommand, Task>, RevokeCommandHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+
 // Add Validator
 builder.Services.AddScoped<IValidator<TestQuery>, TestQueryValidator>();
 
@@ -94,7 +139,7 @@ builder.Services.AddSingleton<ISpeedSMSAPI>(new SpeedSMSAPI(GoShareConfiguration
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GoShareContext))]
-    partial class GoShareContextModelSnapshot : ModelSnapshot
+    [Migration("20231015172858_AddExpiryTimeOtp")]
+    partial class AddExpiryTimeOtp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -422,25 +424,18 @@ namespace Infrastructure.Migrations
                         .HasColumnName("id");
 
                     b.Property<string>("AvatarUrl")
-                        .IsRequired()
                         .HasColumnType("character varying")
                         .HasColumnName("avatar_url");
-
-                    b.Property<DateTime>("Birth")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("birth");
 
                     b.Property<DateTime>("CreateTime")
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("create_time");
 
                     b.Property<string>("DeviceToken")
-                        .IsRequired()
                         .HasColumnType("character varying")
                         .HasColumnName("device_token");
 
                     b.Property<string>("DisabledReason")
-                        .IsRequired()
                         .HasColumnType("character varying")
                         .HasColumnName("disabled_reason");
 
@@ -461,11 +456,8 @@ namespace Infrastructure.Migrations
                         .HasColumnName("isverify");
 
                     b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasColumnType("character varying")
                         .HasColumnName("name");
-
 
                     b.Property<string>("Otp")
                         .IsRequired()
@@ -477,18 +469,8 @@ namespace Infrastructure.Migrations
                         .HasColumnName("otp_expiry_time");
 
                     b.Property<string>("Passcode")
-                        .IsRequired()
                         .HasColumnType("character varying")
                         .HasColumnName("passcode");
-
-                    b.Property<string>("PasscodeResetToken")
-                        .HasColumnType("character varying")
-                        .HasColumnName("passcode_reset_token");
-
-                    b.Property<DateTime>("PasscodeResetTokenExpiryTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("passcode_reset_token_expiry_time");
-
 
                     b.Property<string>("Phone")
                         .IsRequired()
