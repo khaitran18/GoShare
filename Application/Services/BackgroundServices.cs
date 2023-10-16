@@ -215,7 +215,7 @@ namespace Application.Services
 
         private async Task<bool> NotifyDriverAndAwaitResponse(User driver, Trip trip)
         {
-            await FirebaseUtilities.SendNotificationToDeviceAsync(driver.DeviceToken,
+            await FirebaseUtilities.SendNotificationToDeviceAsync(driver.DeviceToken!,
                 "New trip request",
                 $"Do you want to accept a trip from { trip.StartLocation.Address} to { trip.EndLocation.Address}?",
                 new Dictionary<string, string> 
@@ -235,7 +235,7 @@ namespace Application.Services
             trip.DriverId = driver.Id; 
             //trip.Price = CalculatePrice(trip);
 
-            await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
+            await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken!,
                 "Your trip is confirmed",
                 $"Your driver is {driver.Name} and they are on the way.",
                 new Dictionary<string, string>
@@ -252,7 +252,7 @@ namespace Application.Services
 
             await _unitOfWork.TripRepository.UpdateAsync(trip);
 
-            await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
+            await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken!,
                 "Your trip request has timed out",
                 $"We are sorry, we could not find any driver for your trip.",
                 new Dictionary<string, string>
