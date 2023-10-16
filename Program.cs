@@ -17,8 +17,9 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using Application.Configuration;
+using Application.Services;
 using Application.Commands;
-using Application.Commands.Handler;
+using Application.Commands.Handlers;
 using Hangfire;
 using Hangfire.PostgreSql;
 

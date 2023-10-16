@@ -1,4 +1,5 @@
 ﻿using Application.Common.Exceptions;
+using Application.Common.Utilities.Google;
 using Domain.DataModels;
 using Domain.Interfaces;
 using MediatR;
@@ -159,8 +160,8 @@ namespace Application.Services
 
             var origin = await trip.StartLocation;
 
-            var radius = 1;
-            var maxRadius = 5;
+            var radius = 1.0; //km
+            var maxRadius = 5.0; //km
             var startTime = DateTime.Now;
             var timeout = TimeSpan.FromMinutes(5); // Set a timeout for finding a driver
 
@@ -169,7 +170,7 @@ namespace Application.Services
                 var nearestDriver = new User();
                 double shortestDistance = double.MaxValue;
                 // Get all the available drivers within the current radius
-                var drivers = await _unitOfWork.UserRepository.GetDriversWithinRadius(origin, radius);
+                var drivers = await _unitOfWork.UserRepository.GetActiveDriversWithinRadius(origin, radius); //Haversine formula
 
                 if (drivers.Any())
                 {
@@ -184,20 +185,15 @@ namespace Application.Services
                             shortestDistance = distance;
                         }
                     }
-                    // Sort the drivers by distance using Google Matrix API
-                    drivers = drivers.OrderBy(d => await GoogleMapsApiUtilities.ComputeDistanceMatrixAsync(origin, d.Location));
 
-                    foreach (var driver in drivers)
+                    // Send a trip request to the driver
+                    var accepted = await NotifyDriverAndAwaitResponse(nearestDriver, trip);
+
+                    if (accepted)
                     {
-                        // Send a trip request to the driver
-                        var accepted = await NotifyDriverAndAwaitResponse(driver, trip);
-
-                        if (accepted)
-                        {
-                            // The driver accepted the trip
-                            await NotifyPassengerAndFinishTripSetup(trip, driver);
-                            return;
-                        }
+                        // The driver accepted the trip
+                        await NotifyPassengerAndFinishTripSetup(trip, nearestDriver);
+                        return;
                     }
                 }
 
@@ -217,7 +213,7 @@ namespace Application.Services
             var notification = new Notification
             {
                 Title = "New trip request",
-                Body = $"Do you want to accept a trip from {trip.StartLocation} to {trip.Destination}?",
+                Body = $"Do you want to accept a trip from {trip.StartLocation.Address} to {trip.Destination.Address}?",
                 Data = new Dictionary<string, string>
         {
             { "tripId", trip.Id.ToString() },
@@ -256,7 +252,6 @@ namespace Application.Services
 
             // Update the trip in the database
             await _unitOfWork.TripRepository.UpdateAsync(trip);
-            await _unitOfWork.SaveChangesAsync();
         }
 
         private async Task HandleTimeoutScenario(Trip trip)

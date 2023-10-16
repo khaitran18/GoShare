@@ -13,7 +13,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Commands.Handler
+namespace Application.Commands.Handlers
 {
     public class CreateTripHandler : IRequestHandler<CreateTripCommand, TripDto>
     {
