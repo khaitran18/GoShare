@@ -76,5 +76,13 @@ namespace Application.Configuration
             AccessToken = Configuration["SpeedSMSAPI:AccessToken"]!,
             DeviceId = Configuration["SpeedSMSAPI:DeviceId"]!
         };
+        public static Jwt jwt => new Jwt
+        {
+            key = Configuration["Jwt:Key"]!,
+            expiryTime = Configuration["Jwt:ExpiryMinutes"]!,
+            refreshTokenExpiryTime = Configuration["Jwt:RefreshTokenExpiryMinutes"]!,
+            issuer = Configuration["Jwt:Issuer"]!,
+            audience = Configuration["Jwt:Audience"]!
+        };
     }
 }

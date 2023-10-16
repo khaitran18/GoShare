@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.Extensions.Configuration;
 using Domain.DataModels;
 using Application.Configuration;
+using Microsoft.Extensions.Configuration;
 
 namespace Infrastructure.Data
 {
@@ -18,7 +18,9 @@ namespace Infrastructure.Data
         public GoShareContext(DbContextOptions<GoShareContext> options, IConfiguration? configuration)
             : base(options)
         {
+
             _configuration = configuration;
+
         }
 
         public virtual DbSet<Appfeedback> Appfeedbacks { get; set; } = null!;
@@ -430,6 +432,11 @@ namespace Infrastructure.Data
                     .HasColumnType("character varying")
                     .HasColumnName("avatar_url");
 
+                entity.Property(e => e.Birth)
+                    .HasColumnType("timestamp without time zone")
+                    .HasColumnName("birth")
+                    .HasDefaultValueSql("'-infinity'::timestamp without time zone");
+
                 entity.Property(e => e.CreateTime)
                     .HasColumnType("timestamp without time zone")
                     .HasColumnName("create_time");
@@ -442,15 +449,53 @@ namespace Infrastructure.Data
                     .HasColumnType("character varying")
                     .HasColumnName("disabled_reason");
 
+                entity.Property(e => e.Gender).HasColumnName("gender");
+
                 entity.Property(e => e.GuardianId).HasColumnName("guardian_id");
 
                 entity.Property(e => e.Isdriver).HasColumnName("isdriver");
 
                 entity.Property(e => e.Isverify).HasColumnName("isverify");
 
+                entity.Property(e => e.Name)
+                    .HasColumnType("character varying")
+                    .HasColumnName("name")
+                    .HasDefaultValueSql("''::character varying");
+
+                entity.Property(e => e.Otp)
+                    .HasColumnType("character varying")
+                    .HasColumnName("otp");
+
+                entity.Property(e => e.OtpExpiryTime)
+                    .HasColumnType("timestamp without time zone")
+                    .HasColumnName("otp_expiry_time")
+                    .HasDefaultValueSql("'-infinity'::timestamp without time zone");
+
+                entity.Property(e => e.Passcode)
+                    .HasColumnType("character varying")
+                    .HasColumnName("passcode")
+                    .HasDefaultValueSql("''::character varying");
+
+                entity.Property(e => e.PasscodeResetToken)
+                    .HasColumnType("character varying")
+                    .HasColumnName("passcode_reset_token");
+
+                entity.Property(e => e.PasscodeResetTokenExpiryTime)
+                    .HasColumnType("timestamp without time zone")
+                    .HasColumnName("passcode_reset_token_expiry_time")
+                    .HasDefaultValueSql("'-infinity'::timestamp without time zone");
+
                 entity.Property(e => e.Phone)
                     .HasMaxLength(15)
                     .HasColumnName("phone");
+
+                entity.Property(e => e.RefreshToken)
+                    .HasColumnType("character varying")
+                    .HasColumnName("refresh_token");
+
+                entity.Property(e => e.RefreshTokenExpiryTime)
+                    .HasColumnType("timestamp without time zone")
+                    .HasColumnName("refresh_token_expiry_time");
 
                 entity.Property(e => e.Status).HasColumnName("status");
 

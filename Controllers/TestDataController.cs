@@ -1,4 +1,5 @@
 ﻿using Application.Common;
+using Application.Common.Utilities;
 using Application.Queries;
 using Application.Services;
 using Domain.Interfaces;
@@ -36,12 +37,12 @@ namespace Api_Mobile.Controllers
             return Ok();
         }
 
-        [HttpPost("SpeedSMS")]
-        public async Task<IActionResult> SpeedApiSendOtp([FromQuery] string[] phone)
-        {
-            var verification = await _SpeedSMSAPI.sendSMS(phone,"Ma OTP cua ban la:",5);
-            return Ok();
-        }
+        //[HttpPost("SpeedSMS")]
+        //public async Task<IActionResult> SpeedApiSendOtp([FromQuery] string phone)
+        //{
+        //    var verification = await _SpeedSMSAPI.sendSMS(phone,"Ma OTP cua ban la: "+OtpUtils.Generate(),5);
+        //    return Ok(verification);
+        //}
 
         [HttpPost("TwilioVerify")]
         public async Task<IActionResult> CheckOtp([FromQuery] string phone = "+84919651361", string? code="")
