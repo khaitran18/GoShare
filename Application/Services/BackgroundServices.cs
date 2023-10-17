@@ -18,139 +18,13 @@ namespace Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMediator _mediator;
+        private Dictionary<Guid, TaskCompletionSource<bool>> tripConfirmationTasks = new Dictionary<Guid, TaskCompletionSource<bool>>();
 
         public BackgroundServices(IUnitOfWork unitOfWork, IMediator mediator)
         {
             _unitOfWork = unitOfWork;
             _mediator = mediator;
         }
-
-        //public async void FindDriver(Guid tripId)
-        //{
-        //    var trip = await _unitOfWork.TripRepository.GetByIdAsync(tripId);
-
-        //    if (trip == null)
-        //    {
-        //        throw new NotFoundException(nameof(Trip), tripId);
-        //    }
-
-        //    var origin = await trip.StartLocation;
-
-        //    var radius = 1;
-        //    var step = 1;
-        //    var maxRadius = 5;
-        //    var startTime = DateTime.Now;
-
-        //    // Loop until a driver is found or the timeout is reached
-        //    while (true)
-        //    {
-        //        // Get all the drivers from the database using the repository pattern
-        //        var drivers = await _unitOfWork.UserRepository.GetAllAsync(u => u.Role == "Driver");
-
-        //        // Filter the drivers by their availability and location within the radius
-        //        drivers = drivers.Where(d => d.Location != null && IsWithinRadius(origin, d.Location, radius));
-
-        //        // If no drivers are found, increase the radius and continue the loop
-        //        if (!drivers.Any())
-        //        {
-        //            radius += step;
-        //            if (radius > maxRadius)
-        //            {
-        //                radius = maxRadius;
-        //            }
-        //            continue;
-        //        }
-
-        //        // Sort the drivers by their distance to the origin using Google Matrix API
-        //        drivers = drivers.OrderBy(d => GetDistance(origin, d.Location));
-
-        //        // Loop through the drivers and send them a notification using Firebase Cloud Messaging
-        //        foreach (var driver in drivers)
-        //        {
-        //            var notification = new Notification
-        //            {
-        //                Title = "New trip request",
-        //                Body = $"Do you want to accept a trip from {origin} to {trip.Destination}?",
-        //                Data = new Dictionary<string, string>
-        //            {
-        //                { "tripId", trip.Id.ToString() },
-        //                { "action", "accept" }
-        //            }
-        //            };
-
-        //            await SendNotificationAsync(driver.DeviceToken, notification);
-
-        //            // Wait for the driver response time and check if the driver accepted the trip
-        //            await Task.Delay(TimeSpan.FromMinutes(DriverResponseTime));
-        //            var updatedTrip = await _unitOfWork.Trips.GetByIdAsync(trip.Id);
-
-        //            if (updatedTrip.Status == "Going" && updatedTrip.Driver.Id == driver.Id)
-        //            {
-        //                // The driver accepted the trip, send a notification to the passenger and return
-        //                var passengerNotification = new Notification
-        //                {
-        //                    Title = "Your trip is confirmed",
-        //                    Body = $"Your driver is {driver.Name} and he/she is on the way.",
-        //                    Data = new Dictionary<string, string>
-        //                {
-        //                    { "tripId", trip.Id.ToString() },
-        //                    { "action", "view" }
-        //                }
-        //                };
-
-        //                await SendNotificationAsync(trip.Passenger.DeviceToken, passengerNotification);
-        //                return;
-        //            }
-        //        }
-
-        //        // If none of the drivers accepted the trip, check if the timeout is reached
-        //        var currentTime = DateTime.Now;
-        //        var elapsedTime = currentTime - startTime;
-
-        //        if (elapsedTime.TotalMinutes >= Timeout)
-        //        {
-        //            // The timeout is reached, update the trip status to timed out and send a notification to the passenger
-        //            await _mediator.Send(new UpdateTripCommand(trip.Id, null, "TimedOut"));
-
-        //            var passengerNotification = new Notification
-        //            {
-        //                Title = "Your trip request has timed out",
-        //                Body = $"We are sorry, we could not find any driver for your trip.",
-        //                Data = new Dictionary<string, string>
-        //            {
-        //                { "tripId", trip.Id.ToString() },
-        //                { "action", "cancel" }
-        //            }
-        //            };
-
-        //            await SendNotificationAsync(trip.Passenger.DeviceToken, passengerNotification);
-        //            return;
-        //        }
-        //    }
-        //}
-
-        //private bool IsWithinRadius(Location origin, Location destination, double radius)
-        //{
-        //    // Calculate the distance between two locations using Haversine formula
-        //    var earthRadius = 6371.0; // Earth radius in km
-        //    var lat1 = origin.Latitude * Math.PI / 180.0; // Convert degrees to radians
-        //    var lon1 = origin.Longitude * Math.PI / 180.0;
-        //    var lat2 = destination.Latitude * Math.PI / 180.0;
-        //    var lon2 = destination.Longitude * Math.PI / 180.0;
-        //    var dLat = lat2 - lat1;
-        //    var dLon = lon2 - lon1;
-
-        //    var a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
-        //            Math.Cos(lat1) * Math.Cos(lat2) *
-        //            Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
-
-        //    var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
-
-        //    var distance = earthRadius * c; // Distance in km
-
-        //    // Check if the distance is less than or equal to the radius
-        //    return distance <= radius;
-        //}
 
         public async Task FindDriver(Guid tripId)
         {
@@ -167,6 +41,9 @@ namespace Application.Services
             var maxRadius = 5.0; //km
             var startTime = DateTime.Now;
             var timeout = TimeSpan.FromMinutes(5); // Set a timeout for finding a driver
+
+            var tripConfirmationTask = new TaskCompletionSource<bool>();
+            tripConfirmationTasks.Add(tripId, tripConfirmationTask);
 
             while (DateTime.Now - startTime < timeout)
             {
@@ -196,8 +73,8 @@ namespace Application.Services
 
                     if (accepted)
                     {
-                        // The driver accepted the trip
-                        await NotifyPassengerAndFinishTripSetup(trip, nearestDriver);
+                        tripConfirmationTask.SetResult(true);
+                        tripConfirmationTasks.Remove(tripId); // Remove the task from the dictionary
                         return;
                     }
                 }
@@ -231,7 +108,7 @@ namespace Application.Services
 
         private async Task NotifyPassengerAndFinishTripSetup(Trip trip, User driver)
         {
-            trip.Status = TripStatus.GOING; 
+            trip.Status = TripStatus.GOING;
             trip.DriverId = driver.Id; 
             //trip.Price = CalculatePrice(trip);
 

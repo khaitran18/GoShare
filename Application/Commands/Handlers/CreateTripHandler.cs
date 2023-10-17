@@ -35,7 +35,7 @@ namespace Application.Commands.Handlers
             var tripDto = new TripDto();
 
             //ClaimsPrincipal claims = _tokenService.ValidateToken(Token ?? "");
-            ClaimsPrincipal claims = _tokenService.ValidateToken("");
+            ClaimsPrincipal? claims = _tokenService.ValidateToken("");
             if (claims != null)
             {
                 Guid.TryParse(claims.FindFirst("jti")?.Value, out Guid userId);
