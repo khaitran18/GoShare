@@ -106,6 +106,7 @@ builder.Services.AddScoped<IRequestHandler<ResendOtpCommand, Task>, ResendOtpCom
 builder.Services.AddScoped<IRequestHandler<SetPasscodeCommand, Task>, SetPasscodeCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<RefreshTokenCommand, string>, RefreshTokenCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<RevokeCommand, Task>, RevokeCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<ConfirmPassengerCommand, bool>, ConfirmPassengerHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
 // Add Validator

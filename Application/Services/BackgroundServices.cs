@@ -1,5 +1,6 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Exceptions;
+using Application.Common.Utilities;
 using Application.Common.Utilities.Google;
 using Application.Common.Utilities.Google.Firebase;
 using Domain.DataModels;
@@ -18,7 +19,6 @@ namespace Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMediator _mediator;
-        private Dictionary<Guid, TaskCompletionSource<bool>> tripConfirmationTasks = new Dictionary<Guid, TaskCompletionSource<bool>>();
 
         public BackgroundServices(IUnitOfWork unitOfWork, IMediator mediator)
         {
@@ -69,8 +69,7 @@ namespace Application.Services
                         }
                     }
 
-                    var tripConfirmationTask = new TaskCompletionSource<bool>();
-                    tripConfirmationTasks.Add(tripId, tripConfirmationTask);
+                    KeyValueStore.Instance.Set($"TripConfirmationTask_{trip.Id}", "");
 
                     // Send a trip request to the driver
                     var accepted = await NotifyDriverAndAwaitResponse(nearestDriver, trip);
@@ -78,13 +77,14 @@ namespace Application.Services
                     if (accepted)
                     {
                         await NotifyBackToPassenger(trip, nearestDriver);
+                        KeyValueStore.Instance.Remove($"TripConfirmationTask_{trip.Id}");
                         return; // Driver found, exit the loop
                     }
                     else
                     {
                         // Driver canceled or didn't respond, exclude the driver
                         driversToExclude.Add(nearestDriver);
-                        tripConfirmationTasks.Remove(tripId);
+                        KeyValueStore.Instance.Remove($"TripConfirmationTask_{trip.Id}");
                     }
                 }
 
@@ -101,8 +101,6 @@ namespace Application.Services
 
         private async Task<bool> NotifyDriverAndAwaitResponse(User driver, Trip trip)
         {
-            var tripConfirmationTask = tripConfirmationTasks[trip.Id];
-
             string content = (trip.StartLocation.Address == null || trip.EndLocation.Address == null)
                 ? "Bạn có yêu cầu chuyến xe mới"
                 : $"Bạn có muốn đón khách từ {trip.StartLocation.Address} đi {trip.EndLocation.Address} không?";
@@ -112,15 +110,29 @@ namespace Application.Services
                 content,
                 new Dictionary<string, string>
                 {
-                    { "tripId", trip.Id.ToString() }
+            { "tripId", trip.Id.ToString() }
                 });
 
-            // Wait for the driver's response with a two-minute timeout
-            var completedTask = await Task.WhenAny(tripConfirmationTask.Task, Task.Delay(TimeSpan.FromMinutes(2)));
+            // Set a two-minute timeout for driver response
+            var timeoutTask = Task.Delay(TimeSpan.FromMinutes(2));
 
-            if (completedTask == tripConfirmationTask.Task)
+            var key = $"TripConfirmationTask_{trip.Id}";
+            var status = KeyValueStore.Instance.Get<string>(key);
+
+            // Wait for either driver response or timeout
+            var completedTask = await Task.WhenAny(Task.FromResult(status), timeoutTask);
+
+            if (completedTask == timeoutTask)
             {
-                return tripConfirmationTask.Task.Result;
+                return false;
+            }
+            else if (status == "true")
+            {
+                return true;
+            }
+            else if (status == "false")
+            {
+                return false;
             }
             else
             {

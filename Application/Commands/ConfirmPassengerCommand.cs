@@ -9,6 +9,7 @@ namespace Application.Commands
 {
     public class ConfirmPassengerCommand : IRequest<bool>
     {
+        public string? Token { get; set; }
         public Guid TripId { get; set; }
         //public Guid? DriverId { get; set; }
         public bool Accept { get; set; }

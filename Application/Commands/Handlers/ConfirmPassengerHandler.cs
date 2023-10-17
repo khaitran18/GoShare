@@ -14,12 +14,12 @@ using System.Threading.Tasks;
 
 namespace Application.Commands.Handlers
 {
-    public class AcceptPassengerHandler : IRequestHandler<ConfirmPassengerCommand, bool>
+    public class ConfirmPassengerHandler : IRequestHandler<ConfirmPassengerCommand, bool>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ITokenService _tokenService;
 
-        public AcceptPassengerHandler(IUnitOfWork unitOfWork, ITokenService tokenService)
+        public ConfirmPassengerHandler(IUnitOfWork unitOfWork, ITokenService tokenService)
         {
             _unitOfWork = unitOfWork;
             _tokenService = tokenService;
@@ -36,7 +36,7 @@ namespace Application.Commands.Handlers
 
             if (request.Accept)
             {
-                ClaimsPrincipal? claims = _tokenService.ValidateToken("");
+                ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
                 if (claims != null)
                 {
                     Guid.TryParse(claims.FindFirst("jti")?.Value, out Guid driverId);
@@ -44,12 +44,12 @@ namespace Application.Commands.Handlers
                     trip.Status = TripStatus.GOING_TO_PICKUP;
                     trip.UpdatedTime = DateTime.Now;
 
-                    KeyValueStore.Instance.Set($"TripConfirmationTask_{trip.Id}", true);
+                    KeyValueStore.Instance.Set($"TripConfirmationTask_{trip.Id}", "true");
                 }
             }
             else
             {
-                KeyValueStore.Instance.Set($"TripConfirmationTask_{trip.Id}", false);
+                KeyValueStore.Instance.Set($"TripConfirmationTask_{trip.Id}", "false");
             }
 
             await _unitOfWork.TripRepository.UpdateAsync(trip);

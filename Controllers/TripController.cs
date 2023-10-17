@@ -21,6 +21,8 @@ namespace Api_Mobile.Controllers
         [ProducesDefaultResponseType(typeof(TripDto))]
         public async Task<IActionResult> CreateTrip([FromBody] CreateTripCommand command)
         {
+            var authorization = HttpContext.Request.Headers["Authorization"].ToString();
+            command.Token = authorization;
             var response = await _mediator.Send(command);
             return Ok(response);
         }
@@ -28,6 +30,8 @@ namespace Api_Mobile.Controllers
         [HttpPost("accept")]
         public async Task<IActionResult> AcceptPassenger([FromBody] ConfirmPassengerCommand command)
         {
+            var authorization = HttpContext.Request.Headers["Authorization"].ToString();
+            command.Token = authorization;
             var response = await _mediator.Send(command);
             return Ok(response);
         }
@@ -35,6 +39,8 @@ namespace Api_Mobile.Controllers
         [HttpPost("deny")]
         public async Task<IActionResult> DenyPassenger([FromBody] ConfirmPassengerCommand command)
         {
+            var authorization = HttpContext.Request.Headers["Authorization"].ToString();
+            command.Token = authorization;
             var response = await _mediator.Send(command);
             return Ok(response);
         }

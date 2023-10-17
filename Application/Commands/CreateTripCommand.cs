@@ -11,6 +11,7 @@ namespace Application.Commands
 {
     public class CreateTripCommand : IRequest<TripDto>
     {
+        public string? Token { get; set; }
         //[JsonProperty("user_id")]
         //public Guid PassengerId { get; set; }
         public string? StartLatitude { get; set; }
