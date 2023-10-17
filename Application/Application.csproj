@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-	  <Folder Include="Commands\" />
     <Folder Include="Common\Mappers\" />
     <Folder Include="Services\Interfaces\" />
   </ItemGroup>
