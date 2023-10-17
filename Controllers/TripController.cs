@@ -24,5 +24,19 @@ namespace Api_Mobile.Controllers
             var response = await _mediator.Send(command);
             return Ok(response);
         }
+
+        [HttpPost("accept")]
+        public async Task<IActionResult> AcceptPassenger([FromBody] ConfirmPassengerCommand command)
+        {
+            var response = await _mediator.Send(command);
+            return Ok(response);
+        }
+
+        [HttpPost("deny")]
+        public async Task<IActionResult> DenyPassenger([FromBody] ConfirmPassengerCommand command)
+        {
+            var response = await _mediator.Send(command);
+            return Ok(response);
+        }
     }
 }

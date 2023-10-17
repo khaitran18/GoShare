@@ -26,9 +26,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Application.Service;
-using Application.Commands;
-using Application.Commands.Handlers;
-
+using Application.Common.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -76,6 +74,7 @@ builder.Services.AddSingleton<ITokenService>(new TokenService(_key,_expirtyMinut
 // Add dependency injection
 builder.Services.AddDbContext<GoShareContext>(options => options.UseNpgsql(GoShareConfiguration.ConnectionString("GoShareAzure")));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddSingleton<KeyValueStore>();
 
 //Hangfire
 builder.Services.AddHangfire(config => config

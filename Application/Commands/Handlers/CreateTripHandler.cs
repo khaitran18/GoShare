@@ -52,6 +52,7 @@ namespace Application.Commands.Handlers
                     {
                         Id = Guid.NewGuid(),
                         UserId = userId,
+                        Address = request.StartAddress,
                         Latitude = startLatitude,
                         Longtitude = startLongitude,
                         Type = LocationType.CURRENT_LOCATION,
@@ -63,6 +64,7 @@ namespace Application.Commands.Handlers
                 }
                 else
                 {
+                    origin.Address = request.StartAddress;
                     origin.Latitude = startLatitude;
                     origin.Longtitude = startLongitude;
                     origin.UpdatedTime = DateTime.Now;
@@ -74,6 +76,7 @@ namespace Application.Commands.Handlers
                 {
                     Id = Guid.NewGuid(),
                     UserId = userId,
+                    Address = request.EndAddress,
                     Latitude = endLatitude,
                     Longtitude = endLongitude,
                     Type = LocationType.PAST_DESTINATION,
@@ -90,6 +93,8 @@ namespace Application.Commands.Handlers
                     StartLocationId = origin.Id,
                     EndLocationId = destination.Id,
                     StartTime = DateTime.Now,
+                    CreateTime = DateTime.Now,
+                    UpdatedTime= DateTime.Now,
                     Status = TripStatus.PENDING
                 };
 

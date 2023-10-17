@@ -42,15 +42,16 @@ namespace Application.Services
             var startTime = DateTime.Now;
             var timeout = TimeSpan.FromMinutes(5); // Set a timeout for finding a driver
 
-            var tripConfirmationTask = new TaskCompletionSource<bool>();
-            tripConfirmationTasks.Add(tripId, tripConfirmationTask);
+            var driversToExclude = new List<User>();
 
             while (DateTime.Now - startTime < timeout)
             {
                 var nearestDriver = new User();
                 double shortestDistance = double.MaxValue;
-                // Get all the available drivers within the current radius
-                var drivers = await _unitOfWork.UserRepository.GetActiveDriversWithinRadius(origin, radius); //Haversine formula
+                // Get all the available drivers within the current radius, excluding those in the exclusion list
+                var drivers = (await _unitOfWork.UserRepository.GetActiveDriversWithinRadius(origin, radius))
+                    .Where(driver => !driversToExclude.Contains(driver))
+                    .ToList();
 
                 if (drivers.Any())
                 {
@@ -68,14 +69,22 @@ namespace Application.Services
                         }
                     }
 
+                    var tripConfirmationTask = new TaskCompletionSource<bool>();
+                    tripConfirmationTasks.Add(tripId, tripConfirmationTask);
+
                     // Send a trip request to the driver
                     var accepted = await NotifyDriverAndAwaitResponse(nearestDriver, trip);
 
                     if (accepted)
                     {
-                        tripConfirmationTask.SetResult(true);
-                        tripConfirmationTasks.Remove(tripId); // Remove the task from the dictionary
-                        return;
+                        await NotifyBackToPassenger(trip, nearestDriver);
+                        return; // Driver found, exit the loop
+                    }
+                    else
+                    {
+                        // Driver canceled or didn't respond, exclude the driver
+                        driversToExclude.Add(nearestDriver);
+                        tripConfirmationTasks.Remove(tripId);
                     }
                 }
 
@@ -92,35 +101,42 @@ namespace Application.Services
 
         private async Task<bool> NotifyDriverAndAwaitResponse(User driver, Trip trip)
         {
+            var tripConfirmationTask = tripConfirmationTasks[trip.Id];
+
+            string content = (trip.StartLocation.Address == null || trip.EndLocation.Address == null)
+                ? "Bạn có yêu cầu chuyến xe mới"
+                : $"Bạn có muốn đón khách từ {trip.StartLocation.Address} đi {trip.EndLocation.Address} không?";
+
             await FirebaseUtilities.SendNotificationToDeviceAsync(driver.DeviceToken!,
-                "New trip request",
-                $"Do you want to accept a trip from { trip.StartLocation.Address} to { trip.EndLocation.Address}?",
-                new Dictionary<string, string> 
-                { 
-                    { "tripId", trip.Id.ToString() }
-                });
-
-            await Task.Delay(TimeSpan.FromMinutes(2));
-            var updatedTrip = await _unitOfWork.TripRepository.GetByIdAsync(trip.Id);
-
-            return updatedTrip.Status == TripStatus.GOING && updatedTrip.Driver.Id == driver.Id;
-        }
-
-        private async Task NotifyPassengerAndFinishTripSetup(Trip trip, User driver)
-        {
-            trip.Status = TripStatus.GOING;
-            trip.DriverId = driver.Id; 
-            //trip.Price = CalculatePrice(trip);
-
-            await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken!,
-                "Your trip is confirmed",
-                $"Your driver is {driver.Name} and they are on the way.",
+                "Yêu cầu chuyến mới",
+                content,
                 new Dictionary<string, string>
                 {
                     { "tripId", trip.Id.ToString() }
                 });
 
-            await _unitOfWork.TripRepository.UpdateAsync(trip);
+            // Wait for the driver's response with a two-minute timeout
+            var completedTask = await Task.WhenAny(tripConfirmationTask.Task, Task.Delay(TimeSpan.FromMinutes(2)));
+
+            if (completedTask == tripConfirmationTask.Task)
+            {
+                return tripConfirmationTask.Task.Result;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private async Task NotifyBackToPassenger(Trip trip, User driver)
+        {
+            await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken!,
+                "Đặt chuyến thành công",
+                $"Tài xế {driver.Name} đang trên đường đến chỗ bạn.",
+                new Dictionary<string, string>
+                {
+                    { "tripId", trip.Id.ToString() }
+                });
         }
 
         private async Task HandleTimeoutScenario(Trip trip)
@@ -130,18 +146,12 @@ namespace Application.Services
             await _unitOfWork.TripRepository.UpdateAsync(trip);
 
             await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken!,
-                "Your trip request has timed out",
-                $"We are sorry, we could not find any driver for your trip.",
+                "Hết thời gian chờ",
+                $"Chúng tôi thành thật xin lỗi, hiện tại chưa có tài xế phù hợp với bạn.",
                 new Dictionary<string, string>
                 {
                     { "tripId", trip.Id.ToString() }
                 });
         }
-
-        //private decimal CalculatePrice(Trip trip)
-        //{
-            
-        //}
-
     }
 }
