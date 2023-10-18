@@ -74,7 +74,6 @@ builder.Services.AddSingleton<ITokenService>(new TokenService(_key,_expirtyMinut
 // Add dependency injection
 builder.Services.AddDbContext<GoShareContext>(options => options.UseNpgsql(GoShareConfiguration.ConnectionString("GoShareAzure")));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddSingleton<KeyValueStore>();
 
 //Hangfire
 builder.Services.AddHangfire(config => config
