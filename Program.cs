@@ -85,13 +85,13 @@ builder.Services.AddHangfireServer(options =>
     options.Queues = new[] { "critical", "default" };
 });
 
-// Firebase
-var credential = GoogleCredential.FromFile(GoShareConfiguration.FirebaseCredentialFile);
-FirebaseApp.Create(new AppOptions
-{
-    Credential = credential,
-    ProjectId = GoShareConfiguration.FirebaseProjectId
-});
+//// Firebase
+//var credential = GoogleCredential.FromFile(GoShareConfiguration.FirebaseCredentialFile);
+//FirebaseApp.Create(new AppOptions
+//{
+//    Credential = credential,
+//    ProjectId = GoShareConfiguration.FirebaseProjectId
+//});
 
 // Add Handler
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));

@@ -33,7 +33,11 @@ namespace Application.Configuration
         #region Public Configuration Fields
 
         public static string ConnectionString(string connectionStringKey)
-            => Configuration.GetConnectionString(connectionStringKey)!;
+        {
+            Console.WriteLine("Add connection string");
+            Console.WriteLine(Configuration.GetConnectionString(connectionStringKey)!);
+            return Configuration.GetConnectionString(connectionStringKey)!;
+        }
 
         //public static string ValidAudience
         //    => Configuration.GetSection("JWT")["ValidAudience"];
