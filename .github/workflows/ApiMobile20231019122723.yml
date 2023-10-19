@@ -42,7 +42,7 @@ jobs:
 
     - name: "Echo in file"
       env:
-        ConnectionStrings.GoShareAzure: ${{ toJson(secrets.ConnectionStrings) }}
+        ConnectionStrings.GoShareAzure: ${{ toJson(secrets.ConnectionStrings.GoShareAzure) }}
         Google: ${{ toJson(secrets.Google) }}
         Twilio: ${{ toJson(secrets.Twilio) }}
         Jwt: ${{ toJson(secrets.Jwt) }}
@@ -54,7 +54,7 @@ jobs:
       name: Upload Artifact
       with:
         name: SecretsVariables
-        path: "secrets.txt"
+        path: ./secrets.txt
 
     - name: Deploy to Azure
       uses: azure/webapps-deploy@v2
