@@ -34,7 +34,7 @@ jobs:
       with:
        files: ./appsettings.json
       env:
-       ConnectionStrings: ${{ secrets.ConnectionStrings }}
+       ConnectionStrings.GoShareAzure: ${{ secrets.ConnectionStrings }}
        App.ServerRootAddress: ${{ env.SERVER_ROOT_ADDRESS }}
 
     - name: Deploy to Azure
