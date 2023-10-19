@@ -1,39 +1,37 @@
-name: Build and deploy .NET Core application to Web App ApiMobile20231019122723
+name: ASP.NET Application
 on:
   push:
     branches:
-    - main
-env:
-  AZURE_WEBAPP_NAME: ApiMobile20231019122723
-  AZURE_WEBAPP_PACKAGE_PATH: .\publish
-  CONFIGURATION: Release
-  DOTNET_CORE_VERSION: 6.0.x
-  WORKING_DIRECTORY: .
+      - main
+  pull_request:
+    branches:
+      - main
+
 jobs:
   build:
     runs-on: windows-latest
+
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET Core
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
-    - name: Restore
-      run: dotnet restore ./GoShare.sln
+        dotnet-version: '6.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore ./GoShare.sln 
+
     - name: Build
-      run: dotnet build ./GoShare.sln --configuration ${{ env.CONFIGURATION }} --no-restore
-    - name: Test
-      run: dotnet test ./GoShare.sln --no-build
+      run: dotnet build ./GoShare.sln --configuration Release --no-restore
+
     - name: Publish
-      run: dotnet publish ./GoShare.sln --configuration ${{ env.CONFIGURATION }} --no-build --output "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
-    - name: Deploy to Azure WebApp
+      run: dotnet publish ./GoShare.sln --configuration Release --no-build --output ./publish
+
+    - name: Deploy to Azure
       uses: azure/webapps-deploy@v2
       with:
         app-name: ApiMobile20231019122723
-        publish-profile: ${{ secrets.ApiMobile20231019122723_FFFF }}
-        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-    - name: Publish Artifacts
-      uses: actions/upload-artifact@v1.0.0
-      with:
-        name: webapp
-        path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        package: './publish'
