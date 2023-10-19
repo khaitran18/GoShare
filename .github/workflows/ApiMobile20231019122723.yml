@@ -1,0 +1,49 @@
+name: ASP.NET Application
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '6.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore ./GoShare.sln 
+
+    - name: Build
+      run: dotnet build ./GoShare.sln --configuration Release --no-restore
+
+    - name: Publish
+      run: dotnet publish ./GoShare.sln --configuration Release --no-build --output ./publish
+
+    - name: App Settings Variable Substitution
+      uses: microsoft/variable-substitution@v1
+      with:
+       files: ./appsettings.json
+      env:
+       ConnectionStrings.GoShareAzure: ${{ secrets.ConnectionStrings }}
+       Google: ${{ secrets.Google }}
+       Twilio: ${{ secrets.Twilio }}
+       Jwt: ${{ secrets.Jwt }}
+       SpeedSMSAPI: ${{ secrets.SpeedSMSAPI }}
+       App.ServerRootAddress: ${{ env.SERVER_ROOT_ADDRESS }}
+
+    - name: Deploy to Azure
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ApiMobile20231019122723
+        publish-profile: ${{ secrets.ApiMobile20231019122723 }}
+        package: './publish'
