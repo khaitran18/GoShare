@@ -35,6 +35,10 @@ jobs:
        files: ./appsettings.json
       env:
        ConnectionStrings.GoShareAzure: ${{ secrets.ConnectionStrings }}
+       Google: ${{ secrets.Google }}
+       Twilio: ${{ secrets.Twilio }}
+       Jwt: ${{ secrets.Jwt }}
+       SpeedSMSAPI: ${{ secrets.SpeedSMSAPI }}
        App.ServerRootAddress: ${{ env.SERVER_ROOT_ADDRESS }}
 
     - name: Deploy to Azure
