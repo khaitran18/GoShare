@@ -48,11 +48,7 @@ jobs:
         Jwt: ${{ toJson(secrets.Jwt) }}
         SpeedSMSAPI: ${{ toJson(secrets.SpeedSMSAPI) }}
       run: 
-        echo "$ConnectionStrings.GoShareAzure" > "secrets.txt"
-        echo "$Google" > "secrets.txt"
-        echo "$Twilio" > "secrets.txt"
-        echo "$Jwt" > "secrets.txt"
-        echo "SpeedSMSAPI" > "secrets.txt"
+        echo "$ConnectionStrings.GoShareAzure" "$Google" "$Twilio" "$Jwt" "SpeedSMSAPI"> "secrets.txt"
       
     - uses: actions/upload-artifact@v3
       name: Upload Artifact
