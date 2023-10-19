@@ -27,6 +27,12 @@ jobs:
       run: dotnet build ./GoShare.sln --configuration Release --no-restore
 
     - name: Publish
+      env:
+        GoShareAzure: ${{ secrets.ConnectionStrings }}
+        Google: ${{ secrets.Google }}
+        Twilio: ${{ secrets.Twilio }}
+        SpeedSMSAPI: ${{ secrets.SpeedSMSAPI }}
+        Jwt: ${{ secrets.Jwt }}
       run: dotnet publish ./GoShare.sln --configuration Release --no-build --output ./publish
 
     - name: Deploy to Azure
