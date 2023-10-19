@@ -27,7 +27,7 @@ namespace Api_Mobile.Controllers
             return Ok(response);
         }
 
-        [HttpPost("accept")]
+        [HttpPost("AcceptPassenger")]
         public async Task<IActionResult> AcceptPassenger([FromBody] ConfirmPassengerCommand command)
         {
             var authorization = HttpContext.Request.Headers["Authorization"].ToString();
@@ -36,8 +36,17 @@ namespace Api_Mobile.Controllers
             return Ok(response);
         }
 
-        [HttpPost("deny")]
+        [HttpPost("DenyPassenger")]
         public async Task<IActionResult> DenyPassenger([FromBody] ConfirmPassengerCommand command)
+        {
+            var authorization = HttpContext.Request.Headers["Authorization"].ToString();
+            command.Token = authorization;
+            var response = await _mediator.Send(command);
+            return Ok(response);
+        }
+
+        [HttpPost("ConfirmPickup")]
+        public async Task<IActionResult> ConfirmPickupPassenger([FromBody] ConfirmPickupPassengerCommand command)
         {
             var authorization = HttpContext.Request.Headers["Authorization"].ToString();
             command.Token = authorization;

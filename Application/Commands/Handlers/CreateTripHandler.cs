@@ -37,7 +37,7 @@ namespace Application.Commands.Handlers
             ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
             if (claims != null)
             {
-                Guid.TryParse(claims.FindFirst("jti")?.Value, out Guid userId);
+                Guid.TryParse(claims.FindFirst("id")?.Value, out Guid userId);
 
                 var startLatitude = decimal.Parse(request.StartLatitude!);
                 var startLongitude = decimal.Parse(request.StartLongitude!);
