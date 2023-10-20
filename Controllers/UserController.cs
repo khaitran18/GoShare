@@ -16,7 +16,7 @@ namespace Api_Mobile.Controllers
             _mediator = mediator;
         }
 
-        [HttpPost("UpdateFcm")]
+        [HttpPut("UpdateFcm")]
         public async Task<IActionResult> UpdateFcmToken([FromHeader(Name = "Authorization")] string? authorization, [FromBody] UpdateFcmTokenCommand command)
         {
             command.Token = authorization;

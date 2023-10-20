@@ -26,7 +26,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Application.Service;
-using Application.Common.Utilities;
+using Application.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -85,13 +85,19 @@ builder.Services.AddHangfireServer(options =>
     options.Queues = new[] { "critical", "default" };
 });
 
-//// Firebase
-//var credential = GoogleCredential.FromFile(GoShareConfiguration.FirebaseCredentialFile);
-//FirebaseApp.Create(new AppOptions
-//{
-//    Credential = credential,
-//    ProjectId = GoShareConfiguration.FirebaseProjectId
-//});
+// Firebase
+var credential = GoogleCredential.FromFile(GoShareConfiguration.FirebaseCredentialFile);
+FirebaseApp.Create(new AppOptions
+{
+    Credential = credential,
+    ProjectId = GoShareConfiguration.FirebaseProjectId
+});
+
+// SignalR
+builder.Services.AddSignalR(hubOptions =>
+{
+    hubOptions.EnableDetailedErrors = true;
+});
 
 // Add Handler
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
@@ -158,5 +164,10 @@ app.UseHangfireDashboard();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<SignalRHub>("/goshareHub");
+});
 
 app.Run();

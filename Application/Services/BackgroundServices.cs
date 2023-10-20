@@ -3,10 +3,12 @@ using Application.Common.Exceptions;
 using Application.Common.Utilities;
 using Application.Common.Utilities.Google;
 using Application.Common.Utilities.Google.Firebase;
+using Application.SignalR;
 using Domain.DataModels;
 using Domain.Enumerations;
 using Domain.Interfaces;
 using MediatR;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,11 +21,13 @@ namespace Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMediator _mediator;
+        private readonly IHubContext<SignalRHub> _hubContext;
 
-        public BackgroundServices(IUnitOfWork unitOfWork, IMediator mediator)
+        public BackgroundServices(IUnitOfWork unitOfWork, IMediator mediator, IHubContext<SignalRHub> hubContext)
         {
             _unitOfWork = unitOfWork;
             _mediator = mediator;
+            _hubContext = hubContext;
         }
 
         public async Task FindDriver(Guid tripId)
@@ -113,6 +117,9 @@ namespace Application.Services
             { "tripId", trip.Id.ToString() }
                 });
 
+            await _hubContext.Clients.User(driver.Id.ToString())
+                .SendAsync("NotifyDriverNewTripRequest", content);
+
             // Set a two-minute timeout for driver response
             var timeoutTask = Task.Delay(TimeSpan.FromMinutes(2));
 
@@ -149,6 +156,8 @@ namespace Application.Services
                 {
                     { "tripId", trip.Id.ToString() }
                 });
+            await _hubContext.Clients.User(trip.PassengerId.ToString())
+                .SendAsync("NotifyPassengerDriverOnTheWay", $"Tài xế {driver.Name} đang trên đường đến chỗ bạn.");
         }
 
         private async Task HandleTimeoutScenario(Trip trip)
@@ -162,8 +171,11 @@ namespace Application.Services
                 $"Chúng tôi thành thật xin lỗi, hiện tại chưa có tài xế phù hợp với bạn.",
                 new Dictionary<string, string>
                 {
-                    { "tripId", trip.Id.ToString() }
+            { "tripId", trip.Id.ToString() }
                 });
+
+            await _hubContext.Clients.User(trip.PassengerId.ToString())
+                .SendAsync("NotifyPassengerTripTimedOut", "Chúng tôi thành thật xin lỗi, hiện tại chưa có tài xế phù hợp với bạn.");
         }
     }
 }

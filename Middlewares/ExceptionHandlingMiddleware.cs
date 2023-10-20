@@ -1,5 +1,6 @@
 ﻿using Application.Common.Exceptions;
 using Domain.DataModels;
+using Microsoft.AspNetCore.SignalR;
 using Twilio.Exceptions;
 
 namespace Api_Mobile.Middlewares
@@ -76,6 +77,17 @@ namespace Api_Mobile.Middlewares
                     {
                         Message = ex?.Message,
                         StackTrace = ex?.StackTrace
+                    };
+                    await context.Response.WriteAsJsonAsync(responseBody);
+                }
+                else if (ex is HubException hubEx)
+                {
+                    context.Response.StatusCode = 500;
+                    context.Response.ContentType = "application/json";
+                    var responseBody = new
+                    {
+                        Message = ex.Message,
+                        StackTrace = ex.StackTrace
                     };
                     await context.Response.WriteAsJsonAsync(responseBody);
                 }
