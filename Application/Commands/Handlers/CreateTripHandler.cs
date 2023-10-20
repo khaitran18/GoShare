@@ -35,79 +35,72 @@ namespace Application.Commands.Handlers
             var tripDto = new TripDto();
 
             ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
-            if (claims != null)
+            Guid.TryParse(claims!.FindFirst("id")?.Value, out Guid userId);
+
+            var startLatitude = decimal.Parse(request.StartLatitude!);
+            var startLongitude = decimal.Parse(request.StartLongitude!);
+            var endLatitude = decimal.Parse(request.EndLatitude!);
+            var endLongitude = decimal.Parse(request.EndLongitude!);
+
+            var origin = await _unitOfWork.LocationRepository.GetByUserIdAndTypeAsync(userId, LocationType.CURRENT_LOCATION);
+            if (origin == null)
             {
-                Guid.TryParse(claims.FindFirst("id")?.Value, out Guid userId);
-
-                var startLatitude = decimal.Parse(request.StartLatitude!);
-                var startLongitude = decimal.Parse(request.StartLongitude!);
-                var endLatitude = decimal.Parse(request.EndLatitude!);
-                var endLongitude = decimal.Parse(request.EndLongitude!);
-
-                var origin = await _unitOfWork.LocationRepository.GetByUserIdAndTypeAsync(userId, LocationType.CURRENT_LOCATION);
-                if (origin == null)
-                {
-                    origin = new Location
-                    {
-                        Id = Guid.NewGuid(),
-                        UserId = userId,
-                        Address = request.StartAddress,
-                        Latitude = startLatitude,
-                        Longtitude = startLongitude,
-                        Type = LocationType.CURRENT_LOCATION,
-                        CreateTime = DateTime.Now,
-                        UpdatedTime = DateTime.Now
-                    };
-
-                    await _unitOfWork.LocationRepository.AddAsync(origin);
-                }
-                else
-                {
-                    origin.Address = request.StartAddress;
-                    origin.Latitude = startLatitude;
-                    origin.Longtitude = startLongitude;
-                    origin.UpdatedTime = DateTime.Now;
-
-                    await _unitOfWork.LocationRepository.UpdateAsync(origin);
-                }
-
-                var destination = new Location
+                origin = new Location
                 {
                     Id = Guid.NewGuid(),
                     UserId = userId,
-                    Address = request.EndAddress,
-                    Latitude = endLatitude,
-                    Longtitude = endLongitude,
-                    Type = LocationType.PAST_DESTINATION,
+                    Address = request.StartAddress,
+                    Latitude = startLatitude,
+                    Longtitude = startLongitude,
+                    Type = LocationType.CURRENT_LOCATION,
                     CreateTime = DateTime.Now,
                     UpdatedTime = DateTime.Now
                 };
 
-                await _unitOfWork.LocationRepository.AddAsync(destination);
-
-                var trip = new Trip
-                {
-                    Id = Guid.NewGuid(),
-                    PassengerId = userId,
-                    StartLocationId = origin.Id,
-                    EndLocationId = destination.Id,
-                    StartTime = DateTime.Now,
-                    CreateTime = DateTime.Now,
-                    UpdatedTime= DateTime.Now,
-                    Status = TripStatus.PENDING
-                };
-
-                await _unitOfWork.TripRepository.AddAsync(trip);
-
-                tripDto = _mapper.Map<TripDto>(trip);
-
-                // Background task
-                BackgroundJob.Enqueue<BackgroundServices>(s => s.FindDriver(trip.Id));
+                await _unitOfWork.LocationRepository.AddAsync(origin);
             }
             else
             {
-                throw new BadRequestException("Invalid credentials");
+                origin.Address = request.StartAddress;
+                origin.Latitude = startLatitude;
+                origin.Longtitude = startLongitude;
+                origin.UpdatedTime = DateTime.Now;
+
+                await _unitOfWork.LocationRepository.UpdateAsync(origin);
             }
+
+            var destination = new Location
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                Address = request.EndAddress,
+                Latitude = endLatitude,
+                Longtitude = endLongitude,
+                Type = LocationType.PAST_DESTINATION,
+                CreateTime = DateTime.Now,
+                UpdatedTime = DateTime.Now
+            };
+
+            await _unitOfWork.LocationRepository.AddAsync(destination);
+
+            var trip = new Trip
+            {
+                Id = Guid.NewGuid(),
+                PassengerId = userId,
+                StartLocationId = origin.Id,
+                EndLocationId = destination.Id,
+                StartTime = DateTime.Now,
+                CreateTime = DateTime.Now,
+                UpdatedTime = DateTime.Now,
+                Status = TripStatus.PENDING
+            };
+
+            await _unitOfWork.TripRepository.AddAsync(trip);
+
+            tripDto = _mapper.Map<TripDto>(trip);
+
+            // Background task
+            BackgroundJob.Enqueue<BackgroundServices>(s => s.FindDriver(trip.Id));
 
             return tripDto;
         }

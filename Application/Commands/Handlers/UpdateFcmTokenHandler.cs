@@ -31,21 +31,19 @@ namespace Application.Commands.Handlers
         {
             var userDto = new UserDto();
             ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
-            if (claims != null)
+            Guid.TryParse(claims!.FindFirst("id")?.Value, out Guid userId);
+            var user = await _unitOfWork.UserRepository.GetUserById(userId.ToString());
+
+            if (user == null)
             {
-                Guid.TryParse(claims.FindFirst("id")?.Value, out Guid userId);
-                var user = await _unitOfWork.UserRepository.GetUserById(userId.ToString());
-
-                if (user == null)
-                {
-                    throw new NotFoundException(nameof(User), userId);
-                }
-
-                user.DeviceToken = request.FcmToken;
-                user.UpdatedTime = DateTime.Now;
-                await _unitOfWork.UserRepository.UpdateAsync(user);
-                userDto = _mapper.Map<UserDto>(user);
+                throw new NotFoundException(nameof(User), userId);
             }
+
+            user.DeviceToken = request.FcmToken;
+            user.UpdatedTime = DateTime.Now;
+            await _unitOfWork.UserRepository.UpdateAsync(user);
+            userDto = _mapper.Map<UserDto>(user);
+
             return userDto;
         }
     }

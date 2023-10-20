@@ -37,19 +37,12 @@ namespace Application.Commands.Handlers
             if (request.Accept)
             {
                 ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
-                if (claims != null)
-                {
-                    Guid.TryParse(claims.FindFirst("id")?.Value, out Guid driverId);
-                    trip.DriverId = driverId;
-                    trip.Status = TripStatus.GOING_TO_PICKUP;
-                    trip.UpdatedTime = DateTime.Now;
+                Guid.TryParse(claims!.FindFirst("id")?.Value, out Guid driverId);
+                trip.DriverId = driverId;
+                trip.Status = TripStatus.GOING_TO_PICKUP;
+                trip.UpdatedTime = DateTime.Now;
 
-                    KeyValueStore.Instance.Set($"TripConfirmationTask_{trip.Id}", "true");
-                }
-                else
-                {
-                    throw new BadRequestException("Invalid credentials");
-                }
+                KeyValueStore.Instance.Set($"TripConfirmationTask_{trip.Id}", "true");
             }
             else
             {

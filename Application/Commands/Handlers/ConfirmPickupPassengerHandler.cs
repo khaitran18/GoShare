@@ -33,27 +33,20 @@ namespace Application.Commands.Handlers
             var tripDto = new TripDto();
 
             ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
-            if (claims != null)
+            var trip = await _unitOfWork.TripRepository.GetByIdAsync(request.TripId);
+
+            if (trip == null)
             {
-                var trip = await _unitOfWork.TripRepository.GetByIdAsync(request.TripId);
-
-                if (trip == null)
-                {
-                    throw new NotFoundException(nameof(Trip), request.TripId);
-                }
-
-                trip.Status = TripStatus.GOING;
-                trip.PickupTime = DateTime.Now;
-                trip.UpdatedTime = DateTime.Now;
-
-                await _unitOfWork.TripRepository.UpdateAsync(trip);
-
-                tripDto = _mapper.Map<TripDto>(trip);
+                throw new NotFoundException(nameof(Trip), request.TripId);
             }
-            else
-            {
-                throw new BadRequestException("Invalid credentials");
-            }
+
+            trip.Status = TripStatus.GOING;
+            trip.PickupTime = DateTime.Now;
+            trip.UpdatedTime = DateTime.Now;
+
+            await _unitOfWork.TripRepository.UpdateAsync(trip);
+
+            tripDto = _mapper.Map<TripDto>(trip);
 
             return tripDto;
         }
