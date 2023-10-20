@@ -19,36 +19,40 @@ namespace Api_Mobile.Controllers
 
         [HttpPost]
         [ProducesDefaultResponseType(typeof(TripDto))]
-        public async Task<IActionResult> CreateTrip([FromBody] CreateTripCommand command)
+        public async Task<IActionResult> CreateTrip([FromHeader(Name = "Authorization")] string? authorization, [FromBody] CreateTripCommand command)
         {
-            var authorization = HttpContext.Request.Headers["Authorization"].ToString();
             command.Token = authorization;
             var response = await _mediator.Send(command);
             return Ok(response);
         }
 
         [HttpPost("AcceptPassenger")]
-        public async Task<IActionResult> AcceptPassenger([FromBody] ConfirmPassengerCommand command)
+        public async Task<IActionResult> AcceptPassenger([FromHeader(Name = "Authorization")] string? authorization, [FromBody] ConfirmPassengerCommand command)
         {
-            var authorization = HttpContext.Request.Headers["Authorization"].ToString();
             command.Token = authorization;
             var response = await _mediator.Send(command);
             return Ok(response);
         }
 
         [HttpPost("DenyPassenger")]
-        public async Task<IActionResult> DenyPassenger([FromBody] ConfirmPassengerCommand command)
+        public async Task<IActionResult> DenyPassenger([FromHeader(Name = "Authorization")] string? authorization, [FromBody] ConfirmPassengerCommand command)
         {
-            var authorization = HttpContext.Request.Headers["Authorization"].ToString();
             command.Token = authorization;
             var response = await _mediator.Send(command);
             return Ok(response);
         }
 
         [HttpPost("ConfirmPickup")]
-        public async Task<IActionResult> ConfirmPickupPassenger([FromBody] ConfirmPickupPassengerCommand command)
+        public async Task<IActionResult> ConfirmPickupPassenger([FromHeader(Name = "Authorization")] string? authorization, [FromBody] ConfirmPickupPassengerCommand command)
         {
-            var authorization = HttpContext.Request.Headers["Authorization"].ToString();
+            command.Token = authorization;
+            var response = await _mediator.Send(command);
+            return Ok(response);
+        }
+
+        [HttpPost("EndTrip")]
+        public async Task<IActionResult> EndTrip([FromHeader(Name = "Authorization")] string? authorization, [FromBody] EndTripCommand command)
+        {
             command.Token = authorization;
             var response = await _mediator.Send(command);
             return Ok(response);

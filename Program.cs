@@ -108,6 +108,7 @@ builder.Services.AddScoped<IRequestHandler<RevokeCommand, Task>, RevokeCommandHa
 builder.Services.AddScoped<IRequestHandler<ConfirmPassengerCommand, bool>, ConfirmPassengerHandler>();
 builder.Services.AddScoped<IRequestHandler<UpdateFcmTokenCommand, UserDto>, UpdateFcmTokenHandler>();
 builder.Services.AddScoped<IRequestHandler<ConfirmPickupPassengerCommand, TripDto>, ConfirmPickupPassengerHandler>();
+builder.Services.AddScoped<IRequestHandler<EndTripCommand, TripDto>, EndTripHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
 // Add Validator
