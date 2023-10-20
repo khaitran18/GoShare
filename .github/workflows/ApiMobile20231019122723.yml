@@ -26,9 +26,6 @@ jobs:
     - name: Build
       run: dotnet build ./GoShare.sln --configuration Release --no-restore
 
-    - name: Publish
-      run: dotnet publish ./GoShare.sln --configuration Release --no-build --output ./publish
-
     - name: App Settings Variable Substitution
       uses: microsoft/variable-substitution@v1
       with:
@@ -39,7 +36,25 @@ jobs:
        Twilio: ${{ secrets.Twilio }}
        Jwt: ${{ secrets.Jwt }}
        SpeedSMSAPI: ${{ secrets.SpeedSMSAPI }}
-       App.ServerRootAddress: ${{ env.SERVER_ROOT_ADDRESS }}
+
+    - name: "Echo in file"
+      env:
+        ConnectionStrings.GoShareAzure: ${{ toJson(secrets.ConnectionStrings.GoShareAzure) }}
+        Google: ${{ toJson(secrets.Google) }}
+        Twilio: ${{ toJson(secrets.Twilio) }}
+        Jwt: ${{ toJson(secrets.Jwt) }}
+        SpeedSMSAPI: ${{ toJson(secrets.SpeedSMSAPI) }}
+      run: 
+        echo "$ConnectionStrings.GoShareAzure" "$Google" "$Twilio" "$Jwt" "SpeedSMSAPI"> ./secrets.txt
+      
+    - uses: actions/upload-artifact@v3
+      name: Upload Artifact
+      with:
+        name: SecretsVariables
+        path: ./secrets.txt
+
+    - name: Publish
+      run: dotnet publish ./GoShare.sln --configuration Release --no-build --output ./publish
 
     - name: Deploy to Azure
       uses: azure/webapps-deploy@v2
