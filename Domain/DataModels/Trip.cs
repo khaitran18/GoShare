@@ -20,6 +20,7 @@ namespace Domain.DataModels
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public DateTime PickupTime { get; set; }
+        public double Distance { get; set; }
         public double Price { get; set; }
         public TripStatus Status { get; set; }
         public DateTime CreateTime { get; set; }

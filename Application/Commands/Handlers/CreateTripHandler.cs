@@ -1,5 +1,6 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Exceptions;
+using Application.Common.Utilities.Google;
 using Application.Service;
 using Application.Services;
 using AutoMapper;
@@ -83,6 +84,8 @@ namespace Application.Commands.Handlers
 
             await _unitOfWork.LocationRepository.AddAsync(destination);
 
+            var distance = await GoogleMapsApiUtilities.ComputeDistanceMatrixAsync(origin, destination);
+
             var trip = new Trip
             {
                 Id = Guid.NewGuid(),
@@ -92,6 +95,7 @@ namespace Application.Commands.Handlers
                 StartTime = DateTime.Now,
                 CreateTime = DateTime.Now,
                 UpdatedTime = DateTime.Now,
+                Distance = distance,
                 Status = TripStatus.PENDING
             };
 
