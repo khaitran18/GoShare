@@ -644,13 +644,13 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.DataModels.Chat", b =>
                 {
-                    b.HasOne("Domain.DataModels.Fee", "ReceiverNavigation")
+                    b.HasOne("Domain.DataModels.User", "ReceiverNavigation")
                         .WithMany("ChatReceiverNavigations")
                         .HasForeignKey("Receiver")
                         .IsRequired()
                         .HasConstraintName("fk_user_receiver");
 
-                    b.HasOne("Domain.DataModels.Fee", "SenderNavigation")
+                    b.HasOne("Domain.DataModels.User", "SenderNavigation")
                         .WithMany("ChatSenderNavigations")
                         .HasForeignKey("Sender")
                         .IsRequired()
@@ -819,10 +819,6 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.DataModels.Fee", b =>
                 {
-                    b.Navigation("ChatReceiverNavigations");
-
-                    b.Navigation("ChatSenderNavigations");
-
                     b.Navigation("Feepolicies");
                 });
 
@@ -845,6 +841,10 @@ namespace Infrastructure.Migrations
                     b.Navigation("Appfeedbacks");
 
                     b.Navigation("Car");
+
+                    b.Navigation("ChatReceiverNavigations");
+
+                    b.Navigation("ChatSenderNavigations");
 
                     b.Navigation("InverseGuardian");
 

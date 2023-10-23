@@ -13,9 +13,15 @@ namespace Infrastructure.Migrations
                 name: "fk_wallet_user",
                 table: "cars");
 
-            migrationBuilder.DropIndex(
-                name: "IX_cars_user_id",
-                table: "cars");
+            migrationBuilder.Sql(@"
+                DO
+                $$
+                BEGIN
+                    IF EXISTS(SELECT 1 FROM pg_indexes WHERE indexname = 'IX_cars_user_id') THEN
+                        DROP INDEX ""IX_cars_user_id"";
+                    END IF;
+                END
+                $$");
 
             migrationBuilder.AlterColumn<short>(
                 name: "status",
@@ -62,23 +68,6 @@ namespace Infrastructure.Migrations
                 nullable: false,
                 defaultValueSql: "''::character varying",
                 oldClrType: typeof(string),
-                oldType: "character varying(50)",
-                oldMaxLength: 50);
-
-            migrationBuilder.AlterColumn<string>(
-                name: "disabled_reason",
-                table: "users",
-                type: "character varying",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "character varying");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "device_token",
-                table: "users",
-                type: "character varying",
-                nullable: true,
-                oldClrType: typeof(string),
                 oldType: "character varying");
 
             migrationBuilder.AlterColumn<DateTime>(
@@ -89,14 +78,6 @@ namespace Infrastructure.Migrations
                 defaultValueSql: "'-infinity'::timestamp without time zone",
                 oldClrType: typeof(DateTime),
                 oldType: "timestamp without time zone");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "avatar_url",
-                table: "users",
-                type: "character varying",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "character varying");
 
             migrationBuilder.AddColumn<double>(
                 name: "distance",
@@ -175,33 +156,12 @@ namespace Infrastructure.Migrations
             migrationBuilder.AlterColumn<string>(
                 name: "name",
                 table: "users",
-                type: "character varying(50)",
-                maxLength: 50,
+                type: "character varying",
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying",
                 oldMaxLength: 50,
                 oldDefaultValueSql: "''::character varying");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "disabled_reason",
-                table: "users",
-                type: "character varying",
-                nullable: false,
-                defaultValue: "",
-                oldClrType: typeof(string),
-                oldType: "character varying",
-                oldNullable: true);
-
-            migrationBuilder.AlterColumn<string>(
-                name: "device_token",
-                table: "users",
-                type: "character varying",
-                nullable: false,
-                defaultValue: "",
-                oldClrType: typeof(string),
-                oldType: "character varying",
-                oldNullable: true);
 
             migrationBuilder.AlterColumn<DateTime>(
                 name: "birth",
@@ -211,16 +171,6 @@ namespace Infrastructure.Migrations
                 oldClrType: typeof(DateTime),
                 oldType: "timestamp without time zone",
                 oldDefaultValueSql: "'-infinity'::timestamp without time zone");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "avatar_url",
-                table: "users",
-                type: "character varying",
-                nullable: false,
-                defaultValue: "",
-                oldClrType: typeof(string),
-                oldType: "character varying",
-                oldNullable: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_cars_user_id",
