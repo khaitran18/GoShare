@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GoShareContext))]
-    partial class GoShareContextModelSnapshot : ModelSnapshot
+    [Migration("20231021070555_fix_car_user_relationship")]
+    partial class fix_car_user_relationship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -644,13 +646,13 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.DataModels.Chat", b =>
                 {
-                    b.HasOne("Domain.DataModels.User", "ReceiverNavigation")
+                    b.HasOne("Domain.DataModels.Fee", "ReceiverNavigation")
                         .WithMany("ChatReceiverNavigations")
                         .HasForeignKey("Receiver")
                         .IsRequired()
                         .HasConstraintName("fk_user_receiver");
 
-                    b.HasOne("Domain.DataModels.User", "SenderNavigation")
+                    b.HasOne("Domain.DataModels.Fee", "SenderNavigation")
                         .WithMany("ChatSenderNavigations")
                         .HasForeignKey("Sender")
                         .IsRequired()
@@ -819,6 +821,10 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.DataModels.Fee", b =>
                 {
+                    b.Navigation("ChatReceiverNavigations");
+
+                    b.Navigation("ChatSenderNavigations");
+
                     b.Navigation("Feepolicies");
                 });
 
@@ -842,10 +848,6 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("Car");
 
-                    b.Navigation("ChatReceiverNavigations");
-
-                    b.Navigation("ChatSenderNavigations");
-                    
                     b.Navigation("InverseGuardian");
 
                     b.Navigation("Locations");
