@@ -32,7 +32,7 @@ namespace Application.Commands.Handlers
         {
             var tripDto = new TripDto();
 
-            ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
+            //ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
             var trip = await _unitOfWork.TripRepository.GetByIdAsync(request.TripId);
 
             if (trip == null)

@@ -121,10 +121,10 @@ namespace Infrastructure.Data
                     .HasConstraintName("fk_car_type");
 
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.Cars)
-                    .HasForeignKey(d => d.UserId)
+                    .WithOne(p => p.Car)
+                    .HasForeignKey<Car>(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("fk_wallet_user");
+                    .HasConstraintName("fk_car_user");
             });
 
             modelBuilder.Entity<Cartype>(entity =>
@@ -377,6 +377,8 @@ namespace Infrastructure.Data
                 entity.Property(e => e.PickupTime)
                     .HasColumnType("timestamp without time zone")
                     .HasColumnName("pickup_time");
+
+                entity.Property(e => e.Distance).HasColumnName("distance");
 
                 entity.Property(e => e.Price).HasColumnName("price");
 

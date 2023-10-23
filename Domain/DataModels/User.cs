@@ -9,7 +9,6 @@ namespace Domain.DataModels
         public User()
         {
             Appfeedbacks = new HashSet<Appfeedback>();
-            Cars = new HashSet<Car>();
             InverseGuardian = new HashSet<User>();
             Locations = new HashSet<Location>();
             RatingRateeNavigations = new HashSet<Rating>();
@@ -20,7 +19,7 @@ namespace Domain.DataModels
         }
 
         public Guid Id { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
         public string Phone { get; set; } = null!;
         public bool Isdriver { get; set; }
         public bool Isverify { get; set; }
@@ -42,8 +41,8 @@ namespace Domain.DataModels
         public DateTime? PasscodeResetTokenExpiryTime { get; set; }
 
         public virtual User? Guardian { get; set; }
+        public virtual Car? Car { get; set; }
         public virtual ICollection<Appfeedback> Appfeedbacks { get; set; }
-        public virtual ICollection<Car> Cars { get; set; }
         public virtual ICollection<User> InverseGuardian { get; set; }
         public virtual ICollection<Location> Locations { get; set; }
         public virtual ICollection<Rating> RatingRateeNavigations { get; set; }

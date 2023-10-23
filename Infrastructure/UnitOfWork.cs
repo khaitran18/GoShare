@@ -13,6 +13,7 @@ namespace Infrastructure
         private IAppfeedbackRepository _appfeedbackRepository;
         private ITripRepository _tripRepository;
         private ILocationRepository _locationRepository;
+        private ICartypeRepository _cartypeRepository;
 
         public UnitOfWork(GoShareContext context, IMapper mapper)
         {
@@ -24,6 +25,7 @@ namespace Infrastructure
         public IAppfeedbackRepository AppfeedbackRepository => _appfeedbackRepository ??= new AppfeedbackRepository(_context);
         public ITripRepository TripRepository => _tripRepository ??= new TripRepository(_context);
         public ILocationRepository LocationRepository => _locationRepository ??= new LocationRepository(_context);
+        public ICartypeRepository CartypeRepository => _cartypeRepository ??= new CartypeRepository(_context);
 
         public void Dispose()
         {
