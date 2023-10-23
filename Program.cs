@@ -115,6 +115,7 @@ builder.Services.AddScoped<IRequestHandler<ConfirmPassengerCommand, bool>, Confi
 builder.Services.AddScoped<IRequestHandler<UpdateFcmTokenCommand, UserDto>, UpdateFcmTokenHandler>();
 builder.Services.AddScoped<IRequestHandler<ConfirmPickupPassengerCommand, TripDto>, ConfirmPickupPassengerHandler>();
 builder.Services.AddScoped<IRequestHandler<EndTripCommand, TripDto>, EndTripHandler>();
+builder.Services.AddScoped<IRequestHandler<CalculateFeesForTripCommand, List<CartypeFeeDto>>, CalculateFeesForTripHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
 // Add Validator

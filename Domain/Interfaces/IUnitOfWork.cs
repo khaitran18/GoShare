@@ -6,6 +6,7 @@
         IAppfeedbackRepository AppfeedbackRepository { get; }
         ITripRepository TripRepository { get; }
         ILocationRepository LocationRepository { get; }
+        ICartypeRepository CartypeRepository { get; }
         Task Save();
     }
 }

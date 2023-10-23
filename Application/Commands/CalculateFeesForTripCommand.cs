@@ -11,6 +11,9 @@ namespace Application.Commands
     public class CalculateFeesForTripCommand : IRequest<List<CartypeFeeDto>>
     {
         public string? Token { get; set; }
-
+        public string? StartLatitude { get; set; }
+        public string? StartLongitude { get; set; }
+        public string? EndLatitude { get; set; }
+        public string? EndLongitude { get; set; }
     }
 }

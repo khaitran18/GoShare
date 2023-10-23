@@ -18,7 +18,6 @@ namespace Api_Mobile.Controllers
         }
 
         [HttpPost]
-        [ProducesDefaultResponseType(typeof(TripDto))]
         public async Task<IActionResult> CreateTrip([FromHeader(Name = "Authorization")] string? authorization, [FromBody] CreateTripCommand command)
         {
             command.Token = authorization;
@@ -52,6 +51,14 @@ namespace Api_Mobile.Controllers
 
         [HttpPost("EndTrip")]
         public async Task<IActionResult> EndTrip([FromHeader(Name = "Authorization")] string? authorization, [FromBody] EndTripCommand command)
+        {
+            command.Token = authorization;
+            var response = await _mediator.Send(command);
+            return Ok(response);
+        }
+
+        [HttpPost("Fees")]
+        public async Task<IActionResult> CalculateFeesForTrip([FromHeader(Name = "Authorization")] string? authorization, [FromBody] CalculateFeesForTripCommand command)
         {
             command.Token = authorization;
             var response = await _mediator.Send(command);
