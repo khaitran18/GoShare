@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GoShareContext))]
-    [Migration("20231016105330_init")]
-    partial class init
+    [Migration("20231023115016_fix_car_user_relationship")]
+    partial class fix_car_user_relationship
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -104,7 +104,8 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("TypeId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("cars", (string)null);
                 });
@@ -364,6 +365,10 @@ namespace Infrastructure.Migrations
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("create_time");
 
+                    b.Property<double>("Distance")
+                        .HasColumnType("double precision")
+                        .HasColumnName("distance");
+
                     b.Property<Guid?>("DriverId")
                         .HasColumnType("uuid")
                         .HasColumnName("driver_id");
@@ -424,23 +429,30 @@ namespace Infrastructure.Migrations
                         .HasColumnName("id");
 
                     b.Property<string>("AvatarUrl")
-                        .IsRequired()
                         .HasColumnType("character varying")
                         .HasColumnName("avatar_url");
+
+                    b.Property<DateTime>("Birth")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("birth")
+                        .HasDefaultValueSql("'-infinity'::timestamp without time zone");
 
                     b.Property<DateTime>("CreateTime")
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("create_time");
 
                     b.Property<string>("DeviceToken")
-                        .IsRequired()
                         .HasColumnType("character varying")
                         .HasColumnName("device_token");
 
                     b.Property<string>("DisabledReason")
-                        .IsRequired()
                         .HasColumnType("character varying")
                         .HasColumnName("disabled_reason");
+
+                    b.Property<short?>("Gender")
+                        .HasColumnType("smallint")
+                        .HasColumnName("gender");
 
                     b.Property<Guid?>("GuardianId")
                         .HasColumnType("uuid")
@@ -456,15 +468,52 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("name");
+                        .HasColumnType("character varying")
+                        .HasColumnName("name")
+                        .HasDefaultValueSql("''::character varying");
+
+                    b.Property<string>("Otp")
+                        .IsRequired()
+                        .HasColumnType("character varying")
+                        .HasColumnName("otp");
+
+                    b.Property<DateTime>("OtpExpiryTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("otp_expiry_time")
+                        .HasDefaultValueSql("'-infinity'::timestamp without time zone");
+
+                    b.Property<string>("Passcode")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("character varying")
+                        .HasColumnName("passcode")
+                        .HasDefaultValueSql("''::character varying");
+
+                    b.Property<string>("PasscodeResetToken")
+                        .HasColumnType("character varying")
+                        .HasColumnName("passcode_reset_token");
+
+                    b.Property<DateTime?>("PasscodeResetTokenExpiryTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("passcode_reset_token_expiry_time")
+                        .HasDefaultValueSql("'-infinity'::timestamp without time zone");
 
                     b.Property<string>("Phone")
                         .IsRequired()
                         .HasMaxLength(15)
                         .HasColumnType("character varying(15)")
                         .HasColumnName("phone");
+
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("character varying")
+                        .HasColumnName("refresh_token");
+
+                    b.Property<DateTime?>("RefreshTokenExpiryTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("refresh_token_expiry_time");
 
                     b.Property<short>("Status")
                         .HasColumnType("smallint")
@@ -585,10 +634,10 @@ namespace Infrastructure.Migrations
                         .HasConstraintName("fk_car_type");
 
                     b.HasOne("Domain.DataModels.User", "User")
-                        .WithMany("Cars")
-                        .HasForeignKey("UserId")
+                        .WithOne("Car")
+                        .HasForeignKey("Domain.DataModels.Car", "UserId")
                         .IsRequired()
-                        .HasConstraintName("fk_wallet_user");
+                        .HasConstraintName("fk_car_user");
 
                     b.Navigation("Type");
 
@@ -797,7 +846,7 @@ namespace Infrastructure.Migrations
                 {
                     b.Navigation("Appfeedbacks");
 
-                    b.Navigation("Cars");
+                    b.Navigation("Car");
 
                     b.Navigation("InverseGuardian");
 

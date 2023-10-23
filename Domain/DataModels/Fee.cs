@@ -7,8 +7,6 @@ namespace Domain.DataModels
     {
         public Fee()
         {
-            ChatReceiverNavigations = new HashSet<Chat>();
-            ChatSenderNavigations = new HashSet<Chat>();
             Feepolicies = new HashSet<Feepolicy>();
         }
 
@@ -20,8 +18,6 @@ namespace Domain.DataModels
         public DateTime UpdateTime { get; set; }
 
         public virtual Cartype CarTypeNavigation { get; set; } = null!;
-        public virtual ICollection<Chat> ChatReceiverNavigations { get; set; }
-        public virtual ICollection<Chat> ChatSenderNavigations { get; set; }
         public virtual ICollection<Feepolicy> Feepolicies { get; set; }
     }
 }
