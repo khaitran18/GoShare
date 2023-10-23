@@ -162,6 +162,8 @@ app.UseHttpsRedirection();
 
 app.UseHangfireDashboard();
 
+app.UseRouting();
+
 app.UseAuthorization();
 
 app.MapControllers();
