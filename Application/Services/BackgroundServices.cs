@@ -30,7 +30,7 @@ namespace Application.Services
             _hubContext = hubContext;
         }
 
-        public async Task FindDriver(Guid tripId)
+        public async Task FindDriver(Guid tripId, Guid cartypeId)
         {
             var trip = await _unitOfWork.TripRepository.GetByIdAsync(tripId);
 
@@ -41,8 +41,8 @@ namespace Application.Services
 
             var origin = trip.StartLocation;
 
-            var radius = 1.0; //km
-            var maxRadius = 5.0; //km
+            var radius = 1.0; // km
+            var maxRadius = 5.0; // km
             var startTime = DateTime.Now;
             var timeout = TimeSpan.FromMinutes(5); // Set a timeout for finding a driver
 
@@ -52,9 +52,11 @@ namespace Application.Services
             {
                 var nearestDriver = new User();
                 double shortestDistance = double.MaxValue;
+
                 // Get all the available drivers within the current radius, excluding those in the exclusion list
                 var drivers = (await _unitOfWork.UserRepository.GetActiveDriversWithinRadius(origin, radius))
-                    .Where(driver => !driversToExclude.Contains(driver))
+                    .Where(driver => !driversToExclude.Contains(driver) &&
+                                    driver.Car != null && driver.Car.TypeId == cartypeId)
                     .ToList();
 
                 if (drivers.Any())
@@ -114,7 +116,7 @@ namespace Application.Services
                 content,
                 new Dictionary<string, string>
                 {
-            { "tripId", trip.Id.ToString() }
+                    { "tripId", trip.Id.ToString() }
                 });
 
             await _hubContext.Clients.User(driver.Id.ToString())
@@ -171,7 +173,7 @@ namespace Application.Services
                 $"Chúng tôi thành thật xin lỗi, hiện tại chưa có tài xế phù hợp với bạn.",
                 new Dictionary<string, string>
                 {
-            { "tripId", trip.Id.ToString() }
+                    { "tripId", trip.Id.ToString() }
                 });
 
             await _hubContext.Clients.User(trip.PassengerId.ToString())

@@ -25,6 +25,7 @@ namespace Infrastructure.Repositories
             var result = new List<User>();
             var users = await _context.Users
                 .Include(u => u.Locations)
+                .Include(u => u.Car)
                 .ToListAsync();
 
             foreach (User user in users)

@@ -20,5 +20,6 @@ namespace Application.Commands
         public string? EndLatitude { get; set; }
         public string? EndLongitude { get; set; }
         public string? EndAddress { get; set; }
+        public Guid CartypeId { get; set; }
     }
 }

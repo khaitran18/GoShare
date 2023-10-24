@@ -104,7 +104,7 @@ namespace Application.Commands.Handlers
             tripDto = _mapper.Map<TripDto>(trip);
 
             // Background task
-            BackgroundJob.Enqueue<BackgroundServices>(s => s.FindDriver(trip.Id));
+            BackgroundJob.Enqueue<BackgroundServices>(s => s.FindDriver(trip.Id, request.CartypeId));
 
             return tripDto;
         }
