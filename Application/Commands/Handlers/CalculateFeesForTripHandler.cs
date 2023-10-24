@@ -31,21 +31,21 @@ namespace Application.Commands.Handlers
         {
             var carTypeFees = new List<CartypeFeeDto>();
 
-            var startLatitude = decimal.Parse(request.StartLatitude!);
-            var startLongitude = decimal.Parse(request.StartLongitude!);
-            var endLatitude = decimal.Parse(request.EndLatitude!);
-            var endLongitude = decimal.Parse(request.EndLongitude!);
+            //var startLatitude = decimal.Parse(request.StartLatitude!);
+            //var startLongitude = decimal.Parse(request.StartLongitude!);
+            //var endLatitude = decimal.Parse(request.EndLatitude!);
+            //var endLongitude = decimal.Parse(request.EndLongitude!);
 
             var origin = new Location
             {
-                Latitude = startLatitude,
-                Longtitude = startLongitude
+                Latitude = request.StartLatitude,
+                Longtitude = request.StartLongitude
             };
 
             var destination = new Location
             {
-                Latitude = endLatitude,
-                Longtitude = endLongitude
+                Latitude = request.EndLatitude,
+                Longtitude = request.EndLongitude
             };
 
             var distance = await GoogleMapsApiUtilities.ComputeDistanceMatrixAsync(origin, destination);
