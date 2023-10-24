@@ -12,14 +12,13 @@ namespace Application.Commands
     public class CreateTripCommand : IRequest<TripDto>
     {
         public string? Token { get; set; }
-        //[JsonProperty("user_id")]
-        //public Guid PassengerId { get; set; }
-        public string? StartLatitude { get; set; }
-        public string? StartLongitude { get; set; }
+        public decimal StartLatitude { get; set; }
+        public decimal StartLongitude { get; set; }
         public string? StartAddress { get; set; }
-        public string? EndLatitude { get; set; }
-        public string? EndLongitude { get; set; }
+        public decimal EndLatitude { get; set; }
+        public decimal EndLongitude { get; set; }
         public string? EndAddress { get; set; }
         public Guid CartypeId { get; set; }
+        public double TotalPrice { get; set; }
     }
 }

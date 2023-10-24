@@ -27,6 +27,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Application.Service;
 using Application.SignalR;
+using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,7 +41,6 @@ builder.Services.AddEndpointsApiExplorer();
 
 // Initialize Configuration
 GoShareConfiguration.Initialize(builder.Configuration);
-
 
 //JWT Config
 
@@ -118,7 +118,8 @@ builder.Services.AddScoped<IRequestHandler<EndTripCommand, TripDto>, EndTripHand
 builder.Services.AddScoped<IRequestHandler<CalculateFeesForTripCommand, List<CartypeFeeDto>>, CalculateFeesForTripHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
-// Add Validator
+// Fluent Validation
+builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddScoped<IValidator<TestQuery>, TestQueryValidator>();
 
 // Add AutoMapper

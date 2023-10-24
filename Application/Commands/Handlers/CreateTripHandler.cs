@@ -38,10 +38,10 @@ namespace Application.Commands.Handlers
             ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
             Guid.TryParse(claims!.FindFirst("id")?.Value, out Guid userId);
 
-            var startLatitude = decimal.Parse(request.StartLatitude!);
-            var startLongitude = decimal.Parse(request.StartLongitude!);
-            var endLatitude = decimal.Parse(request.EndLatitude!);
-            var endLongitude = decimal.Parse(request.EndLongitude!);
+            //var startLatitude = decimal.Parse(request.StartLatitude!);
+            //var startLongitude = decimal.Parse(request.StartLongitude!);
+            //var endLatitude = decimal.Parse(request.EndLatitude!);
+            //var endLongitude = decimal.Parse(request.EndLongitude!);
 
             var origin = await _unitOfWork.LocationRepository.GetByUserIdAndTypeAsync(userId, LocationType.CURRENT_LOCATION);
             if (origin == null)
@@ -51,8 +51,8 @@ namespace Application.Commands.Handlers
                     Id = Guid.NewGuid(),
                     UserId = userId,
                     Address = request.StartAddress,
-                    Latitude = startLatitude,
-                    Longtitude = startLongitude,
+                    Latitude = request.StartLatitude,
+                    Longtitude = request.StartLongitude,
                     Type = LocationType.CURRENT_LOCATION,
                     CreateTime = DateTime.Now,
                     UpdatedTime = DateTime.Now
@@ -63,8 +63,8 @@ namespace Application.Commands.Handlers
             else
             {
                 origin.Address = request.StartAddress;
-                origin.Latitude = startLatitude;
-                origin.Longtitude = startLongitude;
+                origin.Latitude = request.StartLatitude;
+                origin.Longtitude = request.StartLongitude;
                 origin.UpdatedTime = DateTime.Now;
 
                 await _unitOfWork.LocationRepository.UpdateAsync(origin);
@@ -75,8 +75,8 @@ namespace Application.Commands.Handlers
                 Id = Guid.NewGuid(),
                 UserId = userId,
                 Address = request.EndAddress,
-                Latitude = endLatitude,
-                Longtitude = endLongitude,
+                Latitude = request.EndLatitude,
+                Longtitude = request.EndLongitude,
                 Type = LocationType.PAST_DESTINATION,
                 CreateTime = DateTime.Now,
                 UpdatedTime = DateTime.Now
@@ -96,6 +96,7 @@ namespace Application.Commands.Handlers
                 CreateTime = DateTime.Now,
                 UpdatedTime = DateTime.Now,
                 Distance = distance,
+                Price = request.TotalPrice,
                 Status = TripStatus.PENDING
             };
 
