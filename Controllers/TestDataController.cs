@@ -2,6 +2,7 @@
 using Application.Common.Utilities;
 using Application.Queries;
 using Application.Services;
+using Application.Services.Interfaces;
 using Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

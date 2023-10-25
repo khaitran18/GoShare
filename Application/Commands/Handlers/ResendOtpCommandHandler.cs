@@ -1,6 +1,7 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Utilities;
 using Application.Services;
+using Application.Services.Interfaces;
 using Domain.Interfaces;
 using Infrastructure.Service;
 using MediatR;

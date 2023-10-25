@@ -28,6 +28,8 @@ using System.Text;
 using Application.Service;
 using Application.SignalR;
 using FluentValidation.AspNetCore;
+using Application.Services.Interfaces;
+using Google.Cloud.Storage.V1;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -92,8 +94,9 @@ FirebaseApp.Create(new AppOptions
     Credential = credential,
     ProjectId = GoShareConfiguration.FirebaseProjectId
 });
+builder.Services.AddSingleton<IFirebaseStorage>(new FirebaseStorage(GoShareConfiguration.firebaseBucket,GoShareConfiguration.FirebaseCredentialFile));
 
-// SignalR
+//SignalR
 builder.Services.AddSignalR(hubOptions =>
 {
     hubOptions.EnableDetailedErrors = true;
@@ -111,6 +114,7 @@ builder.Services.AddScoped<IRequestHandler<ResendOtpCommand, Task>, ResendOtpCom
 builder.Services.AddScoped<IRequestHandler<SetPasscodeCommand, Task>, SetPasscodeCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<RefreshTokenCommand, string>, RefreshTokenCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<RevokeCommand, Task>, RevokeCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<UpdateProfilePictureCommand, string>, UpdateProfilePictureHandler>();
 builder.Services.AddScoped<IRequestHandler<ConfirmPassengerCommand, bool>, ConfirmPassengerHandler>();
 builder.Services.AddScoped<IRequestHandler<UpdateFcmTokenCommand, UserDto>, UpdateFcmTokenHandler>();
 builder.Services.AddScoped<IRequestHandler<ConfirmPickupPassengerCommand, TripDto>, ConfirmPickupPassengerHandler>();
@@ -138,7 +142,6 @@ builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBeh
 //Add twilio
 builder.Services.AddSingleton<Application.Configuration.Twilio>();
 builder.Services.AddScoped<ITwilioVerification, TwilioVerification>();
-//builder.Services.AddSingleton<IVerification>(new Verification(builder.Configuration.GetSection("Twilio").Get<Application.Common.Dtos.Twilio>()));
 builder.Services.AddSingleton<ITwilioVerification>(new TwilioVerification(GoShareConfiguration.TwilioAccount));
 
 //Add SpeedSMSAPI

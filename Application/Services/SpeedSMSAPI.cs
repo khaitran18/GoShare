@@ -1,5 +1,6 @@
 ﻿using Application.Common.Dtos;
 using Application.Configuration;
+using Application.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,12 +12,7 @@ using System.Threading.Tasks;
 
 namespace Application.Services
 {
-    public interface ISpeedSMSAPI
-    {
-        public Task<String> getUserInfo();
-        public Task sendSMS(string phones, string content, int type);
-        public Task<String> sendMMS(String[] phones, String content, String link, String sender);
-    }
+    
     public class SpeedSMSAPI : ISpeedSMSAPI
     {
         public const int TYPE_QC = 1;

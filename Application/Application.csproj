@@ -7,12 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Services\Interfaces\**" />
-    <EmbeddedResource Remove="Services\Interfaces\**" />
-    <None Remove="Services\Interfaces\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="Common\Mappers\" />
   </ItemGroup>
 
@@ -20,6 +14,7 @@
     <PackageReference Include="AutoMapper" Version="12.0.1" />
     <PackageReference Include="FirebaseAdmin" Version="2.4.0" />
     <PackageReference Include="FluentValidation" Version="11.7.1" />
+    <PackageReference Include="Google.Cloud.Storage.V1" Version="4.6.0" />
     <PackageReference Include="GoogleMapsApi" Version="1.2.1" />
     <PackageReference Include="Hangfire.Core" Version="1.8.5" />
     <PackageReference Include="MediatR" Version="12.1.1" />

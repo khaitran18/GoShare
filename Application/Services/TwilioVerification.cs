@@ -1,4 +1,5 @@
-﻿using Domain.DataModels;
+﻿using Application.Services.Interfaces;
+using Domain.DataModels;
 using Domain.Interfaces;
 using Twilio;
 using Twilio.Exceptions;
@@ -6,12 +7,6 @@ using Twilio.Rest.Verify.V2.Service;
 
 namespace Application.Services
 {
-    public interface ITwilioVerification
-    {
-        Task<VerificationResult> StartVerificationAsync(string phoneNumber, string channel);
-
-        Task<VerificationResult> CheckVerificationAsync(string phoneNumber, string code);
-    }
     public class TwilioVerification : ITwilioVerification
     {
         private readonly Configuration.Twilio _config;
