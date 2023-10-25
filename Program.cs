@@ -27,7 +27,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Application.Service;
 using Application.SignalR;
-using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -119,8 +118,8 @@ builder.Services.AddScoped<IRequestHandler<CalculateFeesForTripCommand, List<Car
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
 // Fluent Validation
-builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddScoped<IValidator<TestQuery>, TestQueryValidator>();
+builder.Services.AddScoped<IValidator<CreateTripCommand>, CreateTripCommandValidator>();
 
 // Add AutoMapper
 var mapperConfig = new MapperConfiguration(cfg =>
