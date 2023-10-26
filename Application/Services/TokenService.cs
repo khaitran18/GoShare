@@ -64,7 +64,7 @@ namespace Application.Service
             return DateTime.Now.AddMinutes(Convert.ToDouble(_refreshTokenExpiryTime));
         }
 
-        public ClaimsPrincipal? ValidateToken(string jwtToken)
+        public ClaimsPrincipal? ValidateToken(string jwtToken) 
         {
             if (jwtToken == "")
             {

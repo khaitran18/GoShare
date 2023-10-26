@@ -9,11 +9,11 @@ namespace Infrastructure
     {
         private readonly GoShareContext _context;
         private readonly IMapper _mapper;
-        private IUserRepository _userRepository;
-        private IAppfeedbackRepository _appfeedbackRepository;
-        private ITripRepository _tripRepository;
-        private ILocationRepository _locationRepository;
-        private ICartypeRepository _cartypeRepository;
+        private IUserRepository _userRepository = null!;
+        private IAppfeedbackRepository _appfeedbackRepository = null!;
+        private ITripRepository _tripRepository = null!;
+        private ILocationRepository _locationRepository = null!;
+        private ICartypeRepository _cartypeRepository = null!;
 
         public UnitOfWork(GoShareContext context, IMapper mapper)
         {

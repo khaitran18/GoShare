@@ -2,23 +2,19 @@
 using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Storage.V1;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Application.Services
 {
     public class FirebaseStorage : IFirebaseStorage
     {
         private readonly string _bucketName;
-        private readonly string _credential;
+        private StorageClient _storageClient;
 
-        public FirebaseStorage(string bucketName, string credential)
+        public FirebaseStorage(string bucketName, StorageClient storageClient)
         {
             _bucketName = bucketName;
-            _credential = credential;
+            _storageClient = storageClient;
         }
 
         public async Task<string> UploadFileAsync(IFormFile fileToUpLoad,string path, string fileName)
@@ -27,9 +23,8 @@ namespace Application.Services
             using (var memoryStream = new MemoryStream())
             {
                 await fileToUpLoad.CopyToAsync(memoryStream);
-                StorageClient _storageClient = StorageClient.Create(GoogleCredential.FromFile(_credential));
                 var uploadedFile = await _storageClient.UploadObjectAsync(bucketName, path +"/"+ fileName, "image/jpeg", memoryStream);
-                string url = $"https://firebasestorage.googleapis.com/v0/b/{bucketName}/o/{Uri.EscapeDataString(uploadedFile.Name)}?alt=media&token={uploadedFile.Generation}";
+                string url = $"https://firebasestorage.googleapis.com/v0/b/{bucketName}/o/{Uri.EscapeDataString(uploadedFile.Name)}?alt=media";
                 return url;
             }
         }

@@ -55,7 +55,9 @@ namespace Application.Services
         {
             String url = rootURL + "/user/info";
             NetworkCredential myCreds = new NetworkCredential(_config.AccessToken, ":x");
+#pragma warning disable SYSLIB0014 // Type or member is obsolete
             WebClient client = new WebClient();
+#pragma warning restore SYSLIB0014 // Type or member is obsolete
 
             client.Credentials = myCreds;
             Stream data = client.OpenRead(url);
@@ -100,7 +102,9 @@ namespace Application.Services
                 return "";
 
             NetworkCredential myCreds = new NetworkCredential(_config.AccessToken, ":x");
+#pragma warning disable SYSLIB0014 // Type or member is obsolete
             WebClient client = new WebClient();
+#pragma warning restore SYSLIB0014 // Type or member is obsolete
             client.Credentials = myCreds;
             client.Headers[HttpRequestHeader.ContentType] = "application/json";
 

@@ -93,7 +93,8 @@ FirebaseApp.Create(new AppOptions
     Credential = credential,
     ProjectId = GoShareConfiguration.FirebaseProjectId
 });
-builder.Services.AddSingleton<IFirebaseStorage>(new FirebaseStorage(GoShareConfiguration.firebaseBucket,GoShareConfiguration.FirebaseCredentialFile));
+StorageClient _storageClient = StorageClient.Create(credential);
+builder.Services.AddSingleton<IFirebaseStorage>(new FirebaseStorage(GoShareConfiguration.firebaseBucket, _storageClient));
 
 //SignalR
 builder.Services.AddSignalR(hubOptions =>

@@ -1,4 +1,5 @@
 ﻿using Application.Services.Interfaces;
+using Domain.DataModels;
 using Domain.Interfaces;
 using MediatR;
 using System;
@@ -26,7 +27,14 @@ namespace Application.Commands.Handlers
         {
             string path = "avatar/";
             Guid.TryParse(_tokenService.ValidateToken(request.Token!)!.FindFirst("id")!.Value, out Guid id);
-            return await _firebaseStorage.UploadFileAsync(request.Image, path+id.ToString(),id.ToString());
+            string url = await _firebaseStorage.UploadFileAsync(request.Image, path + id.ToString(), id.ToString());
+            User? u = await _unitOfWork.UserRepository.GetUserById(id.ToString());
+            if (u != null)
+            {
+                u.AvatarUrl = url;
+                await _unitOfWork.UserRepository.UpdateAsync(u);
+            }
+            return url;
         }
     }
 }
