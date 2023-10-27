@@ -87,5 +87,11 @@ namespace Application.Service
             ClaimsPrincipal principal = new JwtSecurityTokenHandler().ValidateToken(jwtToken, validationParameters, out validatedToken);
             return principal;
         }
+
+        public Guid GetGuid(string jwtToken)
+        {
+            Guid.TryParse(ValidateToken(jwtToken)!.FindFirst("id")!.Value, out Guid id);
+            return id;
+        }
     }
 }

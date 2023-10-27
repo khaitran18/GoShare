@@ -14,7 +14,8 @@ namespace Infrastructure
         private ITripRepository _tripRepository = null!;
         private ILocationRepository _locationRepository = null!;
         private ICartypeRepository _cartypeRepository = null!;
-
+        private ICarRepository _carRepository = null!;
+        private IDriverDocumentRepository _driverDocumentRepository = null!;
         public UnitOfWork(GoShareContext context, IMapper mapper)
         {
             _context = context;
@@ -26,6 +27,8 @@ namespace Infrastructure
         public ITripRepository TripRepository => _tripRepository ??= new TripRepository(_context);
         public ILocationRepository LocationRepository => _locationRepository ??= new LocationRepository(_context);
         public ICartypeRepository CartypeRepository => _cartypeRepository ??= new CartypeRepository(_context);
+        public ICarRepository CarRepository => _carRepository ??= new CarRepository(_context);
+        public IDriverDocumentRepository DriverDocumentRepository => _driverDocumentRepository ??= new DriverDocumentRepository(_context);
 
         public void Dispose()
         {

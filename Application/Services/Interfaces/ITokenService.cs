@@ -21,5 +21,6 @@ namespace Application.Services.Interfaces
         /// <returns></returns>
         public ClaimsPrincipal? ValidateToken(string jwtToken);
         public DateTime CreateRefreshTokenExpiryTime();
+        public Guid GetGuid(string jwtToken);
     }
 }

@@ -10,5 +10,6 @@ namespace Domain.Interfaces
     public interface ICartypeRepository : IBaseRepository<Cartype>
     {
         Task<double> CalculatePriceForCarType(Guid cartypeId, double distance);
+        Task<Guid> GetGuidByCapacity(short capacity);
     }
 }

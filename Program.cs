@@ -29,6 +29,7 @@ using Application.Service;
 using Application.SignalR;
 using Application.Services.Interfaces;
 using Google.Cloud.Storage.V1;
+using Domain.DataModels;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -120,6 +121,8 @@ builder.Services.AddScoped<IRequestHandler<UpdateFcmTokenCommand, UserDto>, Upda
 builder.Services.AddScoped<IRequestHandler<ConfirmPickupPassengerCommand, TripDto>, ConfirmPickupPassengerHandler>();
 builder.Services.AddScoped<IRequestHandler<EndTripCommand, TripDto>, EndTripHandler>();
 builder.Services.AddScoped<IRequestHandler<CalculateFeesForTripCommand, List<CartypeFeeDto>>, CalculateFeesForTripHandler>();
+builder.Services.AddScoped<IRequestHandler<DriverRegisterCommand, bool>, DriverRegisterCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<AddCarCommand, Car>, AddCarCommandHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
 // Fluent Validation
@@ -133,6 +136,7 @@ var mapperConfig = new MapperConfiguration(cfg =>
     cfg.AddProfile<AppfeedbackProfile>();
     cfg.AddProfile<UserProfile>();
     cfg.AddProfile<TripProfile>();
+    cfg.AddProfile<CarProfile>();
 });
 var mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);

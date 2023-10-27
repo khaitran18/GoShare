@@ -27,7 +27,7 @@ namespace Application.Commands.Handlers
         {
             string path = "avatar/";
             Guid.TryParse(_tokenService.ValidateToken(request.Token!)!.FindFirst("id")!.Value, out Guid id);
-            string url = await _firebaseStorage.UploadFileAsync(request.Image, path + id.ToString(), id.ToString());
+            string url = await _firebaseStorage.UploadFileAsync(request.Image, id.ToString() + path, id.ToString());
             User? u = await _unitOfWork.UserRepository.GetUserById(id.ToString());
             if (u != null)
             {

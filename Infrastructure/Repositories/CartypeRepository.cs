@@ -56,5 +56,7 @@ namespace Infrastructure.Repositories
 
             return totalPrice;
         }
+
+        public Task<Guid> GetGuidByCapacity(short capacity) => Task.FromResult(_context.Cartypes.FirstOrDefault(t => t.Capacity == capacity)!.Id);
     }
 }
