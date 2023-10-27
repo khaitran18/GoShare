@@ -39,7 +39,7 @@ namespace Application.Commands.Handlers
                 Driverdocument document = new Driverdocument();
                 document.Id = Guid.NewGuid();
                 document.CarId = car.Id;
-                document.Url = await _firebaseStorage.UploadFileAsync(item.pic, path, item.type.ToString()+"_"+Guid.NewGuid());
+                document.Url = await _firebaseStorage.UploadFileAsync(item.pic, path, item.type.ToString()+"_"+document.Id);
                 await _unitOfWork.DriverDocumentRepository.AddAsync(document);
             }
             return Task.CompletedTask.IsCompleted;
