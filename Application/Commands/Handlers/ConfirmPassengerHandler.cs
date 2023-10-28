@@ -35,24 +35,55 @@ namespace Application.Commands.Handlers
                 throw new NotFoundException(nameof(Trip), request.TripId);
             }
 
+            if (trip.Status != TripStatus.PENDING)
+            {
+                throw new Exception("The trip is invalid.");
+            }
+
             if (request.Accept)
             {
                 ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
                 Guid.TryParse(claims!.FindFirst("id")?.Value, out Guid driverId);
+
+                var driver = await _unitOfWork.UserRepository.GetUserById(driverId.ToString());
+
+                if (driver == null)
+                {
+                    throw new NotFoundException(nameof(User), driverId);
+                }
+
+                var car = await _unitOfWork.CarRepository.GetByUserId(driverId);
+
+                if (car == null)
+                {
+                    throw new NotFoundException(nameof(Car), driverId);
+                }
+
+                if (car.TypeId != trip.CartypeId)
+                {
+                    throw new Exception("The driver's car type does not match the trip's car type.");
+                }
+
+                driver.Status = UserStatus.BUSY;
+                driver.UpdatedTime = DateTime.Now;
+                await _unitOfWork.UserRepository.UpdateAsync(driver);
+
                 trip.DriverId = driverId;
                 trip.Status = TripStatus.GOING_TO_PICKUP;
                 trip.UpdatedTime = DateTime.Now;
 
                 KeyValueStore.Instance.Set($"TripConfirmationTask_{trip.Id}", "true");
+
+                await _unitOfWork.TripRepository.UpdateAsync(trip);
+
+                return true;
             }
             else
             {
                 KeyValueStore.Instance.Set($"TripConfirmationTask_{trip.Id}", "false");
+
+                return false;
             }
-
-            await _unitOfWork.TripRepository.UpdateAsync(trip);
-
-            return true;
         }
     }
 }

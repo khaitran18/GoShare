@@ -97,6 +97,7 @@ namespace Application.Commands.Handlers
                 CreateTime = DateTime.Now,
                 UpdatedTime = DateTime.Now,
                 Distance = distance,
+                CartypeId = request.CartypeId,
                 Price = request.TotalPrice,
                 Status = TripStatus.PENDING
             };

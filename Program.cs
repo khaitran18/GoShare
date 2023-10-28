@@ -77,7 +77,7 @@ builder.Services.AddSingleton<ITokenService>(new TokenService(_key,_expirtyMinut
 builder.Services.AddDbContext<GoShareContext>(options => options.UseNpgsql(GoShareConfiguration.ConnectionString("GoShareAzure")));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-//Hangfire
+// Hangfire
 builder.Services.AddHangfire(config => config
     .UsePostgreSqlStorage(c => c.UseNpgsqlConnection(GoShareConfiguration.ConnectionString("GoShareAzure")))
     .UseFilter(new AutomaticRetryAttribute { Attempts = 5 }));

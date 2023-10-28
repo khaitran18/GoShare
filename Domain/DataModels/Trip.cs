@@ -22,6 +22,7 @@ namespace Domain.DataModels
         public DateTime PickupTime { get; set; }
         public double Distance { get; set; }
         public double Price { get; set; }
+        public Guid CartypeId { get; set; }
         public TripStatus Status { get; set; }
         public DateTime CreateTime { get; set; }
         public DateTime UpdatedTime { get; set; }
@@ -30,6 +31,7 @@ namespace Domain.DataModels
         public virtual Location EndLocation { get; set; } = null!;
         public virtual User Passenger { get; set; } = null!;
         public virtual Location StartLocation { get; set; } = null!;
+        public virtual Cartype Cartype { get; set; } = null!;
         public virtual ICollection<Rating> Ratings { get; set; }
         public virtual ICollection<Wallettransaction> Wallettransactions { get; set; }
     }

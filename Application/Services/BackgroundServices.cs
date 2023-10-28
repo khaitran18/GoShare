@@ -44,7 +44,7 @@ namespace Application.Services
             var radius = 1.0; // km
             var maxRadius = 5.0; // km
             var startTime = DateTime.Now;
-            var timeout = TimeSpan.FromMinutes(5); // Set a timeout for finding a driver
+            var timeout = TimeSpan.FromMinutes(10); // Set a timeout for finding a driver
 
             var driversToExclude = new List<User>();
 

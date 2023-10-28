@@ -49,7 +49,9 @@ namespace Infrastructure.Repositories
                     break;
                 }
 
-                double policyDistance = policy.MaxDistance.HasValue ? Math.Min(remainingDistance, policy.MaxDistance.Value - policy.MinDistance) : remainingDistance;
+                double policyDistance = policy.MaxDistance.HasValue 
+                    ? Math.Min(remainingDistance, policy.MaxDistance.Value - policy.MinDistance) 
+                    : remainingDistance;
                 totalPrice += policyDistance * policy.PricePerKm;
                 remainingDistance -= policyDistance;
             }

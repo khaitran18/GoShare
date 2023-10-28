@@ -1,5 +1,6 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Exceptions;
+using Application.Common.Utilities;
 using Application.Service;
 using Application.Services.Interfaces;
 using AutoMapper;
@@ -34,11 +35,50 @@ namespace Application.Commands.Handlers
             var tripDto = new TripDto();
 
             ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
+            Guid.TryParse(claims!.FindFirst("id")?.Value, out Guid driverId);
+
             var trip = await _unitOfWork.TripRepository.GetByIdAsync(request.TripId);
 
             if (trip == null)
             {
                 throw new NotFoundException(nameof(Trip), request.TripId);
+            }
+
+            if (trip.Status != TripStatus.GOING)
+            {
+                throw new Exception("The trip is invalid.");
+            }
+
+            if (trip.DriverId != driverId)
+            {
+                throw new Exception("The driver does not match for this trip.");
+            }
+
+            var driverLocation = await _unitOfWork.LocationRepository.GetByUserIdAndTypeAsync(driverId, LocationType.CURRENT_LOCATION);
+
+            if (driverLocation == null)
+            {
+                throw new NotFoundException(nameof(Location), driverId);
+            }
+
+            driverLocation.Latitude = request.DriverLatitude;
+            driverLocation.Longtitude = request.DriverLongitude;
+            driverLocation.UpdatedTime = DateTime.Now;
+
+            await _unitOfWork.LocationRepository.UpdateAsync(driverLocation);
+
+            var endLocation = await _unitOfWork.LocationRepository.GetByIdAsync(trip.EndLocationId);
+
+            if (endLocation == null)
+            {
+                throw new NotFoundException(nameof(Location), trip.EndLocationId);
+            }
+
+            var distance = MapsUtilities.GetDistance(driverLocation, endLocation);
+
+            if (distance > 1)
+            {
+                throw new Exception("The driver is not near the drop-off location.");
             }
 
             trip.Status = TripStatus.COMPLETED;

@@ -13,7 +13,7 @@ namespace Application.Common.Dtos
 
     public class CartypeFeeDto
     {
-        public Guid Id { get; set; }
+        public Guid CartypeId { get; set; }
         public short Capacity { get; set; }
         public double TotalPrice { get; set; }
     }

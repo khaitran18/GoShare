@@ -59,7 +59,7 @@ namespace Application.Commands.Handlers
 
                 carTypeFees.Add(new CartypeFeeDto
                 {
-                    Id = carType.Id,
+                    CartypeId = carType.Id,
                     Capacity = carType.Capacity,
                     TotalPrice = price
                 });
