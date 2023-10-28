@@ -122,7 +122,7 @@ builder.Services.AddScoped<IRequestHandler<ConfirmPickupPassengerCommand, TripDt
 builder.Services.AddScoped<IRequestHandler<EndTripCommand, TripDto>, EndTripHandler>();
 builder.Services.AddScoped<IRequestHandler<CalculateFeesForTripCommand, List<CartypeFeeDto>>, CalculateFeesForTripHandler>();
 builder.Services.AddScoped<IRequestHandler<DriverRegisterCommand, bool>, DriverRegisterCommandHandler>();
-builder.Services.AddScoped<IRequestHandler<AddCarCommand, Car>, AddCarCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<AddCarCommand, Guid>, AddCarCommandHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
 // Fluent Validation

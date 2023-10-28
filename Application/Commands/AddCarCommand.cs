@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Application.Commands
 {
-    public record AddCarCommand:IRequest<Car>
+    public record AddCarCommand:IRequest<Guid>
     {
         public Guid UserId { get; set; }
         public short Capacity { get; set; }

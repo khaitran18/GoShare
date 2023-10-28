@@ -32,13 +32,13 @@ namespace Application.Commands.Handlers
                 Capacity = request.Capacity,
                 Car = request.Car
             };
-            Car car = await _mediator.Send(command);
+            Guid carGuid = await _mediator.Send(command);
             string path = id.ToString()+"/"+"DriverDocument";
             foreach (var item in request.List)
             {
                 Driverdocument document = new Driverdocument();
                 document.Id = Guid.NewGuid();
-                document.CarId = car.Id;
+                document.CarId = carGuid;
                 document.Url = await _firebaseStorage.UploadFileAsync(item.pic, path, item.type.ToString()+"_"+document.Id);
                 await _unitOfWork.DriverDocumentRepository.AddAsync(document);
             }
