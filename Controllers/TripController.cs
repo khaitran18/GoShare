@@ -25,23 +25,15 @@ namespace Api_Mobile.Controllers
             return Ok(response);
         }
 
-        [HttpPost("AcceptPassenger")]
-        public async Task<IActionResult> AcceptPassenger([FromHeader(Name = "Authorization")] string? authorization, [FromBody] ConfirmPassengerCommand command)
+        [HttpPost("confirm-passenger")]
+        public async Task<IActionResult> ConfirmPassenger([FromHeader(Name = "Authorization")] string? authorization, [FromBody] ConfirmPassengerCommand command)
         {
             command.Token = authorization;
             var response = await _mediator.Send(command);
             return Ok(response);
         }
 
-        [HttpPost("DenyPassenger")]
-        public async Task<IActionResult> DenyPassenger([FromHeader(Name = "Authorization")] string? authorization, [FromBody] ConfirmPassengerCommand command)
-        {
-            command.Token = authorization;
-            var response = await _mediator.Send(command);
-            return Ok(response);
-        }
-
-        [HttpPost("ConfirmPickup")]
+        [HttpPost("confirm-pickup")]
         public async Task<IActionResult> ConfirmPickupPassenger([FromHeader(Name = "Authorization")] string? authorization, [FromBody] ConfirmPickupPassengerCommand command)
         {
             command.Token = authorization;
@@ -49,7 +41,7 @@ namespace Api_Mobile.Controllers
             return Ok(response);
         }
 
-        [HttpPost("EndTrip")]
+        [HttpPost("end-trip")]
         public async Task<IActionResult> EndTrip([FromHeader(Name = "Authorization")] string? authorization, [FromBody] EndTripCommand command)
         {
             command.Token = authorization;
@@ -57,7 +49,7 @@ namespace Api_Mobile.Controllers
             return Ok(response);
         }
 
-        [HttpPost("Fees")]
+        [HttpPost("fees")]
         public async Task<IActionResult> CalculateFeesForTrip([FromHeader(Name = "Authorization")] string? authorization, [FromBody] CalculateFeesForTripCommand command)
         {
             command.Token = authorization;

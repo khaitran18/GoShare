@@ -7,6 +7,7 @@
         ITripRepository TripRepository { get; }
         ILocationRepository LocationRepository { get; }
         ICartypeRepository CartypeRepository { get; }
+        ICarRepository CarRepository { get; }
         Task Save();
     }
 }

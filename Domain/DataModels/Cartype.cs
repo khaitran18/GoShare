@@ -9,6 +9,7 @@ namespace Domain.DataModels
         {
             Cars = new HashSet<Car>();
             Fees = new HashSet<Fee>();
+            Trips = new HashSet<Trip>();
         }
 
         public Guid Id { get; set; }
@@ -18,5 +19,6 @@ namespace Domain.DataModels
 
         public virtual ICollection<Car> Cars { get; set; }
         public virtual ICollection<Fee> Fees { get; set; }
+        public virtual ICollection<Trip> Trips { get; set; }
     }
 }

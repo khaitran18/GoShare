@@ -416,6 +416,14 @@ namespace Infrastructure.Data
                     .HasForeignKey(d => d.StartLocationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("fk_start_location");
+
+                entity.Property(e => e.CartypeId).HasColumnName("cartype_id");
+
+                entity.HasOne(d => d.Cartype)
+                    .WithMany(p => p.Trips)
+                    .HasForeignKey(d => d.CartypeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("fk_cartype_trip");
             });
 
             modelBuilder.Entity<User>(entity =>
