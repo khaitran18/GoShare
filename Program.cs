@@ -27,6 +27,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Application.Service;
 using Application.SignalR;
+using Application.Services.Interfaces;
+using Google.Cloud.Storage.V1;
+using Domain.DataModels;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -91,8 +94,10 @@ FirebaseApp.Create(new AppOptions
     Credential = credential,
     ProjectId = GoShareConfiguration.FirebaseProjectId
 });
+StorageClient _storageClient = StorageClient.Create(credential);
+builder.Services.AddSingleton<IFirebaseStorage>(new FirebaseStorage(GoShareConfiguration.firebaseBucket, _storageClient));
 
-// SignalR
+//SignalR
 builder.Services.AddSignalR(hubOptions =>
 {
     hubOptions.EnableDetailedErrors = true;
@@ -110,11 +115,14 @@ builder.Services.AddScoped<IRequestHandler<ResendOtpCommand, Task>, ResendOtpCom
 builder.Services.AddScoped<IRequestHandler<SetPasscodeCommand, Task>, SetPasscodeCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<RefreshTokenCommand, string>, RefreshTokenCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<RevokeCommand, Task>, RevokeCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<UpdateProfilePictureCommand, string>, UpdateProfilePictureHandler>();
 builder.Services.AddScoped<IRequestHandler<ConfirmPassengerCommand, bool>, ConfirmPassengerHandler>();
 builder.Services.AddScoped<IRequestHandler<UpdateFcmTokenCommand, UserDto>, UpdateFcmTokenHandler>();
 builder.Services.AddScoped<IRequestHandler<ConfirmPickupPassengerCommand, TripDto>, ConfirmPickupPassengerHandler>();
 builder.Services.AddScoped<IRequestHandler<EndTripCommand, TripDto>, EndTripHandler>();
 builder.Services.AddScoped<IRequestHandler<CalculateFeesForTripCommand, List<CartypeFeeDto>>, CalculateFeesForTripHandler>();
+builder.Services.AddScoped<IRequestHandler<DriverRegisterCommand, bool>, DriverRegisterCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<AddCarCommand, Car>, AddCarCommandHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
 // Fluent Validation
@@ -128,6 +136,7 @@ var mapperConfig = new MapperConfiguration(cfg =>
     cfg.AddProfile<AppfeedbackProfile>();
     cfg.AddProfile<UserProfile>();
     cfg.AddProfile<TripProfile>();
+    cfg.AddProfile<CarProfile>();
 });
 var mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
@@ -137,7 +146,6 @@ builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBeh
 //Add twilio
 builder.Services.AddSingleton<Application.Configuration.Twilio>();
 builder.Services.AddScoped<ITwilioVerification, TwilioVerification>();
-//builder.Services.AddSingleton<IVerification>(new Verification(builder.Configuration.GetSection("Twilio").Get<Application.Common.Dtos.Twilio>()));
 builder.Services.AddSingleton<ITwilioVerification>(new TwilioVerification(GoShareConfiguration.TwilioAccount));
 
 //Add SpeedSMSAPI

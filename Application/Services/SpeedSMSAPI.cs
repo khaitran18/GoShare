@@ -1,5 +1,6 @@
 ﻿using Application.Common.Dtos;
 using Application.Configuration;
+using Application.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,12 +12,7 @@ using System.Threading.Tasks;
 
 namespace Application.Services
 {
-    public interface ISpeedSMSAPI
-    {
-        public Task<String> getUserInfo();
-        public Task sendSMS(string phones, string content, int type);
-        public Task<String> sendMMS(String[] phones, String content, String link, String sender);
-    }
+    
     public class SpeedSMSAPI : ISpeedSMSAPI
     {
         public const int TYPE_QC = 1;
@@ -59,7 +55,9 @@ namespace Application.Services
         {
             String url = rootURL + "/user/info";
             NetworkCredential myCreds = new NetworkCredential(_config.AccessToken, ":x");
+#pragma warning disable SYSLIB0014 // Type or member is obsolete
             WebClient client = new WebClient();
+#pragma warning restore SYSLIB0014 // Type or member is obsolete
 
             client.Credentials = myCreds;
             Stream data = client.OpenRead(url);
@@ -104,7 +102,9 @@ namespace Application.Services
                 return "";
 
             NetworkCredential myCreds = new NetworkCredential(_config.AccessToken, ":x");
+#pragma warning disable SYSLIB0014 // Type or member is obsolete
             WebClient client = new WebClient();
+#pragma warning restore SYSLIB0014 // Type or member is obsolete
             client.Credentials = myCreds;
             client.Headers[HttpRequestHeader.ContentType] = "application/json";
 

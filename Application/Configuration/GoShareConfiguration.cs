@@ -88,5 +88,6 @@ namespace Application.Configuration
             issuer = Configuration["Jwt:Issuer"]!,
             audience = Configuration["Jwt:Audience"]!
         };
+        public static string firebaseBucket => Configuration["Google:Firebase:Bucket"]!;
     }
 }

@@ -2,6 +2,7 @@
 using Application.Common.Exceptions;
 using Application.Common.Utilities;
 using Application.Service;
+using Application.Services.Interfaces;
 using AutoMapper;
 using Domain.DataModels;
 using Domain.Enumerations;

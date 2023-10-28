@@ -17,8 +17,8 @@ namespace Domain.DataModels
         public string Model { get; set; } = null!;
         public Guid TypeId { get; set; }
         public short Status { get; set; }
-        public DateTime CreateTime { get; set; }
-        public DateTime UpdatedTime { get; set; }
+        public DateTime CreateTime { get; set; } = DateTime.Now;
+        public DateTime UpdatedTime { get; set; } = DateTime.Now;
 
         public virtual Cartype Type { get; set; } = null!;
         public virtual User User { get; set; } = null!;

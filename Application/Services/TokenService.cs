@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Logging;
+﻿using Application.Services.Interfaces;
+using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -7,21 +8,6 @@ using System.Text;
 
 namespace Application.Service
 {
-    public interface ITokenService
-    {
-        public string GenerateJWTToken(Guid id, string phone, string? name);
-
-        public string GenerateRefreshToken();
-
-        /// <summary>
-        /// using to extract claim from token from header.Authorization
-        /// example use: ValidateToken(tokenString)?.FindFirst("ClaimName")?.Value
-        /// </summary>
-        /// <param name="jwtToken"></param>
-        /// <returns></returns>
-        public ClaimsPrincipal? ValidateToken(string jwtToken);
-        public DateTime CreateRefreshTokenExpiryTime();
-    }
     public class TokenService : ITokenService
     {
         private readonly string _key;
@@ -78,7 +64,7 @@ namespace Application.Service
             return DateTime.Now.AddMinutes(Convert.ToDouble(_refreshTokenExpiryTime));
         }
 
-        public ClaimsPrincipal? ValidateToken(string jwtToken)
+        public ClaimsPrincipal? ValidateToken(string jwtToken) 
         {
             if (jwtToken == "")
             {
@@ -100,6 +86,12 @@ namespace Application.Service
             validationParameters.IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key));
             ClaimsPrincipal principal = new JwtSecurityTokenHandler().ValidateToken(jwtToken, validationParameters, out validatedToken);
             return principal;
+        }
+
+        public Guid GetGuid(string jwtToken)
+        {
+            Guid.TryParse(ValidateToken(jwtToken)!.FindFirst("id")!.Value, out Guid id);
+            return id;
         }
     }
 }
