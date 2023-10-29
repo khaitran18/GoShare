@@ -76,6 +76,7 @@ builder.Services.AddSingleton<ITokenService>(new TokenService(_key,_expirtyMinut
 // Add dependency injection
 builder.Services.AddDbContext<GoShareContext>(options => options.UseNpgsql(GoShareConfiguration.ConnectionString("GoShareAzure")));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddSingleton<ISettingService, SettingService>();
 
 // Hangfire
 builder.Services.AddHangfire(config => config
@@ -156,6 +157,11 @@ builder.Services.AddSingleton<ISpeedSMSAPI>(new SpeedSMSAPI(GoShareConfiguration
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+// Load settings
+var settingService = app.Services.GetRequiredService<ISettingService>();
+settingService.LoadSettings().Wait();
+
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

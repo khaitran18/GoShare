@@ -16,6 +16,9 @@ namespace Infrastructure
         private ICartypeRepository _cartypeRepository = null!;
         private ICarRepository _carRepository = null!;
         private IDriverDocumentRepository _driverDocumentRepository = null!;
+        private IWalletRepository _walletRepository = null!;
+        private IWallettransactionRepository _walletTransactionRepository = null!;
+        private ISettingRepository _settingRepository = null!;
         public UnitOfWork(GoShareContext context, IMapper mapper)
         {
             _context = context;
@@ -29,6 +32,9 @@ namespace Infrastructure
         public ICartypeRepository CartypeRepository => _cartypeRepository ??= new CartypeRepository(_context);
         public ICarRepository CarRepository => _carRepository ??= new CarRepository(_context);
         public IDriverDocumentRepository DriverDocumentRepository => _driverDocumentRepository ??= new DriverDocumentRepository(_context);
+        public IWalletRepository WalletRepository => _walletRepository ??= new WalletRepository(_context);
+        public IWallettransactionRepository WallettransactionRepository => _walletTransactionRepository ??= new WallettransactionRepository(_context);
+        public ISettingRepository SettingRepository => _settingRepository ??= new SettingRepository(_context);
 
         public void Dispose()
         {

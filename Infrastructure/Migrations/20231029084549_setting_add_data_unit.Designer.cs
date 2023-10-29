@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GoShareContext))]
-    partial class GoShareContextModelSnapshot : ModelSnapshot
+    [Migration("20231029084549_setting_add_data_unit")]
+    partial class setting_add_data_unit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -380,45 +382,38 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("0e3649f5-eda9-4d1b-9cf2-5e533299e782"),
+                            Id = new Guid("2ed4f1d4-8f8c-4c67-8f9f-3b44a0ec4588"),
                             DataUnit = (short)5,
                             Key = "FIND_DRIVER_RADIUS",
                             Value = 1.0
                         },
                         new
                         {
-                            Id = new Guid("f1c16187-3a19-4cba-80b4-d65872f4a3fa"),
+                            Id = new Guid("834e9b66-b090-4c60-8924-3941ec059298"),
                             DataUnit = (short)5,
                             Key = "MAX_FIND_DRIVER_RADIUS",
                             Value = 5.0
                         },
                         new
                         {
-                            Id = new Guid("1bec16e7-5576-496b-b991-e699af5c7971"),
+                            Id = new Guid("5031b249-ee0b-4dcc-b64f-3558b73e2a46"),
                             DataUnit = (short)1,
                             Key = "FIND_DRIVER_TIMEOUT",
                             Value = 10.0
                         },
                         new
                         {
-                            Id = new Guid("76a30c46-6893-4b4a-9d0e-79d208b79e65"),
+                            Id = new Guid("ed0c6bfa-3205-4da2-9dda-fbd3bf2eaed9"),
                             DataUnit = (short)1,
                             Key = "DRIVER_RESPONSE_TIMEOUT",
                             Value = 2.0
                         },
                         new
                         {
-                            Id = new Guid("c4257c76-ceb5-4a84-91b6-7589a5f80529"),
+                            Id = new Guid("59eafc44-2848-4551-a1c2-6045eb9cf78b"),
                             DataUnit = (short)5,
                             Key = "NEAR_DESTINATION_DISTANCE",
                             Value = 1.0
-                        },
-                        new
-                        {
-                            Id = new Guid("cf03f47b-4e6c-4c84-ac4d-7f6aea5010c9"),
-                            DataUnit = (short)0,
-                            Key = "DRIVER_WAGE_PERCENT",
-                            Value = 80.0
                         });
                 });
 

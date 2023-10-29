@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GoShareContext))]
-    partial class GoShareContextModelSnapshot : ModelSnapshot
+    [Migration("20231029051823_add_setting")]
+    partial class add_setting
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -359,10 +361,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<short>("DataUnit")
-                        .HasColumnType("smallint")
-                        .HasColumnName("data_unit");
-
                     b.Property<string>("Key")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -376,50 +374,6 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("settings", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("0e3649f5-eda9-4d1b-9cf2-5e533299e782"),
-                            DataUnit = (short)5,
-                            Key = "FIND_DRIVER_RADIUS",
-                            Value = 1.0
-                        },
-                        new
-                        {
-                            Id = new Guid("f1c16187-3a19-4cba-80b4-d65872f4a3fa"),
-                            DataUnit = (short)5,
-                            Key = "MAX_FIND_DRIVER_RADIUS",
-                            Value = 5.0
-                        },
-                        new
-                        {
-                            Id = new Guid("1bec16e7-5576-496b-b991-e699af5c7971"),
-                            DataUnit = (short)1,
-                            Key = "FIND_DRIVER_TIMEOUT",
-                            Value = 10.0
-                        },
-                        new
-                        {
-                            Id = new Guid("76a30c46-6893-4b4a-9d0e-79d208b79e65"),
-                            DataUnit = (short)1,
-                            Key = "DRIVER_RESPONSE_TIMEOUT",
-                            Value = 2.0
-                        },
-                        new
-                        {
-                            Id = new Guid("c4257c76-ceb5-4a84-91b6-7589a5f80529"),
-                            DataUnit = (short)5,
-                            Key = "NEAR_DESTINATION_DISTANCE",
-                            Value = 1.0
-                        },
-                        new
-                        {
-                            Id = new Guid("cf03f47b-4e6c-4c84-ac4d-7f6aea5010c9"),
-                            DataUnit = (short)0,
-                            Key = "DRIVER_WAGE_PERCENT",
-                            Value = 80.0
-                        });
                 });
 
             modelBuilder.Entity("Domain.DataModels.Trip", b =>

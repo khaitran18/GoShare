@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Enumerations;
+using System;
 using System.Collections.Generic;
 
 namespace Domain.DataModels
@@ -9,10 +10,10 @@ namespace Domain.DataModels
         public Guid WalletId { get; set; }
         public Guid? TripId { get; set; }
         public double Amount { get; set; }
-        public short PaymentMethod { get; set; }
+        public PaymentMethod PaymentMethod { get; set; }
         public string? ExternalTransactionId { get; set; }
-        public short Status { get; set; }
-        public short Type { get; set; }
+        public WalletTransactionStatus Status { get; set; }
+        public WalletTransactionType Type { get; set; }
         public DateTime CreateTime { get; set; }
         public DateTime UpdatedTime { get; set; }
 

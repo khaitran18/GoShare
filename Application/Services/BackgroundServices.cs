@@ -3,6 +3,7 @@ using Application.Common.Exceptions;
 using Application.Common.Utilities;
 using Application.Common.Utilities.Google;
 using Application.Common.Utilities.Google.Firebase;
+using Application.Services.Interfaces;
 using Application.SignalR;
 using Domain.DataModels;
 using Domain.Enumerations;
@@ -22,12 +23,14 @@ namespace Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMediator _mediator;
         private readonly IHubContext<SignalRHub> _hubContext;
+        private readonly ISettingService _settingService;
 
-        public BackgroundServices(IUnitOfWork unitOfWork, IMediator mediator, IHubContext<SignalRHub> hubContext)
+        public BackgroundServices(IUnitOfWork unitOfWork, IMediator mediator, IHubContext<SignalRHub> hubContext, ISettingService settingService)
         {
             _unitOfWork = unitOfWork;
             _mediator = mediator;
             _hubContext = hubContext;
+            _settingService = settingService;
         }
 
         public async Task FindDriver(Guid tripId, Guid cartypeId)
@@ -41,10 +44,10 @@ namespace Application.Services
 
             var origin = trip.StartLocation;
 
-            var radius = 1.0; // km
-            var maxRadius = 5.0; // km
+            var radius = _settingService.GetSetting("FIND_DRIVER_RADIUS"); // km
+            var maxRadius = _settingService.GetSetting("MAX_FIND_DRIVER_RADIUS"); // km
             var startTime = DateTime.Now;
-            var timeout = TimeSpan.FromMinutes(10); // Set a timeout for finding a driver
+            var timeout = TimeSpan.FromMinutes(_settingService.GetSetting("FIND_DRIVER_TIMEOUT")); // Set a timeout for finding a driver
 
             var driversToExclude = new List<User>();
 
@@ -123,7 +126,7 @@ namespace Application.Services
                 .SendAsync("NotifyDriverNewTripRequest", content);
 
             // Set a two-minute timeout for driver response
-            var timeoutTask = Task.Delay(TimeSpan.FromMinutes(2));
+            var timeoutTask = Task.Delay(TimeSpan.FromMinutes(_settingService.GetSetting("DRIVER_RESPONSE_TIMEOUT")));
 
             var key = $"TripConfirmationTask_{trip.Id}";
             var status = KeyValueStore.Instance.Get<string>(key);

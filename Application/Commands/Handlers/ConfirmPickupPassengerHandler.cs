@@ -22,12 +22,14 @@ namespace Application.Commands.Handlers
         private readonly IUnitOfWork _unitOfWork;
         private readonly ITokenService _tokenService;
         private readonly IMapper _mapper;
+        private readonly ISettingService _settingService;
 
-        public ConfirmPickupPassengerHandler(IUnitOfWork unitOfWork, ITokenService tokenService, IMapper mapper)
+        public ConfirmPickupPassengerHandler(IUnitOfWork unitOfWork, ITokenService tokenService, IMapper mapper, ISettingService settingService)
         {
             _unitOfWork = unitOfWork;
             _tokenService = tokenService;
             _mapper = mapper;
+            _settingService = settingService;
         }
 
         public async Task<TripDto> Handle(ConfirmPickupPassengerCommand request, CancellationToken cancellationToken)
@@ -76,7 +78,7 @@ namespace Application.Commands.Handlers
 
             var distance = MapsUtilities.GetDistance(driverLocation, startLocation);
 
-            if (distance > 1)
+            if (distance > _settingService.GetSetting("NEAR_DESTINATION_DISTANCE")) //km
             {
                 throw new Exception("The driver is not near the pickup location.");
             }
