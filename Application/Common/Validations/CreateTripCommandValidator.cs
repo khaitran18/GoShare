@@ -20,8 +20,6 @@ namespace Application.Common.Validations
             RuleFor(x => x.EndLongitude).InclusiveBetween(-180, 180).WithMessage("EndLongitude must be between -180 and 180.");
 
             RuleFor(x => x.CartypeId).NotEmpty().WithMessage("CartypeId is required.");
-
-            RuleFor(x => x.TotalPrice).GreaterThan(0).WithMessage("TotalPrice must be greater than 0.");
         }
     }
 }

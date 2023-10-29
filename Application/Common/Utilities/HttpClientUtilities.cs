@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Application.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,10 +22,9 @@ namespace Application.Common.Utilities
         public static async Task<T?> SendRequestAsync<T, M>(
             string requestUrl,
             HttpMethod method,
-            IEnumerable<KeyValuePair<string, string>>? parameters = null,
             M? body = null,
             CancellationToken cancellationToken = default
-            ) where T : class where M : class
+        ) where T : class where M : class
         {
             T? result = null;
 
@@ -32,21 +32,21 @@ namespace Application.Common.Utilities
             {
                 client.BaseAddress = new Uri(requestUrl);
                 client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                client.DefaultRequestHeaders.Add("X-Goog-Api-Key", GoShareConfiguration.GoogleMapsApi);
+                client.DefaultRequestHeaders.Add("X-Goog-FieldMask", "routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline");
 
                 HttpResponseMessage response = new HttpResponseMessage();
-                string queryString = parameters is null ? string.Empty :
-                    "?" + GenerateParameters(parameters);
                 string bodyJson = body is null ? string.Empty :
                     JsonConvert.SerializeObject(body);
 
                 if (method == HttpMethod.Get)
                 {
-                    response = await client.GetAsync(queryString);
+                    response = await client.GetAsync("");
                 }
                 else if (method == HttpMethod.Post)
                 {
                     StringContent content = new StringContent(bodyJson, Encoding.UTF8, "application/json");
-                    response = await client.PostAsync(queryString, content, cancellationToken);
+                    response = await client.PostAsync("", content, cancellationToken);
                 }
 
                 string resultText = await response.Content.ReadAsStringAsync();
@@ -58,7 +58,7 @@ namespace Application.Common.Utilities
                 else
                 {
                     throw new Exception("Failed to fetch: " +
-                        requestUrl + queryString + "\n" +
+                        requestUrl + "\n" +
                         "Status Code: " + response.StatusCode + "\n" +
                         "Response: " + resultText);
                 }

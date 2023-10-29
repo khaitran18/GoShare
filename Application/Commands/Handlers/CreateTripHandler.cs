@@ -39,10 +39,19 @@ namespace Application.Commands.Handlers
             ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
             Guid.TryParse(claims!.FindFirst("id")?.Value, out Guid userId);
 
-            //var startLatitude = decimal.Parse(request.StartLatitude!);
-            //var startLongitude = decimal.Parse(request.StartLongitude!);
-            //var endLatitude = decimal.Parse(request.EndLatitude!);
-            //var endLongitude = decimal.Parse(request.EndLongitude!);
+            var passenger = await _unitOfWork.UserRepository.GetUserById(userId.ToString());
+            if (passenger == null)
+            {
+                throw new NotFoundException(nameof(User), userId);
+            }
+
+            Guid walletOwnerId = passenger.GuardianId ?? passenger.Id;
+
+            var walletOwnerWallet = await _unitOfWork.WalletRepository.GetByUserIdAsync(walletOwnerId);
+            if (walletOwnerWallet == null)
+            {
+                throw new NotFoundException(nameof(Wallet), walletOwnerId);
+            }
 
             var origin = await _unitOfWork.LocationRepository.GetByUserIdAndTypeAsync(userId, LocationType.CURRENT_LOCATION);
             if (origin == null)
@@ -83,9 +92,16 @@ namespace Application.Commands.Handlers
                 UpdatedTime = DateTime.Now
             };
 
-            await _unitOfWork.LocationRepository.AddAsync(destination);
-
             var distance = await GoogleMapsApiUtilities.ComputeDistanceMatrixAsync(origin, destination);
+
+            var totalPrice = await _unitOfWork.CartypeRepository.CalculatePriceForCarType(request.CartypeId, distance);
+
+            if (walletOwnerWallet.Balance < totalPrice)
+            {
+                throw new Exception("The wallet owner's wallet does not have enough balance.");
+            }
+
+            await _unitOfWork.LocationRepository.AddAsync(destination);
 
             var trip = new Trip
             {
@@ -98,7 +114,7 @@ namespace Application.Commands.Handlers
                 UpdatedTime = DateTime.Now,
                 Distance = distance,
                 CartypeId = request.CartypeId,
-                Price = request.TotalPrice,
+                Price = totalPrice,
                 Status = TripStatus.PENDING
             };
 
