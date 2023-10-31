@@ -36,6 +36,7 @@ namespace Infrastructure.Data
         public virtual DbSet<User> Users { get; set; } = null!;
         public virtual DbSet<Wallet> Wallets { get; set; } = null!;
         public virtual DbSet<Wallettransaction> Wallettransactions { get; set; } = null!;
+        public virtual DbSet<Setting> Settings { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -352,6 +353,25 @@ namespace Infrastructure.Data
                     .HasConstraintName("fk_rating_trip");
             });
 
+            modelBuilder.Entity<Setting>(entity =>
+            {
+                entity.ToTable("settings");
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("id");
+
+                entity.Property(e => e.Key)
+                    .HasMaxLength(100)
+                    .HasColumnName("key");
+
+                entity.Property(e => e.Value)
+                    .HasColumnName("value");
+
+                entity.Property(e => e.DataUnit)
+                    .HasColumnName("data_unit");
+            });
+
             modelBuilder.Entity<Trip>(entity =>
             {
                 entity.ToTable("trips");
@@ -466,6 +486,13 @@ namespace Infrastructure.Data
                 entity.Property(e => e.Isdriver).HasColumnName("isdriver");
 
                 entity.Property(e => e.Isverify).HasColumnName("isverify");
+
+                entity.Property(e => e.CanceledTripCount)
+                    .HasColumnName("canceled_trip_count");
+
+                entity.Property(e => e.LastTripCancellationTime)
+                    .HasColumnType("timestamp without time zone")
+                    .HasColumnName("last_trip_cancellation_time");
 
                 entity.Property(e => e.Name)
                     .HasColumnType("character varying")
@@ -591,6 +618,10 @@ namespace Infrastructure.Data
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("fk_wallet_transaction");
             });
+
+            #region DataSeed
+            modelBuilder.SeedSettings();
+            #endregion
 
             OnModelCreatingPartial(modelBuilder);
         }

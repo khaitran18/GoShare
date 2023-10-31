@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Enumerations;
+using System;
 using System.Collections.Generic;
 
 namespace Domain.DataModels
@@ -13,7 +14,7 @@ namespace Domain.DataModels
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
         public double Balance { get; set; }
-        public short Type { get; set; }
+        public WalletStatus Type { get; set; }
         public DateTime CreateTime { get; set; }
         public DateTime UpdatedTime { get; set; }
 

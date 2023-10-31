@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GoShareContext))]
-    partial class GoShareContextModelSnapshot : ModelSnapshot
+    [Migration("20231029084549_setting_add_data_unit")]
+    partial class setting_add_data_unit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -380,45 +382,38 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("839a2c65-cada-4d79-8283-f9d589ba84a1"),
+                            Id = new Guid("2ed4f1d4-8f8c-4c67-8f9f-3b44a0ec4588"),
                             DataUnit = (short)5,
                             Key = "FIND_DRIVER_RADIUS",
                             Value = 1.0
                         },
                         new
                         {
-                            Id = new Guid("df3be7ca-4424-4b81-a401-927772652ccb"),
+                            Id = new Guid("834e9b66-b090-4c60-8924-3941ec059298"),
                             DataUnit = (short)5,
                             Key = "MAX_FIND_DRIVER_RADIUS",
                             Value = 5.0
                         },
                         new
                         {
-                            Id = new Guid("9db1b685-438f-4039-9a9d-02b3583b584e"),
+                            Id = new Guid("5031b249-ee0b-4dcc-b64f-3558b73e2a46"),
                             DataUnit = (short)1,
                             Key = "FIND_DRIVER_TIMEOUT",
                             Value = 10.0
                         },
                         new
                         {
-                            Id = new Guid("6f5ee0f0-1334-4dd3-a2cb-d03310405e0d"),
+                            Id = new Guid("ed0c6bfa-3205-4da2-9dda-fbd3bf2eaed9"),
                             DataUnit = (short)1,
                             Key = "DRIVER_RESPONSE_TIMEOUT",
                             Value = 2.0
                         },
                         new
                         {
-                            Id = new Guid("bf5fec29-67ca-436c-ac22-5390bc91c2f7"),
+                            Id = new Guid("59eafc44-2848-4551-a1c2-6045eb9cf78b"),
                             DataUnit = (short)5,
                             Key = "NEAR_DESTINATION_DISTANCE",
                             Value = 1.0
-                        },
-                        new
-                        {
-                            Id = new Guid("c498f355-5fad-4ffc-86c5-f2a6c6b6594d"),
-                            DataUnit = (short)0,
-                            Key = "DRIVER_WAGE_PERCENT",
-                            Value = 80.0
                         });
                 });
 
@@ -511,10 +506,6 @@ namespace Infrastructure.Migrations
                         .HasColumnName("birth")
                         .HasDefaultValueSql("'-infinity'::timestamp without time zone");
 
-                    b.Property<int>("CanceledTripCount")
-                        .HasColumnType("integer")
-                        .HasColumnName("canceled_trip_count");
-
                     b.Property<DateTime>("CreateTime")
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("create_time");
@@ -542,10 +533,6 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("Isverify")
                         .HasColumnType("boolean")
                         .HasColumnName("isverify");
-
-                    b.Property<DateTime?>("LastTripCancellationTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("last_trip_cancellation_time");
 
                     b.Property<string>("Name")
                         .IsRequired()

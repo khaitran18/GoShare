@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GoShareContext))]
-    partial class GoShareContextModelSnapshot : ModelSnapshot
+    [Migration("20231031035449_add_cancel_trip_count")]
+    partial class add_cancel_trip_count
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -380,42 +382,42 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("839a2c65-cada-4d79-8283-f9d589ba84a1"),
+                            Id = new Guid("0464f0a4-af46-49e0-9140-3db90cd522e0"),
                             DataUnit = (short)5,
                             Key = "FIND_DRIVER_RADIUS",
                             Value = 1.0
                         },
                         new
                         {
-                            Id = new Guid("df3be7ca-4424-4b81-a401-927772652ccb"),
+                            Id = new Guid("44bab87a-f698-4049-ae2b-83df2c6a2bfd"),
                             DataUnit = (short)5,
                             Key = "MAX_FIND_DRIVER_RADIUS",
                             Value = 5.0
                         },
                         new
                         {
-                            Id = new Guid("9db1b685-438f-4039-9a9d-02b3583b584e"),
+                            Id = new Guid("c48d2360-169b-4116-8c58-4191b966d65b"),
                             DataUnit = (short)1,
                             Key = "FIND_DRIVER_TIMEOUT",
                             Value = 10.0
                         },
                         new
                         {
-                            Id = new Guid("6f5ee0f0-1334-4dd3-a2cb-d03310405e0d"),
+                            Id = new Guid("20874b9e-d811-48df-bcf9-7872100251ee"),
                             DataUnit = (short)1,
                             Key = "DRIVER_RESPONSE_TIMEOUT",
                             Value = 2.0
                         },
                         new
                         {
-                            Id = new Guid("bf5fec29-67ca-436c-ac22-5390bc91c2f7"),
+                            Id = new Guid("71a3b3d3-a2a6-447e-9ff7-80e9e09c85e4"),
                             DataUnit = (short)5,
                             Key = "NEAR_DESTINATION_DISTANCE",
                             Value = 1.0
                         },
                         new
                         {
-                            Id = new Guid("c498f355-5fad-4ffc-86c5-f2a6c6b6594d"),
+                            Id = new Guid("d5c2ae8c-75da-426d-a39b-03e8a4955a73"),
                             DataUnit = (short)0,
                             Key = "DRIVER_WAGE_PERCENT",
                             Value = 80.0
@@ -542,10 +544,6 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("Isverify")
                         .HasColumnType("boolean")
                         .HasColumnName("isverify");
-
-                    b.Property<DateTime?>("LastTripCancellationTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("last_trip_cancellation_time");
 
                     b.Property<string>("Name")
                         .IsRequired()

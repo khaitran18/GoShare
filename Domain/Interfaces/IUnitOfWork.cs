@@ -9,6 +9,9 @@
         ICartypeRepository CartypeRepository { get; }
         ICarRepository CarRepository { get; }
         IDriverDocumentRepository DriverDocumentRepository { get; }
+        IWalletRepository WalletRepository { get; }
+        IWallettransactionRepository WallettransactionRepository { get; }
+        ISettingRepository SettingRepository { get; }
         Task Save();
     }
 }

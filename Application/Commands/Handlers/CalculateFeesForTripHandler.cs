@@ -32,11 +32,6 @@ namespace Application.Commands.Handlers
         {
             var carTypeFees = new List<CartypeFeeDto>();
 
-            //var startLatitude = decimal.Parse(request.StartLatitude!);
-            //var startLongitude = decimal.Parse(request.StartLongitude!);
-            //var endLatitude = decimal.Parse(request.EndLatitude!);
-            //var endLongitude = decimal.Parse(request.EndLongitude!);
-
             var origin = new Location
             {
                 Latitude = request.StartLatitude,

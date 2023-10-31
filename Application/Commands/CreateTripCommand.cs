@@ -19,6 +19,5 @@ namespace Application.Commands
         public decimal EndLongitude { get; set; }
         public string? EndAddress { get; set; }
         public Guid CartypeId { get; set; }
-        public double TotalPrice { get; set; }
     }
 }

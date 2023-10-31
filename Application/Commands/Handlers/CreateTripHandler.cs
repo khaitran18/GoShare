@@ -1,5 +1,6 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Exceptions;
+using Application.Common.Utilities;
 using Application.Common.Utilities.Google;
 using Application.Service;
 using Application.Services;
@@ -39,10 +40,19 @@ namespace Application.Commands.Handlers
             ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
             Guid.TryParse(claims!.FindFirst("id")?.Value, out Guid userId);
 
-            //var startLatitude = decimal.Parse(request.StartLatitude!);
-            //var startLongitude = decimal.Parse(request.StartLongitude!);
-            //var endLatitude = decimal.Parse(request.EndLatitude!);
-            //var endLongitude = decimal.Parse(request.EndLongitude!);
+            var passenger = await _unitOfWork.UserRepository.GetUserById(userId.ToString());
+            if (passenger == null)
+            {
+                throw new NotFoundException(nameof(User), userId);
+            }
+
+            Guid walletOwnerId = passenger.GuardianId ?? passenger.Id;
+
+            var walletOwnerWallet = await _unitOfWork.WalletRepository.GetByUserIdAsync(walletOwnerId);
+            if (walletOwnerWallet == null)
+            {
+                throw new NotFoundException(nameof(Wallet), walletOwnerId);
+            }
 
             var origin = await _unitOfWork.LocationRepository.GetByUserIdAndTypeAsync(userId, LocationType.CURRENT_LOCATION);
             if (origin == null)
@@ -83,9 +93,16 @@ namespace Application.Commands.Handlers
                 UpdatedTime = DateTime.Now
             };
 
-            await _unitOfWork.LocationRepository.AddAsync(destination);
-
             var distance = await GoogleMapsApiUtilities.ComputeDistanceMatrixAsync(origin, destination);
+
+            var totalPrice = await _unitOfWork.CartypeRepository.CalculatePriceForCarType(request.CartypeId, distance);
+
+            if (walletOwnerWallet.Balance < totalPrice)
+            {
+                throw new BadRequestException("The wallet owner's wallet does not have enough balance.");
+            }
+
+            await _unitOfWork.LocationRepository.AddAsync(destination);
 
             var trip = new Trip
             {
@@ -98,7 +115,7 @@ namespace Application.Commands.Handlers
                 UpdatedTime = DateTime.Now,
                 Distance = distance,
                 CartypeId = request.CartypeId,
-                Price = request.TotalPrice,
+                Price = totalPrice,
                 Status = TripStatus.PENDING
             };
 
@@ -107,7 +124,8 @@ namespace Application.Commands.Handlers
             tripDto = _mapper.Map<TripDto>(trip);
 
             // Background task
-            BackgroundJob.Enqueue<BackgroundServices>(s => s.FindDriver(trip.Id, request.CartypeId));
+            string jobId = BackgroundJob.Enqueue<BackgroundServices>(s => s.FindDriver(trip.Id, request.CartypeId));
+            KeyValueStore.Instance.Set($"FindDriverTask_{trip.Id}", jobId);
 
             return tripDto;
         }

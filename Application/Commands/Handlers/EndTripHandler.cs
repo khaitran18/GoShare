@@ -22,12 +22,14 @@ namespace Application.Commands.Handlers
         private readonly IUnitOfWork _unitOfWork;
         private readonly ITokenService _tokenService;
         private readonly IMapper _mapper;
+        private readonly ISettingService _settingService;
 
-        public EndTripHandler(IUnitOfWork unitOfWork, ITokenService tokenService, IMapper mapper)
+        public EndTripHandler(IUnitOfWork unitOfWork, ITokenService tokenService, IMapper mapper, ISettingService settingService)
         {
             _unitOfWork = unitOfWork;
             _tokenService = tokenService;
             _mapper = mapper;
+            _settingService = settingService;
         }
 
         public async Task<TripDto> Handle(EndTripCommand request, CancellationToken cancellationToken)
@@ -46,12 +48,12 @@ namespace Application.Commands.Handlers
 
             if (trip.Status != TripStatus.GOING)
             {
-                throw new Exception("The trip is invalid.");
+                throw new BadRequestException("The trip is invalid.");
             }
 
             if (trip.DriverId != driverId)
             {
-                throw new Exception("The driver does not match for this trip.");
+                throw new BadRequestException("The driver does not match for this trip.");
             }
 
             var driverLocation = await _unitOfWork.LocationRepository.GetByUserIdAndTypeAsync(driverId, LocationType.CURRENT_LOCATION);
@@ -76,9 +78,9 @@ namespace Application.Commands.Handlers
 
             var distance = MapsUtilities.GetDistance(driverLocation, endLocation);
 
-            if (distance > 1)
+            if (distance > _settingService.GetSetting("NEAR_DESTINATION_DISTANCE")) //km
             {
-                throw new Exception("The driver is not near the drop-off location.");
+                throw new BadRequestException("The driver is not near the drop-off location.");
             }
 
             trip.Status = TripStatus.COMPLETED;
@@ -92,5 +94,4 @@ namespace Application.Commands.Handlers
             return tripDto;
         }
     }
-
 }
