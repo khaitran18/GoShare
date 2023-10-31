@@ -487,6 +487,9 @@ namespace Infrastructure.Data
 
                 entity.Property(e => e.Isverify).HasColumnName("isverify");
 
+                entity.Property(e => e.CanceledTripCount)
+                    .HasColumnName("canceled_trip_count");
+
                 entity.Property(e => e.Name)
                     .HasColumnType("character varying")
                     .HasColumnName("name")
