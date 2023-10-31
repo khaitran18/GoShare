@@ -42,6 +42,7 @@ namespace Domain.DataModels
         public string? PasscodeResetToken { get; set; }
         public DateTime? PasscodeResetTokenExpiryTime { get; set; }
         public int CanceledTripCount { get; set; }
+        public DateTime? LastTripCancellationTime { get; set; }
 
         public virtual User? Guardian { get; set; }
         public virtual Car? Car { get; set; }

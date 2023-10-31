@@ -39,7 +39,7 @@ namespace Application.Commands.Handlers
 
             if (trip.Status != TripStatus.PENDING)
             {
-                throw new Exception("The trip is invalid.");
+                throw new BadRequestException("The trip is invalid.");
             }
 
             if (request.Accept)
@@ -63,7 +63,7 @@ namespace Application.Commands.Handlers
 
                 if (car.TypeId != trip.CartypeId)
                 {
-                    throw new Exception("The driver's car type does not match the trip's car type.");
+                    throw new BadRequestException("The driver's car type does not match the trip's car type.");
                 }
 
                 driver.Status = UserStatus.BUSY;
@@ -100,7 +100,7 @@ namespace Application.Commands.Handlers
 
                 if (walletOwnerWallet.Balance < trip.Price)
                 {
-                    throw new Exception("The wallet owner's wallet does not have enough balance.");
+                    throw new BadRequestException("The wallet owner's wallet does not have enough balance.");
                 }
 
                 walletOwnerWallet.Balance -= trip.Price;
@@ -149,14 +149,14 @@ namespace Application.Commands.Handlers
                 systemWallet.Balance += systemCommission;
                 await _unitOfWork.WalletRepository.UpdateAsync(systemWallet);
 
-                return true;
             }
             else
             {
                 KeyValueStore.Instance.Set($"TripConfirmationTask_{trip.Id}", "false");
 
-                return false;
             }
+
+            return true;
         }
     }
 }

@@ -45,7 +45,7 @@ namespace Application.Commands.Handlers
 
             if (trip.Status != TripStatus.GOING_TO_PICKUP)
             {
-                throw new Exception("The trip is invalid.");
+                throw new BadRequestException("The trip is invalid.");
             }
 
             ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
@@ -53,7 +53,7 @@ namespace Application.Commands.Handlers
 
             if (trip.DriverId != driverId)
             {
-                throw new Exception("The driver does not match for this trip.");
+                throw new BadRequestException("The driver does not match for this trip.");
             }
 
             var driverLocation = await _unitOfWork.LocationRepository.GetByUserIdAndTypeAsync(driverId, LocationType.CURRENT_LOCATION);
@@ -80,7 +80,7 @@ namespace Application.Commands.Handlers
 
             if (distance > _settingService.GetSetting("NEAR_DESTINATION_DISTANCE")) //km
             {
-                throw new Exception("The driver is not near the pickup location.");
+                throw new BadRequestException("The driver is not near the pickup location.");
             }
 
             trip.Status = TripStatus.GOING;

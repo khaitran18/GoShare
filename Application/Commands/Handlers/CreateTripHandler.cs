@@ -1,5 +1,6 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Exceptions;
+using Application.Common.Utilities;
 using Application.Common.Utilities.Google;
 using Application.Service;
 using Application.Services;
@@ -98,7 +99,7 @@ namespace Application.Commands.Handlers
 
             if (walletOwnerWallet.Balance < totalPrice)
             {
-                throw new Exception("The wallet owner's wallet does not have enough balance.");
+                throw new BadRequestException("The wallet owner's wallet does not have enough balance.");
             }
 
             await _unitOfWork.LocationRepository.AddAsync(destination);
@@ -123,7 +124,8 @@ namespace Application.Commands.Handlers
             tripDto = _mapper.Map<TripDto>(trip);
 
             // Background task
-            BackgroundJob.Enqueue<BackgroundServices>(s => s.FindDriver(trip.Id, request.CartypeId));
+            string jobId = BackgroundJob.Enqueue<BackgroundServices>(s => s.FindDriver(trip.Id, request.CartypeId));
+            KeyValueStore.Instance.Set($"FindDriverTask_{trip.Id}", jobId);
 
             return tripDto;
         }

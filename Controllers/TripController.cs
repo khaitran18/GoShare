@@ -56,5 +56,13 @@ namespace Api_Mobile.Controllers
             var response = await _mediator.Send(command);
             return Ok(response);
         }
+
+        [HttpPost("cancel")]
+        public async Task<IActionResult> CancelTrip([FromHeader(Name = "Authorization")] string? authorization, [FromBody] CancelTripCommand command)
+        {
+            command.Token = authorization;
+            var response = await _mediator.Send(command);
+            return Ok(response);
+        }
     }
 }
