@@ -115,6 +115,8 @@ namespace Infrastructure.Data
 
                 entity.Property(e => e.UserId).HasColumnName("user_id");
 
+                entity.HasIndex(e => e.UserId).IsUnique();
+
                 entity.HasOne(d => d.Type)
                     .WithMany(p => p.Cars)
                     .HasForeignKey(d => d.TypeId)
@@ -124,7 +126,7 @@ namespace Infrastructure.Data
                 entity.HasOne(d => d.User)
                     .WithOne(p => p.Car)
                     .HasForeignKey<Car>(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("fk_car_user");
             });
 

@@ -110,6 +110,7 @@ namespace Application.Services
 
         private async Task<bool> NotifyDriverAndAwaitResponse(User driver, Trip trip)
         {
+            Console.WriteLine($"Found driver {driver.Id}!");
             string content = (trip.StartLocation.Address == null || trip.EndLocation.Address == null)
                 ? "Bạn có yêu cầu chuyến xe mới"
                 : $"Bạn có muốn đón khách từ {trip.StartLocation.Address} đi {trip.EndLocation.Address} không?";
