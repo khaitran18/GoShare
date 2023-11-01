@@ -22,12 +22,11 @@ jobs:
          6.0.x
          8.0.x
 
-
     - name: Restore dependencies
       run: dotnet restore ./GoShare.sln 
 
     - name: Build
-      run: dotnet build ./GoShare.sln --configuration Release --no-restore
+      run: dotnet build GoShare --configuration Release --no-restore
 
     - name: Mobile App Settings Variable Substitution
       uses: microsoft/variable-substitution@v1
@@ -49,12 +48,22 @@ jobs:
        Jwt: ${{ secrets.Jwt }}
        Admin: ${{ secrets.Admin }}
 
-    - name: Publish
-      run: dotnet publish ./GoShare.sln --configuration Release --no-build --output ./publish
+    - name: Publish Admin Api Project
+      run: dotnet publish ./Api_Admin/Api_Admin.csprj --configuration Release --no-build --output ./publish/Admin_Api
 
-    - name: Deploy to Azure
+    - name: Publish Mobile Api Project
+      run: dotnet publish ./Api_Mobile/Api_Mobile.csprj --configuration Release --no-build --output ./publish/Mobile_Api
+
+    - name: Deploy Mobile Api to Azure
       uses: azure/webapps-deploy@v2
       with:
         app-name: ApiMobile20231019122723
         publish-profile: ${{ secrets.ApiMobile20231019122723 }}
-        package: './publish'
+        package: './publish/Mobile_Api'
+
+    - name: Deploy Admin Api to Azure
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ApiMobile20231019122723/admin
+        publish-profile: ${{ secrets.ApiMobile20231019122723 }}
+        package: './publish/Admin_Api'
