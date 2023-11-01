@@ -89,5 +89,11 @@ namespace Application.Configuration
             audience = Configuration["Jwt:Audience"]!
         };
         public static string firebaseBucket => Configuration["Google:Firebase:Bucket"]!;
+
+        public static Admin admin => new Admin
+        {
+            Username = Configuration["Admin:Username"]!,
+            Password = Configuration["Admin:Password"]!
+        };
     }
 }

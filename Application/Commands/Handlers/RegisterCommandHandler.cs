@@ -35,6 +35,7 @@ namespace Application.Commands.Handlers
             {
                 string otp = OtpUtils.Generate();
                 //await Task.FromResult(_SpeedSMSAPI.sendSMS(request.Phone, "Ma OTP GoShare cua ban la: " + otp, 5));
+                //await 
                 User user = new User();
                 user.Id = Guid.NewGuid();
                 user.Phone = request.Phone;

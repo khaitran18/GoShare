@@ -12,12 +12,10 @@ namespace Infrastructure.Repositories
     public class UserRepository : BaseRepository<User>, IUserRepository
     {
         private readonly GoShareContext _context;
-        private readonly IMapper _mapper;
 
-        public UserRepository(GoShareContext context, IMapper mapper) : base(context)
+        public UserRepository(GoShareContext context) : base(context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
 
@@ -80,6 +78,14 @@ namespace Infrastructure.Repositories
         public Task<bool> PhoneExist(string phone)
         {
             return Task.FromResult(_context.Users.Any(u => u.Phone.Equals(phone)));
+        }
+
+        public async Task<bool> VerifyDriver(Guid userGuid)
+        {
+            User u = _context.Users.FirstOrDefault(u => u.Id.Equals(userGuid))!;
+            u.Isdriver = true;
+            await _context.SaveChangesAsync();
+            return await Task.FromResult(true);
         }
     }
 }

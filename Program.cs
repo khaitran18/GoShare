@@ -32,7 +32,6 @@ using Google.Cloud.Storage.V1;
 using Domain.DataModels;
 
 var builder = WebApplication.CreateBuilder(args);
-
 //Add middlewares
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 // Add services to the container.
@@ -142,6 +141,7 @@ var mapperConfig = new MapperConfiguration(cfg =>
 });
 var mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
+
 // Add Behaviour
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 

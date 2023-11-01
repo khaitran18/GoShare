@@ -8,7 +8,6 @@ namespace Infrastructure
     public class UnitOfWork : IUnitOfWork
     {
         private readonly GoShareContext _context;
-        private readonly IMapper _mapper;
         private IUserRepository _userRepository = null!;
         private IAppfeedbackRepository _appfeedbackRepository = null!;
         private ITripRepository _tripRepository = null!;
@@ -19,13 +18,12 @@ namespace Infrastructure
         private IWalletRepository _walletRepository = null!;
         private IWallettransactionRepository _walletTransactionRepository = null!;
         private ISettingRepository _settingRepository = null!;
-        public UnitOfWork(GoShareContext context, IMapper mapper)
+        public UnitOfWork(GoShareContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
-        public IUserRepository UserRepository => _userRepository ??= new UserRepository(_context, _mapper);
+        public IUserRepository UserRepository => _userRepository ??= new UserRepository(_context);
         public IAppfeedbackRepository AppfeedbackRepository => _appfeedbackRepository ??= new AppfeedbackRepository(_context);
         public ITripRepository TripRepository => _tripRepository ??= new TripRepository(_context);
         public ILocationRepository LocationRepository => _locationRepository ??= new LocationRepository(_context);
