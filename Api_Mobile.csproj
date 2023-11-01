@@ -10,18 +10,22 @@
   <ItemGroup>
     <Compile Remove="Api_Admin\**" />
     <Compile Remove="Application\**" />
+    <Compile Remove="Console\**" />
     <Compile Remove="Domain\**" />
     <Compile Remove="Infrastructure\**" />
     <Content Remove="Api_Admin\**" />
     <Content Remove="Application\**" />
+    <Content Remove="Console\**" />
     <Content Remove="Domain\**" />
     <Content Remove="Infrastructure\**" />
     <EmbeddedResource Remove="Api_Admin\**" />
     <EmbeddedResource Remove="Application\**" />
+    <EmbeddedResource Remove="Console\**" />
     <EmbeddedResource Remove="Domain\**" />
     <EmbeddedResource Remove="Infrastructure\**" />
     <None Remove="Api_Admin\**" />
     <None Remove="Application\**" />
+    <None Remove="Console\**" />
     <None Remove="Domain\**" />
     <None Remove="Infrastructure\**" />
   </ItemGroup>

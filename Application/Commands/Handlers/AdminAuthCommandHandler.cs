@@ -1,7 +1,9 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Exceptions;
+using Application.Common.Utilities;
 using Application.Configuration;
 using Application.Services.Interfaces;
+using Domain.Enumerations;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -27,8 +29,10 @@ namespace Application.Commands.Handlers
             TokenResponse response = new TokenResponse();
             if ((request.Username.Equals(_admin.Username)) && (request.Password.Equals(_admin.Password)))
             {
-                response.AccessToken = _tokenService.GenerateJWTToken(new Guid("b18d7bd7-2589-4094-8814-9dde9dfb7178"), "0919651361", "Admin");
+                response.AccessToken = _tokenService.GenerateJWTToken(null,null,null,role:UserRoleEnumerations.Admin);
                 response.RefreshToken = _tokenService.GenerateRefreshToken();
+                KeyValueStore.Instance.Set("Admin_RefreshToken", response.RefreshToken);
+                KeyValueStore.Instance.Set("Admin_RefreshToken_Expiry", _tokenService.CreateRefreshTokenExpiryTime());
             }
             else throw new BadRequestException("Wrong username or password");
             return await Task.FromResult(response);

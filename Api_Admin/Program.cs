@@ -71,6 +71,7 @@ builder.Services.AddSingleton<Admin>(GoShareConfiguration.admin);
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<IRequestHandler<VerifyDriverCommand, bool>, VerifyDriverCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<AdminAuthCommand, TokenResponse>, AdminAuthCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<RefreshTokenCommand, string>, RefreshTokenCommandHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
 

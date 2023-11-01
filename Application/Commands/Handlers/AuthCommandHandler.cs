@@ -3,6 +3,7 @@ using Application.Common.Exceptions;
 using Application.Service;
 using Application.Services.Interfaces;
 using AutoMapper;
+using Domain.Enumerations;
 using Domain.Interfaces;
 using Infrastructure.Service;
 using MediatR;
@@ -41,7 +42,9 @@ namespace Application.Commands.Handlers
                 }
                 else
                 {
-                    response.AccessToken = _tokenService.GenerateJWTToken(user.Id,user.Phone,user.Name);
+                    UserRoleEnumerations role = UserRoleEnumerations.User;
+                    if (user.Isdriver) role = UserRoleEnumerations.Driver;
+                    response.AccessToken = _tokenService.GenerateJWTToken(user.Id,user.Phone,user.Name,role);
                     response.RefreshToken = _tokenService.GenerateRefreshToken();
                     user.RefreshToken = response.RefreshToken;
                     user.RefreshTokenExpiryTime = _tokenService.CreateRefreshTokenExpiryTime();

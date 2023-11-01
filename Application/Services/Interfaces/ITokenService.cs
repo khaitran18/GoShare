@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Enumerations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -9,7 +10,7 @@ namespace Application.Services.Interfaces
 {
     public interface ITokenService
     {
-        public string GenerateJWTToken(Guid id, string phone, string? name);
+        public string GenerateJWTToken(Guid? id, string? phone, string? name, UserRoleEnumerations role);
 
         public string GenerateRefreshToken();
 

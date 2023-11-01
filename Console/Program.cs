@@ -1,6 +1,8 @@
-﻿using Application.Configuration;
+﻿using Application.Commands;
+using Application.Configuration;
 using Application.Services;
 using Application.Services.Interfaces;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using System.Reflection;
 partial class Program
@@ -10,7 +12,8 @@ partial class Program
         Configure();
         string choice = "";
         List<string> Menu = new List<string>{
-            "Twlio Service"
+            "Twlio Service",
+            "Login Service"
             };
         while (!choice.Equals("-1"))
         {

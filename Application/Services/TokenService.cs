@@ -1,4 +1,5 @@
 ﻿using Application.Services.Interfaces;
+using Domain.Enumerations;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -25,17 +26,16 @@ namespace Application.Service
             _audience = audience;
         }
 
-        public string GenerateJWTToken(Guid id, string phone, string? name)
+        public string GenerateJWTToken(Guid? id, string? phone, string? name, UserRoleEnumerations role)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key));
             var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-            var claims = new List<Claim>()
-            {
-                new Claim("id", id.ToString()),
-                new Claim("phone", phone),
-                new Claim("name", name!),
- //               new Claim(ClaimTypes.Role,roles)
-            };
+            var claims = new List<Claim>();
+
+            if (id is not null) claims.Add(new Claim("id", id.ToString()!));
+            if (phone is not null) claims.Add(new Claim("phone", phone.ToString()));
+            if (name is not null) claims.Add(new Claim("name", name.ToString()));
+            claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
 
             var token = new JwtSecurityToken(
                 issuer: _issuer,
