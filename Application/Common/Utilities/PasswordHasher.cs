@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastructure.Service
+namespace Application.Common.Utilities
 {
     public class PasswordHasher
     {

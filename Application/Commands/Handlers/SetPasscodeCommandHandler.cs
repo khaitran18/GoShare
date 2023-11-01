@@ -1,7 +1,7 @@
 ﻿using Application.Common.Exceptions;
+using Application.Common.Utilities;
 using Domain.DataModels;
 using Domain.Interfaces;
-using Infrastructure.Service;
 using MediatR;
 using System;
 using System.Collections.Generic;

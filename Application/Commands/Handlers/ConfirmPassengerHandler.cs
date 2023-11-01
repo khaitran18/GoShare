@@ -1,6 +1,5 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Utilities;
-using Application.Service;
 using Application.Services.Interfaces;
 using Domain.DataModels;
 using Domain.Enumerations;

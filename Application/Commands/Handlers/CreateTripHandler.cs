@@ -2,7 +2,6 @@
 using Application.Common.Exceptions;
 using Application.Common.Utilities;
 using Application.Common.Utilities.Google;
-using Application.Service;
 using Application.Services;
 using Application.Services.Interfaces;
 using AutoMapper;

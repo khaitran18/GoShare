@@ -3,7 +3,7 @@ using Application.Commands;
 using Application.Commands.Handlers;
 using Application.Common.Dtos;
 using Application.Configuration;
-using Application.Service;
+using Application.Services;
 using Application.Services.Interfaces;
 using Domain.Interfaces;
 using Infrastructure;

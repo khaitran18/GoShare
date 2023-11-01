@@ -4,7 +4,6 @@ using Application.Services;
 using Application.Services.Interfaces;
 using Domain.DataModels;
 using Domain.Interfaces;
-using Infrastructure.Service;
 using MediatR;
 using System;
 using System.Collections.Generic;

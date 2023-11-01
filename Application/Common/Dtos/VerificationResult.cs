@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.DataModels
+namespace Application.Common.Dtos
 {
     public class VerificationResult
     {

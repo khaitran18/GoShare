@@ -1,5 +1,5 @@
-﻿using Application.Services.Interfaces;
-using Domain.DataModels;
+﻿using Application.Common.Dtos;
+using Application.Services.Interfaces;
 using Domain.Interfaces;
 using Twilio;
 using Twilio.Exceptions;

@@ -7,7 +7,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Application.Service
+namespace Application.Services
 {
     public class TokenService : ITokenService
     {
@@ -64,7 +64,7 @@ namespace Application.Service
             return DateTime.Now.AddMinutes(Convert.ToDouble(_refreshTokenExpiryTime));
         }
 
-        public ClaimsPrincipal? ValidateToken(string jwtToken) 
+        public ClaimsPrincipal? ValidateToken(string jwtToken)
         {
             if (jwtToken == "")
             {

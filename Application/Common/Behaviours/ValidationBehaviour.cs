@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using MediatR;
-namespace Application.Common.Behaviour
+namespace Application.Common.Behaviours
 {
     public class ValidationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
@@ -19,7 +19,7 @@ namespace Application.Common.Behaviour
             if (validationFailures.Any())
             {
                 //var error = string.Join("\r\n", validationFailures);
-                throw new Common.Exceptions.ValidationException(validationFailures);
+                throw new Exceptions.ValidationException(validationFailures);
                 //Exceptions.ValidationException exception = new Exceptions.ValidationException();
                 //return (TResponse)Activator.CreateInstance(typeof(TResponse), true, error, exception);
             }

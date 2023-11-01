@@ -1,11 +1,10 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Exceptions;
-using Application.Service;
+using Application.Common.Utilities;
 using Application.Services.Interfaces;
 using AutoMapper;
 using Domain.Enumerations;
 using Domain.Interfaces;
-using Infrastructure.Service;
 using MediatR;
 namespace Application.Commands.Handlers
 {

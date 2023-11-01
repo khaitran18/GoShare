@@ -1,5 +1,4 @@
 using Api_Mobile.Middlewares;
-using Application.Common.Behaviour;
 using Application.Common.Dtos;
 using Application.Common.Mappers;
 using Application.Common.Validations;
@@ -25,11 +24,11 @@ using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Application.Service;
 using Application.SignalR;
 using Application.Services.Interfaces;
 using Google.Cloud.Storage.V1;
 using Domain.DataModels;
+using Application.Common.Behaviours;
 
 var builder = WebApplication.CreateBuilder(args);
 //Add middlewares
@@ -88,7 +87,7 @@ builder.Services.AddHangfireServer(options =>
 });
 
 // Firebase
-var credential = GoogleCredential.FromFile(GoShareConfiguration.FirebaseCredentialFile);
+var credential = GoogleCredential.FromFile(Directory.GetParent(Environment.CurrentDirectory)!.FullName +  "\\" +GoShareConfiguration.FirebaseCredentialFile);
 FirebaseApp.Create(new AppOptions
 {
     Credential = credential,
