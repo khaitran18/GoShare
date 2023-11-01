@@ -11,6 +11,6 @@ namespace Application.Commands
     public class AdminAuthCommand : IRequest<TokenResponse>
     {
         public string Username { get; set; } = null!;
-        public string Password { get; set; } = null!;
+        public string Password { get; set; } = null!;   
     }
 }
