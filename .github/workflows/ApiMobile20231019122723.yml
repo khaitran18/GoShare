@@ -49,10 +49,10 @@ jobs:
        Admin: ${{ secrets.Admin }}
 
     - name: Publish Admin Api Project
-      run: dotnet publish ./Api_Admin/Api_Admin.csprj --configuration Release --no-build --output ./publish/Admin_Api
+      run: dotnet publish ./Api_Admin/Api_Admin.csproj --configuration Release --no-build --output ./publish/Admin_Api
 
     - name: Publish Mobile Api Project
-      run: dotnet publish ./Api_Mobile/Api_Mobile.csprj --configuration Release --no-build --output ./publish/Mobile_Api
+      run: dotnet publish ./Api_Mobile/Api_Mobile.csproj --configuration Release --no-build --output ./publish/Mobile_Api
 
     - name: Deploy Mobile Api to Azure
       uses: azure/webapps-deploy@v2
