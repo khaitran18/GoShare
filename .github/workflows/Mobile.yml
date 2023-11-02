@@ -43,6 +43,6 @@ jobs:
     - name: Deploy to Azure
       uses: azure/webapps-deploy@v2
       with:
-        app-name: ApiMobile20231019122723
-        publish-profile: ${{ secrets.ApiMobile20231019122723 }}
+        app-name: GoShareApi
+        publish-profile: ${{ secrets.GoShareApiPublishSettings }}
         package: './publish'
