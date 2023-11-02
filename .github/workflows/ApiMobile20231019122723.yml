@@ -57,7 +57,7 @@ jobs:
     - name: Deploy Mobile Api to Azure
       uses: azure/webapps-deploy@v2
       with:
-        app-name: ApiMobile20231019122723
+        app-name: ApiMobile20231019122723/mobile
         publish-profile: ${{ secrets.ApiMobile20231019122723 }}
         package: './publish/Mobile_Api'
 
