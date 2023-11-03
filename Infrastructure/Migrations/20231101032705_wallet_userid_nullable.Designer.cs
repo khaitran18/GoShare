@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GoShareContext))]
-    partial class GoShareContextModelSnapshot : ModelSnapshot
+    [Migration("20231101032705_wallet_userid_nullable")]
+    partial class wallet_userid_nullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -380,66 +382,45 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("5ec1198e-4a90-4304-bfbd-964d07efcc26"),
+                            Id = new Guid("383d361e-402a-412e-9cd3-e53945cf3ad9"),
                             DataUnit = (short)5,
                             Key = "FIND_DRIVER_RADIUS",
                             Value = 1.0
                         },
                         new
                         {
-                            Id = new Guid("b582f1b7-c70c-4b49-94cd-97911c6efefc"),
+                            Id = new Guid("17ba9b2f-c1e1-40a2-874f-2a5e4a7afabe"),
                             DataUnit = (short)5,
                             Key = "MAX_FIND_DRIVER_RADIUS",
                             Value = 5.0
                         },
                         new
                         {
-                            Id = new Guid("60c4b25e-b8eb-477a-80c6-ce0d5ea70b3b"),
+                            Id = new Guid("35c259d6-0130-4c6b-9a10-72a42455e708"),
                             DataUnit = (short)1,
                             Key = "FIND_DRIVER_TIMEOUT",
                             Value = 10.0
                         },
                         new
                         {
-                            Id = new Guid("694ff23a-f3bf-485d-a28e-321dc3bcc7ae"),
+                            Id = new Guid("207062ce-e2e1-4b79-8172-853fa6221af8"),
                             DataUnit = (short)1,
                             Key = "DRIVER_RESPONSE_TIMEOUT",
                             Value = 2.0
                         },
                         new
                         {
-                            Id = new Guid("5fe54d27-3ad1-49b7-9742-0e2030fb37d3"),
+                            Id = new Guid("6b3e1b66-593b-4eae-bbfc-5db22abf0899"),
                             DataUnit = (short)5,
                             Key = "NEAR_DESTINATION_DISTANCE",
                             Value = 1.0
                         },
                         new
                         {
-                            Id = new Guid("30811a5b-51b3-4abe-b3b8-b39856174aa5"),
+                            Id = new Guid("e38f60e4-f4b2-4113-b271-5919bbc6175e"),
                             DataUnit = (short)0,
                             Key = "DRIVER_WAGE_PERCENT",
                             Value = 80.0
-                        },
-                        new
-                        {
-                            Id = new Guid("cd2ad062-7d62-439f-963e-aebce3fe19cf"),
-                            DataUnit = (short)6,
-                            Key = "TRIP_CANCELLATION_LIMIT",
-                            Value = 20.0
-                        },
-                        new
-                        {
-                            Id = new Guid("10702f0c-157e-4848-af27-a8b66809e4b3"),
-                            DataUnit = (short)1,
-                            Key = "TRIP_CANCELLATION_WINDOW",
-                            Value = 10.0
-                        },
-                        new
-                        {
-                            Id = new Guid("e86b3014-8910-4bcc-ab4f-867b74fb1059"),
-                            DataUnit = (short)1,
-                            Key = "CANCELLATION_BAN_DURATION",
-                            Value = 15.0
                         });
                 });
 
@@ -535,10 +516,6 @@ namespace Infrastructure.Migrations
                     b.Property<int>("CanceledTripCount")
                         .HasColumnType("integer")
                         .HasColumnName("canceled_trip_count");
-
-                    b.Property<DateTime?>("CancellationBanUntil")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("cancellation_ban_until");
 
                     b.Property<DateTime>("CreateTime")
                         .HasColumnType("timestamp without time zone")

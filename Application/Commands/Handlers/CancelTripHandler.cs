@@ -1,11 +1,13 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Utilities;
+using Application.Services;
 using Application.Services.Interfaces;
 using Domain.DataModels;
 using Domain.Enumerations;
 using Domain.Interfaces;
 using Hangfire;
 using MediatR;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,12 +21,15 @@ namespace Application.Commands.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ITokenService _tokenService;
+        private readonly ISettingService _settingService;
 
-        public CancelTripHandler(IUnitOfWork unitOfWork, ITokenService tokenService)
+        public CancelTripHandler(IUnitOfWork unitOfWork, ITokenService tokenService, ISettingService settingService)
         {
             _unitOfWork = unitOfWork;
             _tokenService = tokenService;
+            _settingService = settingService;
         }
+
         public async Task<bool> Handle(CancelTripCommand request, CancellationToken cancellationToken)
         {
             ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
@@ -37,13 +42,6 @@ namespace Application.Commands.Handlers
             }
 
             var now = DateTime.Now;
-            var tenMinutesAgo = now.AddMinutes(-10);
-
-            // Check if the user has cancelled too many trips recently
-            if (user.LastTripCancellationTime >= tenMinutesAgo && user.CanceledTripCount >= 20)
-            {
-                throw new BadRequestException("You have exceeded the maximum number of cancellations allowed within 10 minutes.");
-            }
 
             var trip = await _unitOfWork.TripRepository.GetByIdAsync(request.TripId);
             if (trip == null)
@@ -66,16 +64,48 @@ namespace Application.Commands.Handlers
 
             await _unitOfWork.TripRepository.UpdateAsync(trip);
 
-            // If the last cancellation was more than 10 minutes ago, reset the count
-            if (user.LastTripCancellationTime < tenMinutesAgo)
+            user.CanceledTripCount++;
+
+            // Cancel reach limit
+            var cancellationLimit = _settingService.GetSetting("TRIP_CANCELLATION_LIMIT");
+            var banDuration = _settingService.GetSetting("CANCELLATION_BAN_DURATION");
+            var cancellationWindowMinutes = _settingService.GetSetting("TRIP_CANCELLATION_WINDOW");
+
+            if (user.CanceledTripCount == 1)
             {
-                user.CanceledTripCount = 0;
+                user.LastTripCancellationTime = now;
+
+                // Scheduled job to reset cancellation count and time
+                var resetJobId = BackgroundJob.Schedule<BackgroundServices>(s => s.ResetCancellationCountAndTime(user.Id), TimeSpan.FromMinutes(cancellationWindowMinutes));
+                KeyValueStore.Instance.Set($"ResetCancellationTask_{user.Id}", resetJobId);
             }
 
-            user.CanceledTripCount++;
-            user.LastTripCancellationTime = now;
+            if (user.CanceledTripCount == cancellationLimit)
+            {
+                user.CancellationBanUntil = now.AddMinutes(banDuration);
+
+                // Cancel the reset job as the user has reached the cancellation limit
+                var resetJobId = KeyValueStore.Instance.Get<string>($"ResetCancellationTask_{user.Id}");
+                if (!string.IsNullOrEmpty(resetJobId))
+                {
+                    BackgroundJob.Delete(resetJobId);
+                    KeyValueStore.Instance.Remove($"ResetCancellationTask_{user.Id}");
+                }
+            }
 
             await _unitOfWork.UserRepository.UpdateAsync(user);
+
+            // Check if a driver was assigned to the trip
+            if (trip.DriverId.HasValue)
+            {
+                var driver = await _unitOfWork.UserRepository.GetUserById(trip.DriverId.Value.ToString());
+                if (driver != null && driver.Status == UserStatus.BUSY)
+                {
+                    // Reset the status of the driver to active
+                    driver.Status = UserStatus.ACTIVE;
+                    await _unitOfWork.UserRepository.UpdateAsync(driver);
+                }
+            }
 
             // Cancel find driver task
             string jobId = KeyValueStore.Instance.Get<string>($"FindDriverTask_{trip.Id}");

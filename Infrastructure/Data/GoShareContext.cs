@@ -496,6 +496,10 @@ namespace Infrastructure.Data
                     .HasColumnType("timestamp without time zone")
                     .HasColumnName("last_trip_cancellation_time");
 
+                entity.Property(e => e.CancellationBanUntil)
+                    .HasColumnType("timestamp without time zone")
+                    .HasColumnName("cancellation_ban_until");
+
                 entity.Property(e => e.Name)
                     .HasColumnType("character varying")
                     .HasColumnName("name")

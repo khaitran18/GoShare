@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GoShareContext))]
-    partial class GoShareContextModelSnapshot : ModelSnapshot
+    [Migration("20231102121514_add_ban_until")]
+    partial class add_ban_until
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -380,66 +382,59 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("5ec1198e-4a90-4304-bfbd-964d07efcc26"),
+                            Id = new Guid("46d0b3db-9de5-460d-b3fe-e982884fc828"),
                             DataUnit = (short)5,
                             Key = "FIND_DRIVER_RADIUS",
                             Value = 1.0
                         },
                         new
                         {
-                            Id = new Guid("b582f1b7-c70c-4b49-94cd-97911c6efefc"),
+                            Id = new Guid("5b4718f3-5239-4bba-b803-20a64f639f15"),
                             DataUnit = (short)5,
                             Key = "MAX_FIND_DRIVER_RADIUS",
                             Value = 5.0
                         },
                         new
                         {
-                            Id = new Guid("60c4b25e-b8eb-477a-80c6-ce0d5ea70b3b"),
+                            Id = new Guid("f3da85d2-07ff-4d55-b67d-10c954a00f42"),
                             DataUnit = (short)1,
                             Key = "FIND_DRIVER_TIMEOUT",
                             Value = 10.0
                         },
                         new
                         {
-                            Id = new Guid("694ff23a-f3bf-485d-a28e-321dc3bcc7ae"),
+                            Id = new Guid("27bfd31f-618f-428e-ac72-ae42eee0725f"),
                             DataUnit = (short)1,
                             Key = "DRIVER_RESPONSE_TIMEOUT",
                             Value = 2.0
                         },
                         new
                         {
-                            Id = new Guid("5fe54d27-3ad1-49b7-9742-0e2030fb37d3"),
+                            Id = new Guid("54b34104-f048-4485-b3c1-add245ec8941"),
                             DataUnit = (short)5,
                             Key = "NEAR_DESTINATION_DISTANCE",
                             Value = 1.0
                         },
                         new
                         {
-                            Id = new Guid("30811a5b-51b3-4abe-b3b8-b39856174aa5"),
+                            Id = new Guid("07ac1981-bf2e-410a-8ab0-be37911e7b9f"),
                             DataUnit = (short)0,
                             Key = "DRIVER_WAGE_PERCENT",
                             Value = 80.0
                         },
                         new
                         {
-                            Id = new Guid("cd2ad062-7d62-439f-963e-aebce3fe19cf"),
+                            Id = new Guid("d6197c75-bce6-456b-9902-92d076367494"),
                             DataUnit = (short)6,
                             Key = "TRIP_CANCELLATION_LIMIT",
                             Value = 20.0
                         },
                         new
                         {
-                            Id = new Guid("10702f0c-157e-4848-af27-a8b66809e4b3"),
+                            Id = new Guid("038d39f6-d6e6-45fa-8f67-63228e75d78f"),
                             DataUnit = (short)1,
                             Key = "TRIP_CANCELLATION_WINDOW",
                             Value = 10.0
-                        },
-                        new
-                        {
-                            Id = new Guid("e86b3014-8910-4bcc-ab4f-867b74fb1059"),
-                            DataUnit = (short)1,
-                            Key = "CANCELLATION_BAN_DURATION",
-                            Value = 15.0
                         });
                 });
 

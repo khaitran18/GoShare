@@ -65,11 +65,6 @@ namespace Application.Commands.Handlers
                     throw new BadRequestException("The driver's car type does not match the trip's car type.");
                 }
 
-                driver.Status = UserStatus.BUSY;
-                driver.UpdatedTime = DateTime.Now;
-                await _unitOfWork.UserRepository.UpdateAsync(driver);
-
-                trip.DriverId = driverId;
                 trip.Status = TripStatus.GOING_TO_PICKUP;
                 trip.UpdatedTime = DateTime.Now;
 
@@ -103,6 +98,7 @@ namespace Application.Commands.Handlers
                 }
 
                 walletOwnerWallet.Balance -= trip.Price;
+                walletOwnerWallet.UpdatedTime = DateTime.Now;
                 await _unitOfWork.WalletRepository.UpdateAsync(walletOwnerWallet);
 
                 // Calculate the driver's wage
@@ -116,12 +112,15 @@ namespace Application.Commands.Handlers
                     Amount = driverWage,
                     PaymentMethod = PaymentMethod.WALLET,
                     Status = WalletTransactionStatus.SUCCESSFULL,
-                    Type = WalletTransactionType.DRIVER_WAGE
+                    Type = WalletTransactionType.DRIVER_WAGE,
+                    CreateTime = DateTime.Now,
+                    UpdatedTime = DateTime.Now
                 };
 
                 await _unitOfWork.WallettransactionRepository.AddAsync(driverTransaction);
 
                 driverWallet.Balance += driverWage;
+                driverWallet.UpdatedTime = DateTime.Now;
                 await _unitOfWork.WalletRepository.UpdateAsync(driverWallet);
 
                 var systemWallet = await _unitOfWork.WalletRepository.GetSystemWalletAsync();
@@ -140,12 +139,15 @@ namespace Application.Commands.Handlers
                     Amount = systemCommission,
                     PaymentMethod = PaymentMethod.WALLET,
                     Status = WalletTransactionStatus.SUCCESSFULL,
-                    Type = WalletTransactionType.SYSTEM_COMMISSION
+                    Type = WalletTransactionType.SYSTEM_COMMISSION,
+                    CreateTime = DateTime.Now,
+                    UpdatedTime= DateTime.Now
                 };
 
                 await _unitOfWork.WallettransactionRepository.AddAsync(systemTransaction);
 
                 systemWallet.Balance += systemCommission;
+                systemWallet.UpdatedTime = DateTime.Now;
                 await _unitOfWork.WalletRepository.UpdateAsync(systemWallet);
 
             }

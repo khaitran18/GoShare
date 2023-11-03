@@ -27,8 +27,8 @@ using System.Text;
 using Application.SignalR;
 using Application.Services.Interfaces;
 using Google.Cloud.Storage.V1;
-using Domain.DataModels;
 using Application.Common.Behaviours;
+using Hangfire.Dashboard.BasicAuthorization;
 
 var builder = WebApplication.CreateBuilder(args);
 //Add middlewares
@@ -85,6 +85,9 @@ builder.Services.AddHangfireServer(options =>
     options.WorkerCount = Environment.ProcessorCount * 5;
     options.Queues = new[] { "critical", "default" };
 });
+
+var cts = new CancellationTokenSource();
+builder.Services.AddSingleton(cts);
 
 // Firebase
 var credential = GoogleCredential.FromFile(Directory.GetParent(Environment.CurrentDirectory)!.FullName +  "\\" +GoShareConfiguration.FirebaseCredentialFile);
@@ -174,7 +177,26 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
-app.UseHangfireDashboard();
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = new[]
+        {
+            new BasicAuthAuthorizationFilter(new BasicAuthAuthorizationFilterOptions
+            {
+                SslRedirect = false,
+                RequireSsl = false,
+                LoginCaseSensitive = true,
+                Users = new []
+                {
+                    new BasicAuthAuthorizationUser
+                    {
+                        Login = "admin",
+                        PasswordClear = "1"
+                    }
+                }
+            })
+        }
+});
 
 app.UseRouting();
 
@@ -186,5 +208,7 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapHub<SignalRHub>("/goshareHub");
 });
+
+app.Services.GetService<IHostApplicationLifetime>()?.ApplicationStopping.Register(cts.Cancel);
 
 app.Run();

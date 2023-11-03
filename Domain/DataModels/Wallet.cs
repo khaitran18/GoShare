@@ -12,13 +12,13 @@ namespace Domain.DataModels
         }
 
         public Guid Id { get; set; }
-        public Guid UserId { get; set; }
+        public Guid? UserId { get; set; }
         public double Balance { get; set; }
         public WalletStatus Type { get; set; }
         public DateTime CreateTime { get; set; }
         public DateTime UpdatedTime { get; set; }
 
-        public virtual User User { get; set; } = null!;
+        public virtual User? User { get; set; } = null!;
         public virtual ICollection<Wallettransaction> Wallettransactions { get; set; }
     }
 }

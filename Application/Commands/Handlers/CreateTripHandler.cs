@@ -10,6 +10,7 @@ using Domain.Enumerations;
 using Domain.Interfaces;
 using Hangfire;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,12 +25,16 @@ namespace Application.Commands.Handlers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ITokenService _tokenService;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly ISettingService _settingService;
 
-        public CreateTripHandler(IUnitOfWork unitOfWork, IMapper mapper, ITokenService tokenService)
+        public CreateTripHandler(IUnitOfWork unitOfWork, IMapper mapper, ITokenService tokenService, IServiceProvider serviceProvider, ISettingService settingService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _tokenService = tokenService;
+            _serviceProvider = serviceProvider;
+            _settingService = settingService;
         }
 
         public async Task<TripDto> Handle(CreateTripCommand request, CancellationToken cancellationToken)
@@ -43,6 +48,30 @@ namespace Application.Commands.Handlers
             if (passenger == null)
             {
                 throw new NotFoundException(nameof(User), userId);
+            }
+
+            var now = DateTime.Now;
+            var cancellationWindowMinutes = _settingService.GetSetting("TRIP_CANCELLATION_WINDOW");
+            var cancellationLimit = _settingService.GetSetting("TRIP_CANCELLATION_LIMIT");
+            var banDurationMinutes = _settingService.GetSetting("CANCELLATION_BAN_DURATION");
+
+            var cancellationWindow = now.AddMinutes(-cancellationWindowMinutes);
+
+            // Check if the user has cancelled too many trips recently
+            if (passenger.LastTripCancellationTime >= cancellationWindow && passenger.CanceledTripCount >= cancellationLimit)
+            {
+                if (now < passenger.CancellationBanUntil)
+                {
+                    throw new BadRequestException($"You have exceeded the maximum number of cancellations allowed within {cancellationWindowMinutes} minutes. Please wait until {passenger.CancellationBanUntil} before creating a new trip.");
+                }
+                else
+                {
+                    // If the ban duration has passed, reset
+                    passenger.CanceledTripCount = 0;
+                    passenger.LastTripCancellationTime = null;
+                    passenger.CancellationBanUntil = null;
+                    await _unitOfWork.UserRepository.UpdateAsync(passenger);
+                }
             }
 
             Guid walletOwnerId = passenger.GuardianId ?? passenger.Id;
@@ -123,7 +152,8 @@ namespace Application.Commands.Handlers
             tripDto = _mapper.Map<TripDto>(trip);
 
             // Background task
-            string jobId = BackgroundJob.Enqueue<BackgroundServices>(s => s.FindDriver(trip.Id, request.CartypeId));
+            var cts = _serviceProvider.GetRequiredService<CancellationTokenSource>();
+            string jobId = BackgroundJob.Enqueue<BackgroundServices>(s => s.FindDriver(trip.Id, request.CartypeId, cts.Token));
             KeyValueStore.Instance.Set($"FindDriverTask_{trip.Id}", jobId);
 
             return tripDto;

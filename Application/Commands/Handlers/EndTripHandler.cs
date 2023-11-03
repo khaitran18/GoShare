@@ -88,6 +88,15 @@ namespace Application.Commands.Handlers
 
             await _unitOfWork.TripRepository.UpdateAsync(trip);
 
+            // Set status of driver back to active
+            var driver = await _unitOfWork.UserRepository.GetUserById(driverId.ToString());
+            if (driver != null)
+            {
+                driver.Status = UserStatus.ACTIVE;
+                driver.UpdatedTime = DateTime.Now;
+                await _unitOfWork.UserRepository.UpdateAsync(driver);
+            }
+
             tripDto = _mapper.Map<TripDto>(trip);
 
             return tripDto;
