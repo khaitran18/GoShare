@@ -1,0 +1,46 @@
+name: Admin Api
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '6.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore ./Api_Admin/Api_Admin.csproj 
+
+    - name: App Settings Variable Substitution
+      uses: microsoft/variable-substitution@v1
+      with:
+       files: ./Api_Admin/appsettings.json
+      env:
+       ConnectionStrings.GoShareAzure: ${{ secrets.ConnectionStrings }}
+       Jwt: ${{ secrets.Jwt }}
+       Admin: ${{ secrets.Admin }}
+
+    - name: Build
+      run: dotnet build ./Api_Admin/Api_Admin.csproj --configuration Release --no-restore
+
+    - name: Publish
+      run: dotnet publish ./Api_Admin/Api_Admin.csproj --configuration Release --no-build --output ./publish
+
+    - name: Deploy to Azure
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: GoShareAdmin
+        publish-profile: ${{ secrets.GoShareAdminPublishSettings }}
+        package: './publish'
