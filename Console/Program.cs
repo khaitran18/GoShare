@@ -1,10 +1,15 @@
 ﻿using Application.Commands;
+using Application.Common.Dtos;
+using Application.Common.Utilities;
 using Application.Configuration;
 using Application.Services;
 using Application.Services.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Configuration;
+using System.ComponentModel;
 using System.Reflection;
+using Twilio.Exceptions;
+
 partial class Program
 {
     static async Task Main(string[] args)
@@ -12,7 +17,8 @@ partial class Program
         Configure();
         string choice = "";
         List<string> Menu = new List<string>{
-            "Twlio Service",
+            "Twlio Service - Send otp",
+            "Twlio Service - Verify otp",
             "Login Service"
             };
         while (!choice.Equals("-1"))
@@ -40,6 +46,18 @@ partial class Program
                             await SendSMSUsingTwilio(phone);
                             break;
                         }
+                    case "1":
+                        {
+                            Console.WriteLine("Enter phone number:");
+                            string phone = Console.ReadLine()!;
+                            Console.WriteLine("Phone number just entered:" + phone);
+                            Console.WriteLine("Enter code:");
+                            string code = Console.ReadLine()!;
+                            Console.WriteLine("Code just entered:" + code);
+                            await VerifyUsingTwilio(phone,code);
+                            break;
+                        }
+                    
                 }
             }
             catch (Exception e)
@@ -54,7 +72,32 @@ partial class Program
     private static async Task SendSMSUsingTwilio(string phone)
     {
         ITwilioVerification _service = new TwilioVerification(GoShareConfiguration.TwilioAccount);
-        Console.WriteLine(await _service.StartVerificationAsync(phone, "sms"));
+        var response = await _service.StartVerificationAsync(phone, "sms");
+        foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(response))
+        {
+            string name = descriptor.Name;
+            object? value = descriptor.GetValue(response);
+            Console.WriteLine("{0}={1}", name, value);
+        }
+    }
+    private static async Task VerifyUsingTwilio(string phone,string code)
+    {
+        try
+        {
+            ITwilioVerification _service = new TwilioVerification(GoShareConfiguration.TwilioAccount);
+            var response = await _service.CheckVerificationAsync(phone, code);
+            foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(response))
+            {
+                string name = descriptor.Name;
+                object? value = descriptor.GetValue(response);
+                Console.WriteLine("{0}={1}", name, value);
+            }
+        }
+        catch (TwilioException e)
+        {
+            throw e;
+        }
+
     }
 
     private static void Configure()

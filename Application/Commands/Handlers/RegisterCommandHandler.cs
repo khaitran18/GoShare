@@ -10,17 +10,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Twilio.Exceptions;
 
 namespace Application.Commands.Handlers
 {
     public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Task>
     {
-        private readonly ISpeedSMSAPI _SpeedSMSAPI;
+        private readonly ITwilioVerification _verificationService;
         private readonly IUnitOfWork _unitOfWork;
 
-        public RegisterCommandHandler(ISpeedSMSAPI speedSMSAPI, IUnitOfWork unitOfWork)
+        public RegisterCommandHandler(ITwilioVerification verificationService, IUnitOfWork unitOfWork)
         {
-            _SpeedSMSAPI = speedSMSAPI;
+            _verificationService = verificationService;
             _unitOfWork = unitOfWork;
         }
 
@@ -32,24 +33,26 @@ namespace Application.Commands.Handlers
             }
             else
             {
-                string otp = OtpUtils.Generate();
-                //await Task.FromResult(_SpeedSMSAPI.sendSMS(request.Phone, "Ma OTP GoShare cua ban la: " + otp, 5));
-                //await 
-                User user = new User();
-                user.Id = Guid.NewGuid();
-                user.Phone = request.Phone;
-                user.Name = request.Name;
-                user.Gender = request.Gender;
-                user.Birth = request.Birth;
-                user.Otp = PasswordHasher.Hash(otp);
-                user.OtpExpiryTime = DateTime.Now.AddMinutes(10);
-                user.CreateTime = DateTime.Now;
-                user.UpdatedTime = DateTime.Now;
-                user.Isverify = false;
-                user.Isdriver = false;
-                user.Status = Domain.Enumerations.UserStatus.INACTIVE;
-                await _unitOfWork.UserRepository.AddAsync(user);
-                return Task.CompletedTask;
+                //string otp = OtpUtils.Generate();
+                if (_verificationService.StartVerificationAsync(request.Phone, "sms").Result.Status.Equals("pending"))
+                {
+                    User user = new User();
+                    user.Id = Guid.NewGuid();
+                    user.Phone = request.Phone;
+                    user.Name = request.Name;
+                    user.Gender = request.Gender;
+                    user.Birth = request.Birth;
+                    //user.Otp = PasswordHasher.Hash(otp);
+                    user.OtpExpiryTime = await _verificationService.GenerateOtpExpiryTime();
+                    user.CreateTime = DateTime.Now;
+                    user.UpdatedTime = DateTime.Now;
+                    user.Isverify = false;
+                    user.Isdriver = false;
+                    user.Status = Domain.Enumerations.UserStatus.INACTIVE;
+                    await _unitOfWork.UserRepository.AddAsync(user);
+                    return Task.CompletedTask;
+                }
+                else throw new TwilioException("Error in sending OTP, please try again later");
             }
         }
     }

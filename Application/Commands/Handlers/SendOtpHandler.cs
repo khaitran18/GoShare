@@ -22,7 +22,8 @@ namespace Application.Commands.Handlers
         public async Task<bool> Handle(SendOtpCommand request, CancellationToken cancellationToken)
         {
             var req = await _verification.StartVerificationAsync(request.phone!, "sms");
-            return req.IsValid;
+            if (req.Status.Equals("pending")) return true;
+            else return false;
         }
     }
 }

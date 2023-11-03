@@ -63,7 +63,7 @@ namespace Infrastructure.Repositories
 
         public Task<DateTime> GetUserOtpExpiryTimeByPhone(string phone)
         {
-            return Task.FromResult(_context.Users.FirstOrDefault(u => u.Phone.Equals(phone))!.OtpExpiryTime);
+            return Task.FromResult((DateTime)_context.Users.FirstOrDefault(u => u.Phone.Equals(phone))!.OtpExpiryTime!);
         }
 
         public Task<string?> GetUserRefreshTokenByUserId(string userId)

@@ -15,11 +15,11 @@ namespace Application.Commands.Handlers
     public class ResendOtpCommandHandler : IRequestHandler<ResendOtpCommand, Task>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ISpeedSMSAPI _SpeedSMSAPI;
-        public ResendOtpCommandHandler(IUnitOfWork unitOfWork, ISpeedSMSAPI speedSMSAPI)
+        private readonly ITwilioVerification _verificationService;
+        public ResendOtpCommandHandler(IUnitOfWork unitOfWork, ITwilioVerification verificationService)
         {
             _unitOfWork = unitOfWork;
-            _SpeedSMSAPI = speedSMSAPI;
+            _verificationService = verificationService;
         }
 
         public async Task<Task> Handle(ResendOtpCommand request, CancellationToken cancellationToken)
@@ -31,10 +31,19 @@ namespace Application.Commands.Handlers
             }
             else
             {
-                string otp = OtpUtils.Generate();
-                await _SpeedSMSAPI.sendSMS(request.phone, "Ma OTP GoShare cua ban la: " + otp, 5);
-                user.Otp = PasswordHasher.Hash(otp);
-                user.OtpExpiryTime = DateTime.Now.AddMinutes(10);
+                //string otp = OtpUtils.Generate();
+                //await _SpeedSMSAPI.sendSMS(request.phone, "Ma OTP GoShare cua ban la: " + otp, 5);
+
+                if (_verificationService.StartVerificationAsync(request.phone, "sms").IsCompletedSuccessfully)
+                {
+                    if (user.OtpExpiryTime!.Value.CompareTo(DateTime.Now) < 0)
+                    {
+                        user.OtpExpiryTime = await _verificationService.GenerateOtpExpiryTime();
+                    }
+                }
+                //user.Otp = PasswordHasher.Hash(otp);
+                //user.OtpExpiryTime = DateTime.Now.AddMinutes(10);
+
                 await _unitOfWork.UserRepository.UpdateAsync(user);
             }
             return Task.CompletedTask;

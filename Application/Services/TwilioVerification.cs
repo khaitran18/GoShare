@@ -1,6 +1,5 @@
-﻿using Application.Common.Dtos;
+﻿
 using Application.Services.Interfaces;
-using Domain.Interfaces;
 using Twilio;
 using Twilio.Exceptions;
 using Twilio.Rest.Verify.V2.Service;
@@ -17,26 +16,33 @@ namespace Application.Services
             TwilioClient.Init(_config.AccountSid, _config.AuthToken);
         }
 
-        public async Task<VerificationResult> StartVerificationAsync(string phoneNumber, string channel)
+        public async Task<VerificationResource> StartVerificationAsync(string phoneNumber, string channel)
         {
             var verificationResource = await VerificationResource.CreateAsync(
                 to: phoneNumber,
                 channel: channel,
                 pathServiceSid: _config.VerificationSid
             );
-            return new VerificationResult(verificationResource.Sid);
+            // status = pending
+            // valid = false
+            return verificationResource;
         }
 
-        public async Task<VerificationResult> CheckVerificationAsync(string phoneNumber, string code)
+        public async Task<bool> CheckVerificationAsync(string phoneNumber, string code)
         {
             var verificationCheckResource = await VerificationCheckResource.CreateAsync(
                 to: phoneNumber,
                 code: code,
                 pathServiceSid: _config.VerificationSid
             );
-            return verificationCheckResource.Status.Equals("approved") ?
-                new VerificationResult(verificationCheckResource.Sid) :
-                new VerificationResult(new List<string> { "Wrong code. Try again." });
+            return (verificationCheckResource.Status.Equals("approved")) ? true : false;
+            //valid = true || status = approve
+            //return verificationCheckResource;
+        }
+
+        public Task<DateTime> GenerateOtpExpiryTime()
+        {
+            return Task.FromResult(DateTime.Now.AddMinutes(_config.OtpLifeSpan));
         }
     }
 }

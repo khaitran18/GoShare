@@ -626,7 +626,7 @@ namespace Infrastructure.Data
             });
 
             #region DataSeed
-            modelBuilder.SeedSettings();
+            //modelBuilder.SeedSettings();
             #endregion
 
             OnModelCreatingPartial(modelBuilder);

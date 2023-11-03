@@ -36,8 +36,8 @@ namespace Domain.DataModels
         public DateTime? RefreshTokenExpiryTime { get; set; }
         public short? Gender { get; set; }
         public string? Passcode { get; set; }
-        public string Otp { get; set; } = null!;
-        public DateTime OtpExpiryTime { get; set; }
+        public string? Otp { get; set; }
+        public DateTime? OtpExpiryTime { get; set; }
         public DateTime Birth { get; set; }
         public string? PasscodeResetToken { get; set; }
         public DateTime? PasscodeResetTokenExpiryTime { get; set; }

@@ -25,9 +25,10 @@ namespace Application.Commands.Handlers
 
         public async Task<string> Handle(UpdateProfilePictureCommand request, CancellationToken cancellationToken)
         {
-            string path = "avatar/";
-            Guid.TryParse(_tokenService.ValidateToken(request.Token!)!.FindFirst("id")!.Value, out Guid id);
-            string url = await _firebaseStorage.UploadFileAsync(request.Image, id.ToString() + path, id.ToString());
+            Guid id = _tokenService.GetGuid(request.Token!);
+            string path = id.ToString();
+            string filename = id.ToString() + "_avatar";
+            string url = await _firebaseStorage.UploadFileAsync(request.Image, path, filename);
             User? u = await _unitOfWork.UserRepository.GetUserById(id.ToString());
             if (u != null)
             {

@@ -33,7 +33,7 @@ namespace Application.Commands.Handlers
                 Car = request.Car
             };
             Guid carGuid = await _mediator.Send(command);
-            string path = id.ToString()+"/"+"DriverDocument";
+            string path = id.ToString()+"/DriverDocument";
             foreach (var item in request.List)
             {
                 Driverdocument document = new Driverdocument();

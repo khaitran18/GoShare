@@ -65,7 +65,7 @@ namespace Api_Mobile.Middlewares
                     context.Response.ContentType = "application/json";
                     var responseBody = new
                     {
-                        Message = "Twilio exception",
+                        Message = ex.Message,
                         StackTrace = ex.StackTrace
                     };
                     await context.Response.WriteAsJsonAsync(responseBody);

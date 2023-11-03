@@ -71,7 +71,8 @@ namespace Application.Configuration
         {
             AccountSid = Configuration["Twilio:AccountSid"]!,
             AuthToken = Configuration["Twilio:AuthToken"]!,
-            VerificationSid = Configuration["Twilio:VerificationSid"]!
+            VerificationSid = Configuration["Twilio:VerificationSid"]!,
+            OtpLifeSpan = short.Parse(Configuration["Twilio:OtpLifeSpan"])
         };
         #endregion
 

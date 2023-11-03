@@ -148,8 +148,8 @@ builder.Services.AddSingleton(mapper);
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 
 //Add twilio
-builder.Services.AddSingleton<Application.Configuration.Twilio>();
-builder.Services.AddScoped<ITwilioVerification, TwilioVerification>();
+//builder.Services.AddSingleton<Application.Configuration.Twilio>();
+//builder.Services.AddScoped<ITwilioVerification, TwilioVerification>();
 builder.Services.AddSingleton<ITwilioVerification>(new TwilioVerification(GoShareConfiguration.TwilioAccount));
 
 //Add SpeedSMSAPI
