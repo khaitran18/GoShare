@@ -138,8 +138,6 @@ namespace Application.Commands.Handlers
                 }
             }
 
-            await _unitOfWork.LocationRepository.AddAsync(destination);
-
             var trip = new Trip
             {
                 Id = Guid.NewGuid(),

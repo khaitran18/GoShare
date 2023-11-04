@@ -152,20 +152,20 @@ namespace Application.Services
         private async Task<bool> NotifyDriverAndAwaitResponse(User driver, Trip trip)
         {
             //Console.WriteLine($"Found driver {driver.Id}!");
-            string content = (trip.StartLocation.Address == null || trip.EndLocation.Address == null)
-                ? "Bạn có yêu cầu chuyến xe mới"
-                : $"Bạn có muốn đón khách từ {trip.StartLocation.Address} đi {trip.EndLocation.Address} không?";
+            //string content = (trip.StartLocation.Address == null || trip.EndLocation.Address == null)
+            //    ? "Bạn có yêu cầu chuyến xe mới"
+            //    : $"Bạn có muốn đón khách từ {trip.StartLocation.Address} đi {trip.EndLocation.Address} không?";
 
-            await FirebaseUtilities.SendNotificationToDeviceAsync(driver.DeviceToken!,
-                "Yêu cầu chuyến mới",
-                content,
-                new Dictionary<string, string>
-                {
-                    { "tripId", trip.Id.ToString() }
-                });
+            //await FirebaseUtilities.SendNotificationToDeviceAsync(driver.DeviceToken!,
+            //    "Yêu cầu chuyến mới",
+            //    content,
+            //    new Dictionary<string, string>
+            //    {
+            //        { "tripId", trip.Id.ToString() }
+            //    });
 
-            await _hubContext.Clients.User(driver.Id.ToString())
-                .SendAsync("NotifyDriverNewTripRequest", content);
+            //await _hubContext.Clients.User(driver.Id.ToString())
+            //    .SendAsync("NotifyDriverNewTripRequest", content);
 
             var timeout = TimeSpan.FromMinutes(_settingService.GetSetting("DRIVER_RESPONSE_TIMEOUT"));
             var startTime = DateTime.Now;
@@ -195,15 +195,15 @@ namespace Application.Services
 
         private async Task NotifyBackToPassenger(Trip trip, User driver)
         {
-            await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken!,
-                "Đặt chuyến thành công",
-                $"Tài xế {driver.Name} đang trên đường đến chỗ bạn.",
-                new Dictionary<string, string>
-                {
-                    { "tripId", trip.Id.ToString() }
-                });
-            await _hubContext.Clients.User(trip.PassengerId.ToString())
-                .SendAsync("NotifyPassengerDriverOnTheWay", $"Tài xế {driver.Name} đang trên đường đến chỗ bạn.");
+            //await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken!,
+            //    "Đặt chuyến thành công",
+            //    $"Tài xế {driver.Name} đang trên đường đến chỗ bạn.",
+            //    new Dictionary<string, string>
+            //    {
+            //        { "tripId", trip.Id.ToString() }
+            //    });
+            //await _hubContext.Clients.User(trip.PassengerId.ToString())
+            //    .SendAsync("NotifyPassengerDriverOnTheWay", $"Tài xế {driver.Name} đang trên đường đến chỗ bạn.");
         }
 
         private async Task HandleTimeoutScenario(Trip trip)
@@ -212,16 +212,16 @@ namespace Application.Services
 
             await _unitOfWork.TripRepository.UpdateAsync(trip);
 
-            await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken!,
-                "Hết thời gian chờ",
-                $"Chúng tôi thành thật xin lỗi, hiện tại chưa có tài xế phù hợp với bạn.",
-                new Dictionary<string, string>
-                {
-                    { "tripId", trip.Id.ToString() }
-                });
+            //await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken!,
+            //    "Hết thời gian chờ",
+            //    $"Chúng tôi thành thật xin lỗi, hiện tại chưa có tài xế phù hợp với bạn.",
+            //    new Dictionary<string, string>
+            //    {
+            //        { "tripId", trip.Id.ToString() }
+            //    });
 
-            await _hubContext.Clients.User(trip.PassengerId.ToString())
-                .SendAsync("NotifyPassengerTripTimedOut", "Chúng tôi thành thật xin lỗi, hiện tại chưa có tài xế phù hợp với bạn.");
+            //await _hubContext.Clients.User(trip.PassengerId.ToString())
+            //    .SendAsync("NotifyPassengerTripTimedOut", "Chúng tôi thành thật xin lỗi, hiện tại chưa có tài xế phù hợp với bạn.");
         }
 
         public async Task ResetCancellationCountAndTime(Guid userId)
