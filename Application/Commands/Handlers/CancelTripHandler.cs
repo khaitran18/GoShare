@@ -107,6 +107,8 @@ namespace Application.Commands.Handlers
                 }
             }
 
+            await _unitOfWork.Save();
+
             // Cancel find driver task
             string jobId = KeyValueStore.Instance.Get<string>($"FindDriverTask_{trip.Id}");
             if (!string.IsNullOrEmpty(jobId))

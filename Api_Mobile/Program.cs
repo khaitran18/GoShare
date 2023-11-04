@@ -140,6 +140,8 @@ var mapperConfig = new MapperConfiguration(cfg =>
     cfg.AddProfile<UserProfile>();
     cfg.AddProfile<TripProfile>();
     cfg.AddProfile<CarProfile>();
+    cfg.AddProfile<LocationProfile>();
+    cfg.AddProfile<CartypeProfile>();
 });
 var mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);

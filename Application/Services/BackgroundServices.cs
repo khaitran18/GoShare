@@ -1,4 +1,4 @@
-﻿﻿using Application.Common.Dtos;
+﻿using Application.Common.Dtos;
 using Application.Common.Exceptions;
 using Application.Common.Utilities;
 using Application.Common.Utilities.Google;
@@ -98,6 +98,8 @@ namespace Application.Services
                         trip.UpdatedTime = DateTime.Now;
                         await _unitOfWork.TripRepository.UpdateAsync(trip);
 
+                        await _unitOfWork.Save();
+
                         KeyValueStore.Instance.Set($"TripConfirmationTask_{trip.Id}", "");
 
                         // Send a trip request to the driver
@@ -118,6 +120,8 @@ namespace Application.Services
 
                             trip.DriverId = null;
                             await _unitOfWork.TripRepository.UpdateAsync(trip);
+
+                            await _unitOfWork.Save();
 
                             // Driver canceled or didn't respond, exclude the driver
                             driversToExclude.Add(nearestDriver);

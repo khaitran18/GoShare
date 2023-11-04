@@ -74,14 +74,6 @@ namespace Application.Commands.Handlers
                 }
             }
 
-            Guid walletOwnerId = passenger.GuardianId ?? passenger.Id;
-
-            var walletOwnerWallet = await _unitOfWork.WalletRepository.GetByUserIdAsync(walletOwnerId);
-            if (walletOwnerWallet == null)
-            {
-                throw new NotFoundException(nameof(Wallet), walletOwnerId);
-            }
-
             var origin = await _unitOfWork.LocationRepository.GetByUserIdAndTypeAsync(userId, LocationType.CURRENT_LOCATION);
             if (origin == null)
             {
@@ -109,25 +101,41 @@ namespace Application.Commands.Handlers
                 await _unitOfWork.LocationRepository.UpdateAsync(origin);
             }
 
-            var destination = new Location
+            var destination = await _unitOfWork.LocationRepository.GetByUserIdAndLatLongAsync(userId, request.EndLatitude, request.EndLongitude);
+            if (destination == null)
             {
-                Id = Guid.NewGuid(),
-                UserId = userId,
-                Address = request.EndAddress,
-                Latitude = request.EndLatitude,
-                Longtitude = request.EndLongitude,
-                Type = LocationType.PAST_DESTINATION,
-                CreateTime = DateTime.Now,
-                UpdatedTime = DateTime.Now
-            };
+                destination = new Location
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = userId,
+                    Address = request.EndAddress,
+                    Latitude = request.EndLatitude,
+                    Longtitude = request.EndLongitude,
+                    Type = LocationType.PAST_DESTINATION,
+                    CreateTime = DateTime.Now,
+                    UpdatedTime = DateTime.Now
+                };
+
+                await _unitOfWork.LocationRepository.AddAsync(destination);
+            }
 
             var distance = await GoogleMapsApiUtilities.ComputeDistanceMatrixAsync(origin, destination);
 
             var totalPrice = await _unitOfWork.CartypeRepository.CalculatePriceForCarType(request.CartypeId, distance);
 
-            if (walletOwnerWallet.Balance < totalPrice)
+            if (request.PaymentMethod == PaymentMethod.WALLET)
             {
-                throw new BadRequestException("The wallet owner's wallet does not have enough balance.");
+                Guid walletOwnerId = passenger.GuardianId ?? passenger.Id;
+
+                var walletOwnerWallet = await _unitOfWork.WalletRepository.GetByUserIdAsync(walletOwnerId);
+                if (walletOwnerWallet == null)
+                {
+                    throw new NotFoundException(nameof(Wallet), walletOwnerId);
+                }
+                if (walletOwnerWallet.Balance < totalPrice)
+                {
+                    throw new BadRequestException("The wallet owner's wallet does not have enough balance.");
+                }
             }
 
             await _unitOfWork.LocationRepository.AddAsync(destination);
@@ -144,10 +152,13 @@ namespace Application.Commands.Handlers
                 Distance = distance,
                 CartypeId = request.CartypeId,
                 Price = totalPrice,
-                Status = TripStatus.PENDING
+                Status = TripStatus.PENDING,
+                PaymentMethod = request.PaymentMethod
             };
 
             await _unitOfWork.TripRepository.AddAsync(trip);
+
+            await _unitOfWork.Save();
 
             tripDto = _mapper.Map<TripDto>(trip);
 

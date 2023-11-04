@@ -41,6 +41,7 @@ namespace Application.Commands.Handlers
                 document.CarId = carGuid;
                 document.Url = await _firebaseStorage.UploadFileAsync(item.pic, path, item.type.ToString()+"_"+document.Id);
                 await _unitOfWork.DriverDocumentRepository.AddAsync(document);
+                await _unitOfWork.Save();
             }
             return Task.CompletedTask.IsCompleted;
         }

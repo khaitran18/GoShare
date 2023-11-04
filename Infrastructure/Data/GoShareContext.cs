@@ -412,6 +412,8 @@ namespace Infrastructure.Data
 
                 entity.Property(e => e.Status).HasColumnName("status");
 
+                entity.Property(e => e.PaymentMethod).HasColumnName("payment_method");
+
                 entity.Property(e => e.UpdatedTime)
                     .HasColumnType("timestamp without time zone")
                     .HasColumnName("updated_time");

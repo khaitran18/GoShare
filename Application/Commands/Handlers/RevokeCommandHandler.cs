@@ -31,6 +31,7 @@ namespace Application.Commands.Handlers
                 u.RefreshToken = null;
                 u.RefreshTokenExpiryTime = DateTime.Now;
                 await _unitOfWork.UserRepository.UpdateAsync(u);
+                await _unitOfWork.Save();
             }
             return Task.CompletedTask;
         }

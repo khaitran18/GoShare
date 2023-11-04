@@ -34,6 +34,7 @@ namespace Application.Commands.Handlers
             {
                 u.AvatarUrl = url;
                 await _unitOfWork.UserRepository.UpdateAsync(u);
+                await _unitOfWork.Save();
             }
             return url;
         }

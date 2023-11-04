@@ -37,6 +37,7 @@ namespace Application.Commands.Handlers
                 u!.PasscodeResetToken = PasswordHasher.Hash(PasscodeResetToken);
                 u!.PasscodeResetTokenExpiryTime = DateTime.Now.AddMinutes(60);
                 await _unitOfWork.UserRepository.UpdateAsync(u!);
+                await _unitOfWork.Save();
                 return PasscodeResetToken;
             }
             else throw new TwilioException("Otp is incorrect or expired");

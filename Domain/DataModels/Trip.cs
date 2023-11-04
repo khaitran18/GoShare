@@ -26,6 +26,7 @@ namespace Domain.DataModels
         public TripStatus Status { get; set; }
         public DateTime CreateTime { get; set; }
         public DateTime UpdatedTime { get; set; }
+        public PaymentMethod PaymentMethod { get; set; }
 
         public virtual User? Driver { get; set; }
         public virtual Location EndLocation { get; set; } = null!;

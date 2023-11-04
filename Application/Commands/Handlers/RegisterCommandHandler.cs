@@ -50,6 +50,7 @@ namespace Application.Commands.Handlers
                     user.Isdriver = false;
                     user.Status = Domain.Enumerations.UserStatus.INACTIVE;
                     await _unitOfWork.UserRepository.AddAsync(user);
+                    await _unitOfWork.Save();
                     return Task.CompletedTask;
                 }
                 else throw new TwilioException("Error in sending OTP, please try again later");

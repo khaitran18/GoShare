@@ -68,6 +68,8 @@ namespace Application.Commands.Handlers
 
             await _unitOfWork.LocationRepository.UpdateAsync(driverLocation);
 
+            await _unitOfWork.Save();
+
             var endLocation = await _unitOfWork.LocationRepository.GetByIdAsync(trip.EndLocationId);
 
             if (endLocation == null)
@@ -96,6 +98,74 @@ namespace Application.Commands.Handlers
                 driver.UpdatedTime = DateTime.Now;
                 await _unitOfWork.UserRepository.UpdateAsync(driver);
             }
+
+            // Payment
+            var driverWallet = await _unitOfWork.WalletRepository.GetByUserIdAsync(driverId);
+            if (driverWallet == null)
+            {
+                throw new NotFoundException(nameof(Wallet), driverId);
+            }
+
+            var systemWallet = await _unitOfWork.WalletRepository.GetSystemWalletAsync();
+            if (systemWallet == null)
+            {
+                throw new NotFoundException(nameof(Wallet), "System");
+            }
+
+            if (trip.PaymentMethod == PaymentMethod.CASH)
+            {
+                driverWallet.Balance -= trip.Price;
+                driverWallet.UpdatedTime = DateTime.Now;
+                await _unitOfWork.WalletRepository.UpdateAsync(driverWallet);
+            }
+            else if (trip.PaymentMethod == PaymentMethod.WALLET)
+            {
+                // Wallet transaction
+
+                double driverWage = trip.Price * (_settingService.GetSetting("DRIVER_WAGE_PERCENT") / 100.0);
+
+                var driverTransaction = new Wallettransaction
+                {
+                    Id = Guid.NewGuid(),
+                    WalletId = driverWallet.Id,
+                    TripId = trip.Id,
+                    Amount = driverWage,
+                    PaymentMethod = PaymentMethod.WALLET,
+                    Status = WalletTransactionStatus.SUCCESSFULL,
+                    Type = WalletTransactionType.DRIVER_WAGE,
+                    CreateTime = DateTime.Now,
+                    UpdatedTime = DateTime.Now
+                };
+
+                await _unitOfWork.WallettransactionRepository.AddAsync(driverTransaction);
+
+                driverWallet.Balance += driverWage;
+                driverWallet.UpdatedTime = DateTime.Now;
+                await _unitOfWork.WalletRepository.UpdateAsync(driverWallet);
+
+                double systemCommission = trip.Price - driverWage;
+
+                var systemTransaction = new Wallettransaction
+                {
+                    Id = Guid.NewGuid(),
+                    WalletId = systemWallet.Id,
+                    TripId = trip.Id,
+                    Amount = systemCommission,
+                    PaymentMethod = PaymentMethod.WALLET,
+                    Status = WalletTransactionStatus.SUCCESSFULL,
+                    Type = WalletTransactionType.SYSTEM_COMMISSION,
+                    CreateTime = DateTime.Now,
+                    UpdatedTime = DateTime.Now
+                };
+
+                await _unitOfWork.WallettransactionRepository.AddAsync(systemTransaction);
+
+                systemWallet.Balance += systemCommission;
+                systemWallet.UpdatedTime = DateTime.Now;
+                await _unitOfWork.WalletRepository.UpdateAsync(systemWallet);
+            }
+
+            await _unitOfWork.Save();
 
             tripDto = _mapper.Map<TripDto>(trip);
 

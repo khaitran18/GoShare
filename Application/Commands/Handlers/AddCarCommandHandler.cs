@@ -32,6 +32,7 @@ namespace Application.Commands.Handlers
             response.TypeId = await _unitOfWork.CartypeRepository.GetGuidByCapacity(request.Capacity);
             response.Status = (short)CarStatusEnumerations.Not_Verified;
             await _unitOfWork.CarRepository.AddAsync(response);
+            await _unitOfWork.Save();
             return response.Id;
         }
     }

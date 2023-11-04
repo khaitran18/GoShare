@@ -68,6 +68,8 @@ namespace Application.Commands.Handlers
 
             await _unitOfWork.LocationRepository.UpdateAsync(driverLocation);
 
+            await _unitOfWork.Save();
+
             var startLocation = await _unitOfWork.LocationRepository.GetByIdAsync(trip.StartLocationId);
 
             if (startLocation == null)
@@ -87,6 +89,8 @@ namespace Application.Commands.Handlers
             trip.UpdatedTime = DateTime.Now;
 
             await _unitOfWork.TripRepository.UpdateAsync(trip);
+
+            await _unitOfWork.Save();
 
             tripDto = _mapper.Map<TripDto>(trip);
 

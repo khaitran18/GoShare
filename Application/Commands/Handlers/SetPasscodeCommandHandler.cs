@@ -34,6 +34,7 @@ namespace Application.Commands.Handlers
                     {
                         u.Passcode = PasswordHasher.Hash(request.Passcode);
                         await _unitOfWork.UserRepository.UpdateAsync(u);
+                        await _unitOfWork.Save();
                     }
                 }
             }

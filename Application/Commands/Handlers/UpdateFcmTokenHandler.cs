@@ -42,6 +42,8 @@ namespace Application.Commands.Handlers
             user.DeviceToken = request.FcmToken;
             user.UpdatedTime = DateTime.Now;
             await _unitOfWork.UserRepository.UpdateAsync(user);
+            await _unitOfWork.Save();
+
             userDto = _mapper.Map<UserDto>(user);
 
             return userDto;

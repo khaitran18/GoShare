@@ -15,7 +15,8 @@ namespace Domain.Enumerations
     public enum PaymentMethod : short
     {
         WALLET = 0,
-        VNPAY = 1
+        VNPAY = 1,
+        CASH = 2
     }
 
     public enum WalletTransactionStatus : short

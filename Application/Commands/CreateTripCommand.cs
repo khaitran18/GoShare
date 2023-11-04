@@ -1,4 +1,5 @@
 ﻿using Application.Common.Dtos;
+using Domain.Enumerations;
 using MediatR;
 using Newtonsoft.Json;
 using System;
@@ -19,5 +20,6 @@ namespace Application.Commands
         public decimal EndLongitude { get; set; }
         public string? EndAddress { get; set; }
         public Guid CartypeId { get; set; }
+        public PaymentMethod PaymentMethod { get; set; }
     }
 }

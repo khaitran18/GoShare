@@ -24,6 +24,11 @@ namespace Infrastructure.Repositories
             return await _context.Locations.FirstOrDefaultAsync(t => t.Id == id);
         }
 
+        public async Task<Location?> GetByUserIdAndLatLongAsync(Guid userId, decimal latitude, decimal longitude)
+        {
+            return await _context.Locations.FirstOrDefaultAsync(l => l.UserId == userId && l.Latitude == latitude && l.Longtitude == longitude);
+        }
+
         public async Task<Location?> GetByUserIdAndTypeAsync(Guid userId, LocationType type)
         {
             return await _context.Locations.FirstOrDefaultAsync(l => l.UserId == userId && l.Type == type);

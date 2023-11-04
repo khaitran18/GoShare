@@ -23,6 +23,8 @@ namespace Infrastructure.Repositories
             return await _context.Trips
                 .Include(t => t.StartLocation)
                 .Include(t => t.EndLocation)
+                .Include(t => t.Driver)
+                .Include(t => t.Cartype)
                 .FirstOrDefaultAsync(t => t.Id == id);
         }
     }

@@ -45,6 +45,7 @@ namespace Application.Commands.Handlers
                 //user.OtpExpiryTime = DateTime.Now.AddMinutes(10);
 
                 await _unitOfWork.UserRepository.UpdateAsync(user);
+                await _unitOfWork.Save();
             }
             return Task.CompletedTask;
         }

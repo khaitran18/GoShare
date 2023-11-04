@@ -48,6 +48,7 @@ namespace Application.Commands.Handlers
                     user.RefreshToken = response.RefreshToken;
                     user.RefreshTokenExpiryTime = _tokenService.CreateRefreshTokenExpiryTime();
                     await _unitOfWork.UserRepository.UpdateAsync(user);
+                    await _unitOfWork.Save();
                 }
             }
             return response;

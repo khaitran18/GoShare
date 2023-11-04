@@ -12,5 +12,6 @@ namespace Domain.Interfaces
     {
         Task<Location?> GetByIdAsync(Guid id);
         Task<Location?> GetByUserIdAndTypeAsync(Guid userId, LocationType type);
+        Task<Location?> GetByUserIdAndLatLongAsync(Guid userId, decimal latitude, decimal longitude);
     }
 }

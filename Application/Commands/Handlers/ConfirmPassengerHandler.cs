@@ -68,88 +68,37 @@ namespace Application.Commands.Handlers
                 trip.Status = TripStatus.GOING_TO_PICKUP;
                 trip.UpdatedTime = DateTime.Now;
 
-                KeyValueStore.Instance.Set($"TripConfirmationTask_{trip.Id}", "true");
-
                 await _unitOfWork.TripRepository.UpdateAsync(trip);
 
                 // Wallet transaction
-                var driverWallet = await _unitOfWork.WalletRepository.GetByUserIdAsync(driverId);
-                if (driverWallet == null)
+                if (trip.PaymentMethod == PaymentMethod.WALLET)
                 {
-                    throw new NotFoundException(nameof(Wallet), driverId);
+                    var passenger = await _unitOfWork.UserRepository.GetUserById(trip.PassengerId.ToString());
+                    if (passenger == null)
+                    {
+                        throw new NotFoundException(nameof(User), trip.PassengerId);
+                    }
+
+                    Guid walletOwnerId = passenger.GuardianId ?? passenger.Id;
+                    var walletOwnerWallet = await _unitOfWork.WalletRepository.GetByUserIdAsync(walletOwnerId);
+                    if (walletOwnerWallet == null)
+                    {
+                        throw new NotFoundException(nameof(Wallet), walletOwnerId);
+                    }
+
+                    if (walletOwnerWallet.Balance < trip.Price)
+                    {
+                        throw new BadRequestException("The wallet owner's wallet does not have enough balance.");
+                    }
+
+                    walletOwnerWallet.Balance -= trip.Price;
+                    walletOwnerWallet.UpdatedTime = DateTime.Now;
+                    await _unitOfWork.WalletRepository.UpdateAsync(walletOwnerWallet);
                 }
 
-                var passenger = await _unitOfWork.UserRepository.GetUserById(trip.PassengerId.ToString());
-                if (passenger == null)
-                {
-                    throw new NotFoundException(nameof(User), trip.PassengerId);
-                }
+                await _unitOfWork.Save();
 
-                Guid walletOwnerId = passenger.GuardianId ?? passenger.Id;
-                var walletOwnerWallet = await _unitOfWork.WalletRepository.GetByUserIdAsync(walletOwnerId);
-                if (walletOwnerWallet == null)
-                {
-                    throw new NotFoundException(nameof(Wallet), walletOwnerId);
-                }
-
-                if (walletOwnerWallet.Balance < trip.Price)
-                {
-                    throw new BadRequestException("The wallet owner's wallet does not have enough balance.");
-                }
-
-                walletOwnerWallet.Balance -= trip.Price;
-                walletOwnerWallet.UpdatedTime = DateTime.Now;
-                await _unitOfWork.WalletRepository.UpdateAsync(walletOwnerWallet);
-
-                // Calculate the driver's wage
-                double driverWage = trip.Price * (_settingService.GetSetting("DRIVER_WAGE_PERCENT") / 100.0);
-
-                var driverTransaction = new Wallettransaction
-                {
-                    Id = Guid.NewGuid(),
-                    WalletId = driverWallet.Id,
-                    TripId = trip.Id,
-                    Amount = driverWage,
-                    PaymentMethod = PaymentMethod.WALLET,
-                    Status = WalletTransactionStatus.SUCCESSFULL,
-                    Type = WalletTransactionType.DRIVER_WAGE,
-                    CreateTime = DateTime.Now,
-                    UpdatedTime = DateTime.Now
-                };
-
-                await _unitOfWork.WallettransactionRepository.AddAsync(driverTransaction);
-
-                driverWallet.Balance += driverWage;
-                driverWallet.UpdatedTime = DateTime.Now;
-                await _unitOfWork.WalletRepository.UpdateAsync(driverWallet);
-
-                var systemWallet = await _unitOfWork.WalletRepository.GetSystemWalletAsync();
-                if (systemWallet == null)
-                {
-                    throw new NotFoundException(nameof(Wallet), "System");
-                }
-
-                double systemCommission = trip.Price - driverWage;
-
-                var systemTransaction = new Wallettransaction
-                {
-                    Id = Guid.NewGuid(),
-                    WalletId = systemWallet.Id,
-                    TripId = trip.Id,
-                    Amount = systemCommission,
-                    PaymentMethod = PaymentMethod.WALLET,
-                    Status = WalletTransactionStatus.SUCCESSFULL,
-                    Type = WalletTransactionType.SYSTEM_COMMISSION,
-                    CreateTime = DateTime.Now,
-                    UpdatedTime= DateTime.Now
-                };
-
-                await _unitOfWork.WallettransactionRepository.AddAsync(systemTransaction);
-
-                systemWallet.Balance += systemCommission;
-                systemWallet.UpdatedTime = DateTime.Now;
-                await _unitOfWork.WalletRepository.UpdateAsync(systemWallet);
-
+                KeyValueStore.Instance.Set($"TripConfirmationTask_{trip.Id}", "true");
             }
             else
             {

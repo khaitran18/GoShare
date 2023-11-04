@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Enumerations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,15 +10,17 @@ namespace Application.Common.Dtos
     public class UserDto
     {
         public Guid Id { get; set; }
-        public string Phone { get; set; } = null!;
-        public string Password { get; set; } = null!;
         public string Name { get; set; } = null!;
-        public string? Email { get; set; }
-        public string? CompanyAddress { get; set; }
-        public DateTime AddressUpdateDate { get; set; }
-        public bool? Isdriver { get; set; }
-        public bool? Isverify { get; set; }
-        public bool? Isactive { get; set; }
-        public string? DisabledReason { get; set; }
+        public string Phone { get; set; } = null!;
+        //public bool Isdriver { get; set; }
+        //public bool Isverify { get; set; }
+        //public string? DisabledReason { get; set; }
+        public string? AvatarUrl { get; set; }
+        public Guid? GuardianId { get; set; }
+        public UserStatus Status { get; set; }
+        public DateTime CreateTime { get; set; }
+        public DateTime UpdatedTime { get; set; }
+        public short? Gender { get; set; }
+        public DateTime Birth { get; set; }
     }
 }
