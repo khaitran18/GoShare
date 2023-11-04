@@ -211,6 +211,7 @@ namespace Application.Services
             trip.Status = TripStatus.TIMEDOUT;
 
             await _unitOfWork.TripRepository.UpdateAsync(trip);
+            await _unitOfWork.Save();
 
             //await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken!,
             //    "Hết thời gian chờ",
@@ -232,6 +233,7 @@ namespace Application.Services
                 user.CanceledTripCount = 0;
                 user.LastTripCancellationTime = null;
                 await _unitOfWork.UserRepository.UpdateAsync(user);
+                await _unitOfWork.Save();
             }
         }
     }
