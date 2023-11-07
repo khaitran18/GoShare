@@ -22,7 +22,8 @@ namespace Application.Commands.Handlers
 
         public async Task<bool> Handle(VerifyDriverCommand request, CancellationToken cancellationToken)
         {
-            return await _unitOfWork.UserRepository.VerifyDriver(request.id);
+            await _unitOfWork.UserRepository.VerifyDriver(request.id);
+            return _unitOfWork.Save().IsCompletedSuccessfully;
         }
     }
 }

@@ -29,10 +29,14 @@ using Application.Services.Interfaces;
 using Google.Cloud.Storage.V1;
 using Application.Common.Behaviours;
 using Hangfire.Dashboard.BasicAuthorization;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+
 //Add middlewares
+builder.Services.AddTransient<LoggingMiddleware>();
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();
+
 // Add services to the container.
 builder.Services.AddControllers();
 
@@ -63,6 +67,8 @@ builder.Services.AddAuthentication(x =>
     {
         ValidateIssuer = true,
         ValidateAudience = true,
+        ValidAudience = _audience,
+        ValidIssuer = _issuer,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key)),
@@ -126,7 +132,9 @@ builder.Services.AddScoped<IRequestHandler<CalculateFeesForTripCommand, List<Car
 builder.Services.AddScoped<IRequestHandler<DriverRegisterCommand, bool>, DriverRegisterCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<AddCarCommand, Guid>, AddCarCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<CancelTripCommand, bool>, CancelTripHandler>();
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
+    .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>))
+    .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 
 // Fluent Validation
 builder.Services.AddScoped<IValidator<TestQuery>, TestQueryValidator>();
@@ -142,16 +150,13 @@ var mapperConfig = new MapperConfiguration(cfg =>
     cfg.AddProfile<CarProfile>();
     cfg.AddProfile<LocationProfile>();
     cfg.AddProfile<CartypeProfile>();
+    cfg.AddProfile<DriverdocumentProfile>();
 });
 var mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 
-// Add Behaviour
-builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 
 //Add twilio
-//builder.Services.AddSingleton<Application.Configuration.Twilio>();
-//builder.Services.AddScoped<ITwilioVerification, TwilioVerification>();
 builder.Services.AddSingleton<ITwilioVerification>(new TwilioVerification(GoShareConfiguration.TwilioAccount));
 
 //Add SpeedSMSAPI
@@ -159,8 +164,32 @@ builder.Services.AddSingleton<SpeedSMS>();
 builder.Services.AddScoped<ISpeedSMSAPI, SpeedSMSAPI>();
 builder.Services.AddSingleton<ISpeedSMSAPI>(new SpeedSMSAPI(GoShareConfiguration.SpeedSMSAccount));
 
-builder.Services.AddSwaggerGen();
-
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Description = "Bearer Authentication with JWT Token",
+        Type = SecuritySchemeType.Http
+    });
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Id = "Bearer",
+                    Type = ReferenceType.SecurityScheme
+                }
+            },
+            new List<string>()
+        }
+    });
+});
 var app = builder.Build();
 
 // Load settings
@@ -175,6 +204,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<LoggingMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
@@ -201,6 +231,8 @@ app.UseHangfireDashboard("/hangfire", new DashboardOptions
 });
 
 app.UseRouting();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

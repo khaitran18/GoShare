@@ -11,8 +11,15 @@ namespace Infrastructure.Repositories
 {
     public class DriverDocumentRepository : BaseRepository<Driverdocument>, IDriverDocumentRepository
     {
+        private readonly GoShareContext _context;
         public DriverDocumentRepository(GoShareContext context) : base(context)
         {
+            _context = context;
+        }
+
+        public List<Driverdocument> GetByUserId(Guid userId) { 
+            Guid id = _context.Cars.FirstOrDefault(c=>c.UserId.Equals(userId))!.Id;
+            return _context.Driverdocuments.Where(d => d.CarId.Equals(id)).ToList();
         }
     }
 }

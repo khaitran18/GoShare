@@ -1,4 +1,5 @@
-﻿using Application.Services.Interfaces;
+﻿using Application.Common.Dtos;
+using Application.Services.Interfaces;
 using Domain.Enumerations;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -25,6 +26,7 @@ namespace Application.Services
             _issuer = issuer;
             _audience = audience;
         }
+
 
         public string GenerateJWTToken(Guid? id, string? phone, string? name, UserRoleEnumerations role)
         {
