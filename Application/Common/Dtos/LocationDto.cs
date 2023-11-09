@@ -18,4 +18,11 @@ namespace Application.Common.Dtos
         public DateTime CreateTime { get; set; }
         public DateTime UpdatedTime { get; set; }
     }
+
+    public class LocationData
+    {
+        public decimal Latitude { get; set; }
+        public decimal Longitude { get; set; }
+        public string? Address { get; set; }
+    }
 }

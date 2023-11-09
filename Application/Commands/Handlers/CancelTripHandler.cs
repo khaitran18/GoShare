@@ -1,7 +1,9 @@
-﻿using Application.Common.Exceptions;
+﻿using Application.Common.Dtos;
+using Application.Common.Exceptions;
 using Application.Common.Utilities;
 using Application.Services;
 using Application.Services.Interfaces;
+using AutoMapper;
 using Domain.DataModels;
 using Domain.Enumerations;
 using Domain.Interfaces;
@@ -17,20 +19,21 @@ using System.Threading.Tasks;
 
 namespace Application.Commands.Handlers
 {
-    public class CancelTripHandler : IRequestHandler<CancelTripCommand, bool>
+    public class CancelTripHandler : IRequestHandler<CancelTripCommand, TripDto>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ITokenService _tokenService;
         private readonly ISettingService _settingService;
-
-        public CancelTripHandler(IUnitOfWork unitOfWork, ITokenService tokenService, ISettingService settingService)
+        private readonly IMapper _mapper;
+        public CancelTripHandler(IUnitOfWork unitOfWork, ITokenService tokenService, ISettingService settingService, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _tokenService = tokenService;
             _settingService = settingService;
+            _mapper = mapper;
         }
 
-        public async Task<bool> Handle(CancelTripCommand request, CancellationToken cancellationToken)
+        public async Task<TripDto> Handle(CancelTripCommand request, CancellationToken cancellationToken)
         {
             ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
             Guid.TryParse(claims!.FindFirst("id")?.Value, out Guid userId);
@@ -117,7 +120,7 @@ namespace Application.Commands.Handlers
                 KeyValueStore.Instance.Remove($"FindDriverTask_{trip.Id}");
             }
 
-            return true;
+            return _mapper.Map<TripDto>(trip);
         }
     }
 }
