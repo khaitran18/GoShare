@@ -95,5 +95,17 @@ namespace Application.Services
             Guid.TryParse(ValidateToken(jwtToken)!.FindFirst("id")!.Value, out Guid id);
             return id;
         }
+
+        public UserClaims CreateUserClaimsInstance(string token)
+        {
+            UserClaims claims = new UserClaims();
+            ClaimsPrincipal principal = ValidateToken(token)!;
+            Guid.TryParse(principal.FindFirst("id")!.Value, out Guid id);
+            claims.id = id;
+            claims.phone = principal.FindFirst("phone")!.Value;
+            claims.name = principal.FindFirst("name")!.Value;
+            claims.Role = principal.IsInRole("Admin") ? UserRoleEnumerations.Admin : principal.IsInRole("Driver") ? UserRoleEnumerations.Driver : UserRoleEnumerations.User;
+            return claims;
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Domain.Enumerations;
+﻿using Application.Common.Dtos;
+using Domain.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,5 +24,6 @@ namespace Application.Services.Interfaces
         public ClaimsPrincipal? ValidateToken(string jwtToken);
         public DateTime CreateRefreshTokenExpiryTime();
         public Guid GetGuid(string jwtToken);
+        public UserClaims CreateUserClaimsInstance(string token);
     }
 }

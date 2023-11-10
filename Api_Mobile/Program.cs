@@ -36,6 +36,10 @@ var builder = WebApplication.CreateBuilder(args);
 //Add middlewares
 builder.Services.AddTransient<LoggingMiddleware>();
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();
+builder.Services.AddTransient<GetUserClaimsMiddleware>();
+
+//Add class
+builder.Services.AddScoped<UserClaims>();
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -209,6 +213,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseMiddleware<LoggingMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<GetUserClaimsMiddleware>();
 
 app.UseHttpsRedirection();
 

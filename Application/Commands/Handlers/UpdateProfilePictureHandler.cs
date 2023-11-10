@@ -1,4 +1,5 @@
-﻿using Application.Services.Interfaces;
+﻿using Application.Common.Dtos;
+using Application.Services.Interfaces;
 using Domain.DataModels;
 using Domain.Interfaces;
 using MediatR;
@@ -14,18 +15,19 @@ namespace Application.Commands.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IFirebaseStorage _firebaseStorage;
-        private readonly ITokenService _tokenService;
+        private readonly UserClaims _userClaims;
 
-        public UpdateProfilePictureHandler(IUnitOfWork unitOfWork, IFirebaseStorage firebaseStorage, ITokenService tokenService)
+        public UpdateProfilePictureHandler(IUnitOfWork unitOfWork, IFirebaseStorage firebaseStorage, ITokenService tokenService,
+            UserClaims userClaims)
         {
             _unitOfWork = unitOfWork;
             _firebaseStorage = firebaseStorage;
-            _tokenService = tokenService;
+            _userClaims = userClaims;
         }
 
         public async Task<string> Handle(UpdateProfilePictureCommand request, CancellationToken cancellationToken)
         {
-            Guid id = _tokenService.GetGuid(request.Token!);
+            Guid id = (Guid)_userClaims.id!;
             string path = id.ToString();
             string filename = id.ToString() + "_avatar";
             string url = await _firebaseStorage.UploadFileAsync(request.Image, path, filename);
