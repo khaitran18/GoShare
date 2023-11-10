@@ -35,7 +35,7 @@ namespace Application.Commands.Handlers
             Guid id = _tokenService.GetGuid(request.Token!);
             if (await _driverDocumentService.ValidDocuments(request.List))
             {
-                if (await _unitOfWork.CarRepository.CarDupplicated(id))
+                if (!await _unitOfWork.CarRepository.CarDupplicated(id))
                 {
                     AddCarCommand command = new AddCarCommand
                     {
@@ -56,7 +56,7 @@ namespace Application.Commands.Handlers
                         await _unitOfWork.Save();
                     }
                 }
-                else throw new BadRequestException("Registration is existed !");
+                else throw new BadRequestException("Registration is existed!");
             }
             else throw new BadRequestException("Missing document or document is not valid");
             return Task.CompletedTask.IsCompleted;
