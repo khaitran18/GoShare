@@ -17,20 +17,17 @@ namespace Application.Commands.Handlers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IFirebaseStorage _firebaseStorage;
         private readonly UserClaims _userClaims;
-        private readonly ITokenService _tokenService;
 
-        public UpdateProfilePictureHandler(IUnitOfWork unitOfWork, IFirebaseStorage firebaseStorage,UserClaims userClaims,ITokenService tokenService)
+        public UpdateProfilePictureHandler(IUnitOfWork unitOfWork, IFirebaseStorage firebaseStorage,UserClaims userClaims)
         {
             _unitOfWork = unitOfWork;
             _firebaseStorage = firebaseStorage;
             _userClaims = userClaims;
-            _tokenService = tokenService;
         }
 
         public async Task<string> Handle(UpdateProfilePictureCommand request, CancellationToken cancellationToken)
         {
-            //Guid id = (Guid)_userClaims.id!;
-            Guid id = _tokenService.GetGuid(request.Token!);
+            Guid id = (Guid)_userClaims.id!;
             string path = id.ToString();
             string filename = id.ToString() + "_avatar";
             string url = await _firebaseStorage.UploadFileAsync(request.Image, path, filename);

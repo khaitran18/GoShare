@@ -10,7 +10,6 @@ namespace Application.Commands
 {
     public record UpdateProfilePictureCommand : IRequest<string>
     {
-        public string? Token { get; set; }
         public IFormFile Image { get; set; } = null!;
     }
 }

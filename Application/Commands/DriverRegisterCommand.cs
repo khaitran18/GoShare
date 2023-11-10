@@ -12,7 +12,6 @@ namespace Application.Commands
 {
     public record DriverRegisterCommand : IRequest<bool>
     {
-        public string? Token { get; set; }
         public CarDto Car { get; set; } = null!;
         public short Capacity { get; set; }
         public List<PictureUploadDto> List { get; set; } = null!;

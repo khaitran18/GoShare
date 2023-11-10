@@ -17,22 +17,19 @@ namespace Application.Commands.Handlers
         private readonly IMediator _mediator;
         private readonly UserClaims _userClaims;
         private readonly IDriverDocumentService _driverDocumentService;
-        private readonly ITokenService _tokenService;
 
-        public DriverRegisterCommandHandler(IUnitOfWork unitOfWork, IFirebaseStorage firebaseStorage, IMediator mediator, UserClaims userClaims, IDriverDocumentService driverDocumentService, ITokenService tokenService)
+        public DriverRegisterCommandHandler(IUnitOfWork unitOfWork, IFirebaseStorage firebaseStorage, IMediator mediator, UserClaims userClaims, IDriverDocumentService driverDocumentService)
         {
             _unitOfWork = unitOfWork;
             _firebaseStorage = firebaseStorage;
             _mediator = mediator;
             _userClaims = userClaims;
             _driverDocumentService = driverDocumentService;
-            _tokenService = tokenService;
         }
 
         public async Task<bool> Handle(DriverRegisterCommand request, CancellationToken cancellationToken)
         {
-            //Guid id = (Guid)_userClaims.id!;
-            Guid id = _tokenService.GetGuid(request.Token!);
+            Guid id = (Guid)_userClaims.id!;
             if (await _driverDocumentService.ValidDocuments(request.List))
             {
                 if (!await _unitOfWork.CarRepository.CarDupplicated(id))
