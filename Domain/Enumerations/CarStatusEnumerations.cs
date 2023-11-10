@@ -8,7 +8,7 @@ namespace Domain.Enumerations
 {
     public enum CarStatusEnumerations
     {
-        Verified = 0,
-        Not_Verified = 1
+        Verified = 1,
+        Not_Verified = 0
     }
 }

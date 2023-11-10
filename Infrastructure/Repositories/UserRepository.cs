@@ -86,7 +86,7 @@ namespace Infrastructure.Repositories
             User u = _context.Users.FirstOrDefault(u => u.Id.Equals(userGuid))!;
             u.Isdriver = true;
             await _context.SaveChangesAsync();
-            return await Task.FromResult(true);
+            return true;
         }
     }
 }

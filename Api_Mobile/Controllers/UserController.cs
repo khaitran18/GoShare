@@ -1,4 +1,5 @@
 ﻿using Application.Commands;
+using Application.Common.Dtos;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,7 @@ namespace Api_Mobile.Controllers
     public class UserController : ControllerBase
     {
         private readonly IMediator _mediator;
+ 
 
         public UserController(IMediator mediator)
         {
@@ -25,14 +27,14 @@ namespace Api_Mobile.Controllers
         }
 
         [HttpPost("avatar")]
-        public async Task<IActionResult> UpdateProfilePicture([FromHeader(Name = "Authorization")] string authorization, [FromForm] UpdateProfilePictureCommand command)
+        public async Task<IActionResult> UpdateProfilePicture([FromHeader(Name = "Authorization")] string? authorization, [FromForm] UpdateProfilePictureCommand command)
         {
-            command.Token = authorization;
+            command.Token = authorization!;
             var response = await _mediator.Send(command);
             return Ok(response);
         }
         [HttpPost("driver-register")]
-        public async Task<IActionResult> DriverRegister([FromHeader(Name = "Authorization")] string authorization, [FromForm] DriverRegisterCommand command)
+        public async Task<IActionResult> DriverRegister([FromHeader(Name = "Authorization")] string? authorization, [FromForm] DriverRegisterCommand command)
         {
             command.Token = authorization;
             var response = await _mediator.Send(command);

@@ -34,8 +34,6 @@ namespace Application.Configuration
 
         public static string ConnectionString(string connectionStringKey)
         {
-            Console.WriteLine("Add connection string");
-            Console.WriteLine(Configuration.GetConnectionString(connectionStringKey)!);
             return Configuration.GetConnectionString(connectionStringKey)!;
         }
 

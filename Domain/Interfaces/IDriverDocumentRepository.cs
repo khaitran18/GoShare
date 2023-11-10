@@ -9,5 +9,6 @@ namespace Domain.Interfaces
 {
     public interface IDriverDocumentRepository : IBaseRepository<Driverdocument>
     {
+        List<Driverdocument> GetByUserId(Guid userId);
     }
 }

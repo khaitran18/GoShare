@@ -1,4 +1,5 @@
 ﻿using Application.Common;
+using Application.Common.Dtos;
 using Application.Common.Utilities;
 using Application.Queries;
 using Application.Services;
@@ -51,6 +52,5 @@ namespace Api_Mobile.Controllers
             var verification = await _verificationService.CheckVerificationAsync(phone,code!);
             return Ok();
         }
-
     }
 }
