@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Application.Common.Utilities;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Application.SignalR
 {
@@ -27,6 +28,17 @@ namespace Application.SignalR
         public override async Task OnDisconnectedAsync(Exception exception)
         {
             await base.OnDisconnectedAsync(exception);
+        }
+
+        public async Task RequestLocation(string dependentId)
+        {
+            await Clients.Client(dependentId).SendAsync("RequestLocation");
+        }
+
+        public Task SendLocation(string dependentId, string location)
+        {
+            KeyValueStore.Instance.Set($"CurrentLocation_{dependentId}", location);
+            return Task.CompletedTask;
         }
     }
 }

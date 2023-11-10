@@ -25,26 +25,38 @@ namespace Api_Mobile.Controllers
             return Ok(response);
         }
 
-        [HttpPost("confirm-passenger")]
-        public async Task<IActionResult> ConfirmPassenger([FromHeader(Name = "Authorization")] string? authorization, [FromBody] ConfirmPassengerCommand command)
+        [HttpPost("{dependentId}")]
+        public async Task<IActionResult> CreateTripForDependent([FromHeader(Name = "Authorization")] string? authorization, [FromBody] CreateTripForDependentCommand command, [FromRoute] Guid dependentId)
         {
             command.Token = authorization;
+            command.DependentId = dependentId;
             var response = await _mediator.Send(command);
             return Ok(response);
         }
 
-        [HttpPost("confirm-pickup")]
-        public async Task<IActionResult> ConfirmPickupPassenger([FromHeader(Name = "Authorization")] string? authorization, [FromBody] ConfirmPickupPassengerCommand command)
+        [HttpPost("confirm-passenger/{id}")]
+        public async Task<IActionResult> ConfirmPassenger([FromHeader(Name = "Authorization")] string? authorization, [FromBody] ConfirmPassengerCommand command, [FromRoute] Guid id)
         {
             command.Token = authorization;
+            command.TripId = id;
             var response = await _mediator.Send(command);
             return Ok(response);
         }
 
-        [HttpPost("end-trip")]
-        public async Task<IActionResult> EndTrip([FromHeader(Name = "Authorization")] string? authorization, [FromBody] EndTripCommand command)
+        [HttpPost("confirm-pickup/{id}")]
+        public async Task<IActionResult> ConfirmPickupPassenger([FromHeader(Name = "Authorization")] string? authorization, [FromBody] ConfirmPickupPassengerCommand command, [FromRoute] Guid id)
         {
             command.Token = authorization;
+            command.TripId = id;
+            var response = await _mediator.Send(command);
+            return Ok(response);
+        }
+
+        [HttpPost("end-trip/{id}")]
+        public async Task<IActionResult> EndTrip([FromHeader(Name = "Authorization")] string? authorization, [FromBody] EndTripCommand command, [FromRoute] Guid id)
+        {
+            command.Token = authorization;
+            command.TripId = id;
             var response = await _mediator.Send(command);
             return Ok(response);
         }
@@ -57,10 +69,11 @@ namespace Api_Mobile.Controllers
             return Ok(response);
         }
 
-        [HttpPost("cancel")]
-        public async Task<IActionResult> CancelTrip([FromHeader(Name = "Authorization")] string? authorization, [FromBody] CancelTripCommand command)
+        [HttpPost("cancel/{id}")]
+        public async Task<IActionResult> CancelTrip([FromHeader(Name = "Authorization")] string? authorization, [FromBody] CancelTripCommand command, [FromRoute] Guid id)
         {
             command.Token = authorization;
+            command.TripId = id;
             var response = await _mediator.Send(command);
             return Ok(response);
         }

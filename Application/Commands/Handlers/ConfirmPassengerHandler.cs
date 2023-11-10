@@ -1,6 +1,8 @@
-﻿using Application.Common.Exceptions;
+﻿using Application.Common.Dtos;
+using Application.Common.Exceptions;
 using Application.Common.Utilities;
 using Application.Services.Interfaces;
+using AutoMapper;
 using Domain.DataModels;
 using Domain.Enumerations;
 using Domain.Interfaces;
@@ -14,20 +16,22 @@ using System.Threading.Tasks;
 
 namespace Application.Commands.Handlers
 {
-    public class ConfirmPassengerHandler : IRequestHandler<ConfirmPassengerCommand, bool>
+    public class ConfirmPassengerHandler : IRequestHandler<ConfirmPassengerCommand, TripDto>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ITokenService _tokenService;
         private readonly ISettingService _settingService;
+        private readonly IMapper _mapper;
 
-        public ConfirmPassengerHandler(IUnitOfWork unitOfWork, ITokenService tokenService, ISettingService settingService)
+        public ConfirmPassengerHandler(IUnitOfWork unitOfWork, ITokenService tokenService, ISettingService settingService, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _tokenService = tokenService;
             _settingService = settingService;
+            _mapper = mapper;
         }
 
-        public async Task<bool> Handle(ConfirmPassengerCommand request, CancellationToken cancellationToken)
+        public async Task<TripDto> Handle(ConfirmPassengerCommand request, CancellationToken cancellationToken)
         {
             var trip = await _unitOfWork.TripRepository.GetByIdAsync(request.TripId);
 
@@ -103,10 +107,9 @@ namespace Application.Commands.Handlers
             else
             {
                 KeyValueStore.Instance.Set($"TripConfirmationTask_{trip.Id}", "false");
-
             }
 
-            return true;
+            return _mapper.Map<TripDto>(trip);
         }
     }
 }
