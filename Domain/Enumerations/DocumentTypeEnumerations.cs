@@ -10,6 +10,7 @@ namespace Domain.Enumerations
     {
         DriverLicense,
         VehicleRegistration,
-        CarPicture
+        CarPicture,
+        RegistrationCertificate
     }
 }

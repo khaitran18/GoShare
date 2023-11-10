@@ -6,7 +6,6 @@ namespace Api_Mobile.Middlewares
     public class GetUserClaimsMiddleware : IMiddleware
     {
         private readonly ITokenService _tokenService;
-
         public GetUserClaimsMiddleware(ITokenService tokenService)
         {
             _tokenService = tokenService;
@@ -16,13 +15,12 @@ namespace Api_Mobile.Middlewares
         {
             string token = context.Request.Headers.Authorization;
             var serviceProvider = context.RequestServices;
-            var userClaims = serviceProvider.GetService<UserClaims>();
+            var claims = serviceProvider.GetService<UserClaims>();
             if (token is not null)
             {
-                userClaims = _tokenService.CreateUserClaimsInstance(token);
+                claims = _tokenService.CreateUserClaimsInstance(token);
             }
             await next(context);
-            userClaims = null;
         }
     }
 }

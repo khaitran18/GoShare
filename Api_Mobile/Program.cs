@@ -47,6 +47,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
+
 // Initialize Configuration
 GoShareConfiguration.Initialize(builder.Configuration);
 
@@ -80,6 +81,7 @@ builder.Services.AddAuthentication(x =>
     };
 });
 builder.Services.AddSingleton<ITokenService>(new TokenService(_key,_expirtyMinutes,_refreshTokenExpirtyMinutes,_issuer,_audience));
+builder.Services.AddSingleton<IDriverDocumentService, DriverDocumentService>();
 
 // Add dependency injection
 builder.Services.AddDbContext<GoShareContext>(options => options.UseNpgsql(GoShareConfiguration.ConnectionString("GoShareAzure")));
