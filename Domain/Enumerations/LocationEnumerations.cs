@@ -9,7 +9,8 @@ namespace Domain.Enumerations
     public enum LocationType : short
     {
         CURRENT_LOCATION = 0,
-        HOME = 1,
-        PAST_DESTINATION = 2
+        PLANNED_DESTINATION = 1,
+        PAST_DESTINATION = 2,
+        PAST_ORIGIN = 3
     }
 }

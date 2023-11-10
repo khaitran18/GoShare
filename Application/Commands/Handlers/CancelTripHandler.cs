@@ -44,8 +44,6 @@ namespace Application.Commands.Handlers
                 throw new NotFoundException(nameof(User), userId);
             }
 
-            var now = DateTime.Now;
-
             var trip = await _unitOfWork.TripRepository.GetByIdAsync(request.TripId);
             if (trip == null)
             {
@@ -62,6 +60,29 @@ namespace Application.Commands.Handlers
                 throw new BadRequestException("The trip is invalid.");
             }
 
+            var now = DateTime.Now;
+            var cancellationWindowMinutes = _settingService.GetSetting("TRIP_CANCELLATION_WINDOW");
+            var cancellationLimit = _settingService.GetSetting("TRIP_CANCELLATION_LIMIT");
+
+            var cancellationWindow = now.AddMinutes(-cancellationWindowMinutes);
+
+            // Check if the user has cancelled too many trips recently (this is only for blocking dependent)
+            if (user.LastTripCancellationTime >= cancellationWindow && user.CanceledTripCount >= cancellationLimit)
+            {
+                if (now < user.CancellationBanUntil)
+                {
+                    throw new BadRequestException($"You have exceeded the maximum number of cancellations allowed within {cancellationWindowMinutes} minutes.");
+                }
+                else
+                {
+                    // If the ban duration has passed, reset
+                    user.CanceledTripCount = 0;
+                    user.LastTripCancellationTime = null;
+                    user.CancellationBanUntil = null;
+                    await _unitOfWork.UserRepository.UpdateAsync(user);
+                }
+            }
+
             trip.Status = TripStatus.CANCELED;
             trip.UpdatedTime = DateTime.Now;
 
@@ -70,9 +91,7 @@ namespace Application.Commands.Handlers
             user.CanceledTripCount++;
 
             // Cancel reach limit
-            var cancellationLimit = _settingService.GetSetting("TRIP_CANCELLATION_LIMIT");
             var banDuration = _settingService.GetSetting("CANCELLATION_BAN_DURATION");
-            var cancellationWindowMinutes = _settingService.GetSetting("TRIP_CANCELLATION_WINDOW");
 
             if (user.CanceledTripCount == 1)
             {

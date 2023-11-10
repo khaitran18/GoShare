@@ -14,6 +14,7 @@ namespace Domain.DataModels
 
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
+        public string? Name { get; set; }
         public string? Address { get; set; }
         public decimal Latitude { get; set; }
         public decimal Longtitude { get; set; }

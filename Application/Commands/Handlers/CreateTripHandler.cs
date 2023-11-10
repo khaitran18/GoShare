@@ -74,10 +74,10 @@ namespace Application.Commands.Handlers
                 }
             }
 
-            var origin = await _unitOfWork.LocationRepository.GetByUserIdAndTypeAsync(userId, LocationType.CURRENT_LOCATION);
-            if (origin == null)
+            var currentLocation = await _unitOfWork.LocationRepository.GetByUserIdAndTypeAsync(userId, LocationType.CURRENT_LOCATION);
+            if (currentLocation == null)
             {
-                origin = new Location
+                currentLocation = new Location
                 {
                     Id = Guid.NewGuid(),
                     UserId = userId,
@@ -89,17 +89,31 @@ namespace Application.Commands.Handlers
                     UpdatedTime = DateTime.Now
                 };
 
-                await _unitOfWork.LocationRepository.AddAsync(origin);
+                await _unitOfWork.LocationRepository.AddAsync(currentLocation);
             }
             else
             {
-                origin.Address = request.StartAddress;
-                origin.Latitude = request.StartLatitude;
-                origin.Longtitude = request.StartLongitude;
-                origin.UpdatedTime = DateTime.Now;
+                currentLocation.Address = request.StartAddress;
+                currentLocation.Latitude = request.StartLatitude;
+                currentLocation.Longtitude = request.StartLongitude;
+                currentLocation.UpdatedTime = DateTime.Now;
 
-                await _unitOfWork.LocationRepository.UpdateAsync(origin);
+                await _unitOfWork.LocationRepository.UpdateAsync(currentLocation);
             }
+
+            var pastOrigin = new Location
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                Address = currentLocation.Address,
+                Latitude = currentLocation.Latitude,
+                Longtitude = currentLocation.Longtitude,
+                Type = LocationType.PAST_ORIGIN,
+                CreateTime = DateTime.Now,
+                UpdatedTime = DateTime.Now
+            };
+
+            await _unitOfWork.LocationRepository.AddAsync(pastOrigin);
 
             var destination = await _unitOfWork.LocationRepository.GetByUserIdAndLatLongAsync(userId, request.EndLatitude, request.EndLongitude);
             if (destination == null)
@@ -119,7 +133,7 @@ namespace Application.Commands.Handlers
                 await _unitOfWork.LocationRepository.AddAsync(destination);
             }
 
-            var distance = await GoogleMapsApiUtilities.ComputeDistanceMatrixAsync(origin, destination);
+            var distance = await GoogleMapsApiUtilities.ComputeDistanceMatrixAsync(pastOrigin, destination);
 
             var totalPrice = await _unitOfWork.CartypeRepository.CalculatePriceForCarType(request.CartypeId, distance);
 
@@ -142,7 +156,7 @@ namespace Application.Commands.Handlers
             {
                 Id = Guid.NewGuid(),
                 PassengerId = userId,
-                StartLocationId = origin.Id,
+                StartLocationId = pastOrigin.Id,
                 EndLocationId = destination.Id,
                 StartTime = DateTime.Now,
                 CreateTime = DateTime.Now,

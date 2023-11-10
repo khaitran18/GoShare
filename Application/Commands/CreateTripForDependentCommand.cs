@@ -13,9 +13,9 @@ namespace Application.Commands
     {
         public string? Token { get; set; }
         public Guid DependentId { get; set; }
-        public decimal StartLatitude { get; set; }
-        public decimal StartLongitude { get; set; }
-        public string? StartAddress { get; set; }
+        //public decimal StartLatitude { get; set; }
+        //public decimal StartLongitude { get; set; }
+        //public string? StartAddress { get; set; }
         public decimal EndLatitude { get; set; }
         public decimal EndLongitude { get; set; }
         public string? EndAddress { get; set; }
