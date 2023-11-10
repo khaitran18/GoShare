@@ -285,6 +285,10 @@ namespace Infrastructure.Data
                     .HasColumnType("character varying")
                     .HasColumnName("address");
 
+                entity.Property(e => e.Name)
+                    .HasColumnType("character varying")
+                    .HasColumnName("name");
+
                 entity.Property(e => e.CreateTime)
                     .HasColumnType("timestamp without time zone")
                     .HasColumnName("create_time");

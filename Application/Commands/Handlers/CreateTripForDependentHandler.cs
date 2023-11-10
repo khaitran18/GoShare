@@ -74,11 +74,10 @@ namespace Application.Commands.Handlers
             var now = DateTime.Now;
             var cancellationWindowMinutes = _settingService.GetSetting("TRIP_CANCELLATION_WINDOW");
             var cancellationLimit = _settingService.GetSetting("TRIP_CANCELLATION_LIMIT");
-            var banDurationMinutes = _settingService.GetSetting("CANCELLATION_BAN_DURATION");
 
             var cancellationWindow = now.AddMinutes(-cancellationWindowMinutes);
 
-            // Check if the user has cancelled too many trips recently
+            // Check if the user has cancelled too many trips recently (guardian)
             if (guardian.LastTripCancellationTime >= cancellationWindow && guardian.CanceledTripCount >= cancellationLimit)
             {
                 if (now < guardian.CancellationBanUntil)
@@ -95,45 +94,25 @@ namespace Application.Commands.Handlers
                 }
             }
 
-            // Request the location from the dependent's device
-            await _hubContext.Clients.User(request.DependentId.ToString()).SendAsync("RequestLocation");
-
-            // Wait for getting dependent's location
-            await Task.Delay(TimeSpan.FromSeconds(10));
-
-            var dependentLocation = KeyValueStore.Instance.Get<string>($"CurrentLocation_{request.DependentId}");
-            if (dependentLocation == null)
+            var currentLocation = await _unitOfWork.LocationRepository.GetByUserIdAndTypeAsync(request.DependentId, LocationType.CURRENT_LOCATION);
+            if (currentLocation == null)
             {
-                throw new BadRequestException("Unable to get dependent's location");
+                throw new NotFoundException(nameof(Location), request.DependentId);
             }
 
-            var dependentLocationnData = JsonConvert.DeserializeObject<LocationData>(dependentLocation);
-            var origin = await _unitOfWork.LocationRepository.GetByUserIdAndTypeAsync(request.DependentId, LocationType.CURRENT_LOCATION);
-            if (origin == null)
+            var pastOrigin = new Location
             {
-                origin = new Location
-                {
-                    Id = Guid.NewGuid(),
-                    UserId = request.DependentId,
-                    Address = dependentLocationnData!.Address,
-                    Latitude = dependentLocationnData!.Latitude,
-                    Longtitude = dependentLocationnData!.Longitude,
-                    Type = LocationType.CURRENT_LOCATION,
-                    CreateTime = DateTime.Now,
-                    UpdatedTime = DateTime.Now
-                };
+                Id = Guid.NewGuid(),
+                UserId = request.DependentId,
+                Address = currentLocation.Address,
+                Latitude = currentLocation.Latitude,
+                Longtitude = currentLocation.Longtitude,
+                Type = LocationType.PAST_ORIGIN,
+                CreateTime = DateTime.Now,
+                UpdatedTime = DateTime.Now
+            };
 
-                await _unitOfWork.LocationRepository.AddAsync(origin);
-            }
-            else
-            {
-                origin.Address = dependentLocationnData!.Address;
-                origin.Latitude = dependentLocationnData!.Latitude;
-                origin.Longtitude = dependentLocationnData!.Longitude;
-                origin.UpdatedTime = DateTime.Now;
-
-                await _unitOfWork.LocationRepository.UpdateAsync(origin);
-            }
+            await _unitOfWork.LocationRepository.AddAsync(pastOrigin);
 
             var destination = await _unitOfWork.LocationRepository.GetByUserIdAndLatLongAsync(request.DependentId, request.EndLatitude, request.EndLongitude);
             if (destination == null)
@@ -153,7 +132,7 @@ namespace Application.Commands.Handlers
                 await _unitOfWork.LocationRepository.AddAsync(destination);
             }
 
-            var distance = await GoogleMapsApiUtilities.ComputeDistanceMatrixAsync(origin, destination);
+            var distance = await GoogleMapsApiUtilities.ComputeDistanceMatrixAsync(pastOrigin, destination);
 
             var totalPrice = await _unitOfWork.CartypeRepository.CalculatePriceForCarType(request.CartypeId, distance);
 
@@ -175,7 +154,7 @@ namespace Application.Commands.Handlers
             {
                 Id = Guid.NewGuid(),
                 PassengerId = request.DependentId,
-                StartLocationId = origin.Id,
+                StartLocationId = pastOrigin.Id,
                 EndLocationId = destination.Id,
                 StartTime = DateTime.Now,
                 CreateTime = DateTime.Now,
