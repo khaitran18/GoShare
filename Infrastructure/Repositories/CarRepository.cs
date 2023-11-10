@@ -18,6 +18,11 @@ namespace Infrastructure.Repositories
             _context = context;
         }
 
+        public async Task<bool> CarDupplicated(Guid id)
+        {
+            return await Task.FromResult(_context.Cars.Any(a => a.UserId.CompareTo(id) == 0));
+        }
+
         public async Task<Car?> GetByUserId(Guid userId)
         {
             return await _context.Cars

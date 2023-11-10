@@ -35,29 +35,30 @@ namespace Application.Commands.Handlers
             Guid id = _tokenService.GetGuid(request.Token!);
             if (await _driverDocumentService.ValidDocuments(request.List))
             {
-                AddCarCommand command = new AddCarCommand
+                if (await _unitOfWork.CarRepository.CarDupplicated(id))
                 {
-                    UserId = id,
-                    Capacity = request.Capacity,
-                    Car = request.Car
-                };
-                Guid carGuid = await _mediator.Send(command);
-                string path = id.ToString() + "/DriverDocument";
-                foreach (var item in request.List)
-                {
-                    Driverdocument document = new Driverdocument();
-                    document.Id = Guid.NewGuid();
-                    document.CarId = carGuid;
-                    document.Type = (short)item.type;
-                    document.Url = await _firebaseStorage.UploadFileAsync(item.pic, path, item.type.ToString() + "_" + document.Id);
-                    await _unitOfWork.DriverDocumentRepository.AddAsync(document);
-                    await _unitOfWork.Save();
+                    AddCarCommand command = new AddCarCommand
+                    {
+                        UserId = id,
+                        Capacity = request.Capacity,
+                        Car = request.Car
+                    };
+                    Guid carGuid = await _mediator.Send(command);
+                    string path = id.ToString() + "/DriverDocument";
+                    foreach (var item in request.List)
+                    {
+                        Driverdocument document = new Driverdocument();
+                        document.Id = Guid.NewGuid();
+                        document.CarId = carGuid;
+                        document.Type = (short)item.type;
+                        document.Url = await _firebaseStorage.UploadFileAsync(item.pic, path, item.type.ToString() + "_" + document.Id);
+                        await _unitOfWork.DriverDocumentRepository.AddAsync(document);
+                        await _unitOfWork.Save();
+                    }
                 }
+                else throw new BadRequestException("Registration is existed !");
             }
-            else
-            {
-                throw new BadRequestException("Missing document or document is not valid");
-            }
+            else throw new BadRequestException("Missing document or document is not valid");
             return Task.CompletedTask.IsCompleted;
         }
     }

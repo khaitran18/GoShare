@@ -10,5 +10,6 @@ namespace Domain.Interfaces
     public interface ICarRepository : IBaseRepository<Car>
     {
         Task<Car?> GetByUserId (Guid userId);
+        Task<bool> CarDupplicated(Guid id);
     }
 }
