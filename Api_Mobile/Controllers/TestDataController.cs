@@ -17,12 +17,14 @@ namespace Api_Mobile.Controllers
         private readonly IMediator _mediator;
         private readonly ITwilioVerification _verificationService;
         private readonly ISpeedSMSAPI _SpeedSMSAPI;
+        private readonly UserClaims _userClaims;
 
-        public TestDataController(IMediator mediator, ITwilioVerification verificationService, ISpeedSMSAPI speedSMSAPI)
+        public TestDataController(IMediator mediator, ITwilioVerification verificationService, ISpeedSMSAPI speedSMSAPI, UserClaims userClaims)
         {
             _mediator = mediator;
             _verificationService = verificationService;
             _SpeedSMSAPI = speedSMSAPI;
+            _userClaims = userClaims;
         }
 
         [HttpGet]

@@ -34,12 +34,9 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 //Add middlewares
-builder.Services.AddTransient<LoggingMiddleware>();
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();
+builder.Services.AddTransient<LoggingMiddleware>();
 builder.Services.AddTransient<GetUserClaimsMiddleware>();
-
-//Add class
-builder.Services.AddScoped<UserClaims>();
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -47,6 +44,8 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
+//Add class
+builder.Services.AddScoped<UserClaims>();
 
 // Initialize Configuration
 GoShareConfiguration.Initialize(builder.Configuration);
@@ -213,8 +212,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseMiddleware<LoggingMiddleware>();
+
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<LoggingMiddleware>();
 app.UseMiddleware<GetUserClaimsMiddleware>();
 
 app.UseHttpsRedirection();
