@@ -37,6 +37,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 builder.Services.AddTransient<LoggingMiddleware>();
 builder.Services.AddTransient<GetUserClaimsMiddleware>();
+builder.Services.AddTransient<CheckUserVerificationMiddleware>();
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -217,6 +218,7 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<LoggingMiddleware>();
 app.UseMiddleware<GetUserClaimsMiddleware>();
+app.UseMiddleware<CheckUserVerificationMiddleware>();
 
 app.UseHttpsRedirection();
 

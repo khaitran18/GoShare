@@ -22,7 +22,7 @@ namespace Api_Admin.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet("verify-driver/{UserId}")]
+        [HttpGet("driverdocuments/{UserId}")]
         public async Task<IActionResult> ViewDriverDocument([FromRoute] GetDriverDocumentQuery query)
         {
             var response = await _mediator.Send(query);

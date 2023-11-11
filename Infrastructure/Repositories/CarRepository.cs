@@ -31,6 +31,13 @@ namespace Infrastructure.Repositories
                 .FirstOrDefaultAsync(car => car.UserId == userId);
         }
 
+        public Task<bool> IsValidByDate(Guid id)
+        {
+            Car? car = _context.Cars.FirstOrDefault(u => u.UserId.CompareTo(id) == 0);
+            if (car is null) throw new NotFoundException("User's car is not found");
+            return Task.FromResult(car.VerifiedTo > DateTime.Now ? true : false);
+        }
+
         public async Task<bool> VerifyCar(Guid id, DateTime verifiedTo)
         {
             Car? car = _context.Cars.FirstOrDefault(c => c.UserId.CompareTo(id) == 0);
@@ -40,7 +47,7 @@ namespace Infrastructure.Repositories
                 car.VerifiedTo = verifiedTo;
                 await _context.SaveChangesAsync();
             }
-            else throw new BadRequestException("User's car is not found");
+            else throw new NotFoundException("User's car is not found");
             return true;
         }
     }
