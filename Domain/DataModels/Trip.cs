@@ -27,8 +27,11 @@ namespace Domain.DataModels
         public DateTime CreateTime { get; set; }
         public DateTime UpdatedTime { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
+        public Guid BookerId { get; set; }
+        public string? Note { get; set; }
 
         public virtual User? Driver { get; set; }
+        public virtual User Booker { get; set; } = null!;
         public virtual Location EndLocation { get; set; } = null!;
         public virtual User Passenger { get; set; } = null!;
         public virtual Location StartLocation { get; set; } = null!;

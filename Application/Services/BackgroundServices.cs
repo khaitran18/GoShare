@@ -197,12 +197,31 @@ namespace Application.Services
         {
             await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken!,
                 "Đặt chuyến thành công",
-                $"Tài xế {driver.Name} đang trên đường đến chỗ bạn.",
+                $"Tài xế {driver.Name} đang trên đường đến đón bạn.",
                 new Dictionary<string, string>
                 {
                     { "tripId", trip.Id.ToString() }
                 });
-            await _hubContext.Clients.User(trip.PassengerId.ToString())
+
+            await _hubContext.Groups.AddToGroupAsync(trip.PassengerId.ToString(), trip.Id.ToString());
+
+            if (trip.Passenger.GuardianId != null)
+            {
+                if (trip.Passenger.GuardianId == trip.BookerId)
+                {
+                    await _hubContext.Groups.AddToGroupAsync(trip.Passenger.GuardianId.ToString(), trip.Id.ToString());
+                }
+
+                await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian!.DeviceToken!,
+                    "Đặt chuyến thành công",
+                    $"Tài xế {driver.Name} đang trên đường đến đón người thân của bạn.",
+                    new Dictionary<string, string>
+                    {
+                        { "tripId", trip.Id.ToString() }
+                    });
+            }
+
+            await _hubContext.Clients.Group(trip.Id.ToString())
                 .SendAsync("NotifyPassengerDriverOnTheWay", driver);
         }
 
@@ -221,7 +240,25 @@ namespace Application.Services
                     { "tripId", trip.Id.ToString() }
                 });
 
-            await _hubContext.Clients.User(trip.PassengerId.ToString())
+            await _hubContext.Groups.AddToGroupAsync(trip.PassengerId.ToString(), trip.Id.ToString());
+
+            if (trip.Passenger.GuardianId != null)
+            {
+                if (trip.Passenger.GuardianId == trip.BookerId)
+                {
+                    await _hubContext.Groups.AddToGroupAsync(trip.Passenger.GuardianId.ToString(), trip.Id.ToString());
+                }
+
+                await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian!.DeviceToken!,
+                    "Hết thời gian chờ",
+                    $"Chúng tôi thành thật xin lỗi, hiện tại chưa có tài xế phù hợp với người thân của bạn.",
+                    new Dictionary<string, string>
+                    {
+                        { "tripId", trip.Id.ToString() }
+                    });
+            }
+
+            await _hubContext.Clients.Group(trip.Id.ToString())
                 .SendAsync("NotifyPassengerTripTimedOut", trip);
         }
 

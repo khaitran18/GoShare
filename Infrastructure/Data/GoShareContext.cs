@@ -400,6 +400,8 @@ namespace Infrastructure.Data
 
                 entity.Property(e => e.PassengerId).HasColumnName("passenger_id");
 
+                entity.Property(e => e.BookerId).HasColumnName("booker_id");
+
                 entity.Property(e => e.PickupTime)
                     .HasColumnType("timestamp without time zone")
                     .HasColumnName("pickup_time");
@@ -407,6 +409,8 @@ namespace Infrastructure.Data
                 entity.Property(e => e.Distance).HasColumnName("distance");
 
                 entity.Property(e => e.Price).HasColumnName("price");
+
+                entity.Property(e => e.Note).HasColumnName("note");
 
                 entity.Property(e => e.StartLocationId).HasColumnName("start_location_id");
 
@@ -438,6 +442,12 @@ namespace Infrastructure.Data
                     .HasForeignKey(d => d.PassengerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("fk_passenger_trip");
+
+                entity.HasOne(d => d.Booker)
+                    .WithMany(p => p.TripBookers)
+                    .HasForeignKey(d => d.BookerId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("fk_booker_trip");
 
                 entity.HasOne(d => d.StartLocation)
                     .WithMany(p => p.TripStartLocations)

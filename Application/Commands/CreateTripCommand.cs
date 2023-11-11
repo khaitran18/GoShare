@@ -21,5 +21,6 @@ namespace Application.Commands
         public string? EndAddress { get; set; }
         public Guid CartypeId { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
+        public string? Note { get; set; }
     }
 }

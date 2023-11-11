@@ -163,7 +163,9 @@ namespace Application.Commands.Handlers
                 CartypeId = request.CartypeId,
                 Price = totalPrice,
                 Status = TripStatus.PENDING,
-                PaymentMethod = request.PaymentMethod
+                PaymentMethod = request.PaymentMethod,
+                BookerId = userId,
+                Note = request.Note
             };
 
             await _unitOfWork.TripRepository.AddAsync(trip);
