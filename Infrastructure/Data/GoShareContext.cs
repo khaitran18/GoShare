@@ -105,6 +105,10 @@ namespace Infrastructure.Data
                     .HasColumnType("character varying")
                     .HasColumnName("model");
 
+                entity.Property(e => e.VerifiedTo)
+                    .HasColumnType("timestamp without time zone")
+                    .HasColumnName("verifiedto");
+
                 entity.Property(e => e.Status).HasColumnName("status");
 
                 entity.Property(e => e.TypeId).HasColumnName("type_id");

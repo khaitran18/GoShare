@@ -28,7 +28,7 @@ namespace Api_Mobile.Middlewares
                     userClaims.Role = principal.IsInRole(UserRoleEnumerations.User.ToString())?UserRoleEnumerations.User: principal.IsInRole(UserRoleEnumerations.Driver.ToString())?UserRoleEnumerations.Driver:UserRoleEnumerations.Admin;
                 }
                 await next(context);
-            }            
+            }
         }
     }
 }

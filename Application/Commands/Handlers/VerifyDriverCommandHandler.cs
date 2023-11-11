@@ -1,4 +1,5 @@
 ﻿using Application.Services.Interfaces;
+using Domain.DataModels;
 using Domain.Interfaces;
 using MediatR;
 using System;
@@ -22,8 +23,11 @@ namespace Application.Commands.Handlers
 
         public async Task<bool> Handle(VerifyDriverCommand request, CancellationToken cancellationToken)
         {
-            await _unitOfWork.UserRepository.VerifyDriver(request.id);
-            return _unitOfWork.Save().IsCompletedSuccessfully;
+            bool c = true;
+            c = c && await _unitOfWork.UserRepository.VerifyDriver(request.id);
+            c = c && await _unitOfWork.CarRepository.VerifyCar(request.id, request.verifiedTo);
+            if (c) return true;
+            else throw new Exception("Error in verifying driver");
         }
     }
 }

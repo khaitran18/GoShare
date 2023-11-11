@@ -1,18 +1,18 @@
 ﻿using Application.Commands;
-using Application.Common.Dtos;
 using MediatR;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api_Mobile.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(Roles = "User,Driver")]
     public class UserController : ControllerBase
     {
         private readonly IMediator _mediator;
- 
-
         public UserController(IMediator mediator)
         {
             _mediator = mediator;
@@ -32,6 +32,7 @@ namespace Api_Mobile.Controllers
             var response = await _mediator.Send(command);
             return Ok(response);
         }
+
         [HttpPost("driver-register")]
         public async Task<IActionResult> DriverRegister([FromForm] DriverRegisterCommand command)
         {

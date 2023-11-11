@@ -1,4 +1,5 @@
-﻿using Application.Common.Utilities;
+﻿using Application.Common.Exceptions;
+using Application.Common.Utilities;
 using AutoMapper;
 using Domain.DataModels;
 using Domain.Enumerations;
@@ -83,9 +84,13 @@ namespace Infrastructure.Repositories
 
         public async Task<bool> VerifyDriver(Guid userGuid)
         {
-            User u = _context.Users.FirstOrDefault(u => u.Id.Equals(userGuid))!;
-            u.Isdriver = true;
-            await _context.SaveChangesAsync();
+            User? u = _context.Users.FirstOrDefault(u => u.Id.Equals(userGuid));
+            if (u is not null) 
+            {
+                u.Isdriver = true;
+                await _context.SaveChangesAsync();
+            }
+            else throw new BadRequestException("User not found");
             return true;
         }
     }

@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GoShareContext))]
-    partial class GoShareContextModelSnapshot : ModelSnapshot
+    [Migration("20231110145805_AddCarProperty")]
+    partial class AddCarProperty
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -101,12 +103,14 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime?>("VerifiedTo")
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("verifiedto");
+
                     b.HasKey("Id");
 
                     b.HasIndex("TypeId");
 
                     b.HasIndex("UserId")
                         .IsUnique();
+
                     b.ToTable("cars", (string)null);
                 });
 
@@ -291,10 +295,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("longtitude");
 
-                    b.Property<string>("Name")
-                        .HasColumnType("character varying")
-                        .HasColumnName("name");
-
                     b.Property<short>("Type")
                         .HasColumnType("smallint")
                         .HasColumnName("type");
@@ -390,10 +390,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<Guid>("BookerId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("booker_id");
-
                     b.Property<Guid>("CartypeId")
                         .HasColumnType("uuid")
                         .HasColumnName("cartype_id");
@@ -417,10 +413,6 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("end_time");
-
-                    b.Property<string>("Note")
-                        .HasColumnType("text")
-                        .HasColumnName("note");
 
                     b.Property<Guid>("PassengerId")
                         .HasColumnType("uuid")
@@ -455,8 +447,6 @@ namespace Infrastructure.Migrations
                         .HasColumnName("updated_time");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BookerId");
 
                     b.HasIndex("CartypeId");
 
@@ -797,12 +787,6 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.DataModels.Trip", b =>
                 {
-                    b.HasOne("Domain.DataModels.User", "Booker")
-                        .WithMany("TripBookers")
-                        .HasForeignKey("BookerId")
-                        .IsRequired()
-                        .HasConstraintName("fk_booker_trip");
-
                     b.HasOne("Domain.DataModels.Cartype", "Cartype")
                         .WithMany("Trips")
                         .HasForeignKey("CartypeId")
@@ -831,8 +815,6 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("StartLocationId")
                         .IsRequired()
                         .HasConstraintName("fk_start_location");
-
-                    b.Navigation("Booker");
 
                     b.Navigation("Cartype");
 
@@ -933,8 +915,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("RatingRateeNavigations");
 
                     b.Navigation("RatingRaterNavigations");
-
-                    b.Navigation("TripBookers");
 
                     b.Navigation("TripDrivers");
 

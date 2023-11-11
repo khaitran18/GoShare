@@ -11,5 +11,6 @@ namespace Domain.Interfaces
     {
         Task<Car?> GetByUserId (Guid userId);
         Task<bool> CarDupplicated(Guid id);
+        Task<bool> VerifyCar(Guid id, DateTime verifiedTo);
     }
 }
