@@ -15,6 +15,9 @@ namespace Api_Mobile.Controllers
     {
         private readonly IMediator _mediator;
 
-        
+        public AppfeedbackController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
     }
 }

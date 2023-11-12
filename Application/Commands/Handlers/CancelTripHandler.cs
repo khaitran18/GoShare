@@ -50,9 +50,9 @@ namespace Application.Commands.Handlers
                 throw new NotFoundException(nameof(Trip), request.TripId);
             }
 
-            if (trip.PassengerId != userId)
+            if (trip.PassengerId != userId && trip.BookerId != userId)
             {
-                throw new BadRequestException("The passenger does not match for this trip.");
+                throw new BadRequestException("User does not match for this trip.");
             }
 
             if (trip.Status != TripStatus.PENDING)

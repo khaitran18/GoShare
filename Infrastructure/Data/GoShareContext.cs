@@ -516,6 +516,18 @@ namespace Infrastructure.Data
                     .HasColumnType("timestamp without time zone")
                     .HasColumnName("cancellation_ban_until");
 
+                entity.Property(e => e.TotalRating)
+                    .HasColumnName("total_rating");
+
+                entity.Property(e => e.RatingCount)
+                    .HasColumnName("rating_count");
+
+                entity.Property(e => e.RatingStatus).HasColumnName("rating_status");
+
+                entity.Property(e => e.WarnedTime)
+                    .HasColumnType("timestamp without time zone")
+                    .HasColumnName("warned_time");
+
                 entity.Property(e => e.Name)
                     .HasColumnType("character varying")
                     .HasColumnName("name")

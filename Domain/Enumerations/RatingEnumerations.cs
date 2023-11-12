@@ -6,13 +6,9 @@ using System.Threading.Tasks;
 
 namespace Domain.Enumerations
 {
-    public enum UserStatus : short
+    public enum RatingStatus : short
     {
-        BUSY = 0,
-        ACTIVE = 1,
-        INACTIVE = 2,
-        BANNED = 3,
-        REJECTED = 4,
-        WARNED = 5
+        GOOD = 0,
+        WARNED = 1
     }
 }

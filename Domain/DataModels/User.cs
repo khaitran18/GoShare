@@ -45,6 +45,11 @@ namespace Domain.DataModels
         public int CanceledTripCount { get; set; }
         public DateTime? LastTripCancellationTime { get; set; }
         public DateTime? CancellationBanUntil { get; set; }
+        public int TotalRating { get; set; }
+        public int RatingCount { get; set; }
+        public RatingStatus RatingStatus { get; set; }
+        public DateTime? WarnedTime { get; set; }
+        public double AverageRating => RatingCount > 0 ? (double)TotalRating / RatingCount : 0;
 
         public virtual User? Guardian { get; set; }
         public virtual Car? Car { get; set; }

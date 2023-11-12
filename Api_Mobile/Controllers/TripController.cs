@@ -78,5 +78,14 @@ namespace Api_Mobile.Controllers
             var response = await _mediator.Send(command);
             return Ok(response);
         }
+
+        [HttpPost("rate-driver/{id}")]
+        [Authorize(Roles = "User")]
+        public async Task<IActionResult> RateDriver([FromBody] RateDriverCommand command, [FromRoute] Guid id)
+        {
+            command.TripId = id;
+            var response = await _mediator.Send(command);
+            return Ok(response);
+        }
     }
 }

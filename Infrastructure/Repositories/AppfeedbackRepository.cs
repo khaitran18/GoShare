@@ -20,7 +20,8 @@ namespace Infrastructure.Repositories
 
         public async Task<(List<Appfeedback>, int)> GetAppfeedbacks(string? sortBy, int page, int pageSize)
         {
-            IQueryable<Appfeedback> query = _context.Appfeedbacks.Include(a => a.User).AsQueryable();
+            IQueryable<Appfeedback> query = _context.Appfeedbacks
+                .Include(a => a.User).AsQueryable();
 
             // Sort by
             if (!string.IsNullOrEmpty(sortBy))

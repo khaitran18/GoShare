@@ -14,6 +14,7 @@ namespace Domain.Enumerations
         DAYS = 3,
         METERS = 4,
         KILOMETERS = 5,
-        TIMES = 6
+        TIMES = 6,
+        DEFAULT = 7
     }
 }

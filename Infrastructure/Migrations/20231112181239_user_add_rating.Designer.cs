@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GoShareContext))]
-    partial class GoShareContextModelSnapshot : ModelSnapshot
+    [Migration("20231112181239_user_add_rating")]
+    partial class user_add_rating
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -569,10 +571,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("rating_count");
 
-                    b.Property<short>("RatingStatus")
-                        .HasColumnType("smallint")
-                        .HasColumnName("rating_status");
-
                     b.Property<string>("RefreshToken")
                         .HasColumnType("character varying")
                         .HasColumnName("refresh_token");
@@ -592,10 +590,6 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("UpdatedTime")
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("updated_time");
-
-                    b.Property<DateTime?>("WarnedTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("warned_time");
 
                     b.HasKey("Id");
 

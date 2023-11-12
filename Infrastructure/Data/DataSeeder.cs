@@ -23,8 +23,9 @@ namespace Infrastructure.Data
                     new Setting { Id = Guid.NewGuid(), Key = "DRIVER_WAGE_PERCENT", Value = 80, DataUnit = SettingDataUnit.PERCENT },
                     new Setting { Id = Guid.NewGuid(), Key = "TRIP_CANCELLATION_LIMIT", Value = 20, DataUnit = SettingDataUnit.TIMES },
                     new Setting { Id = Guid.NewGuid(), Key = "TRIP_CANCELLATION_WINDOW", Value = 10, DataUnit = SettingDataUnit.MINUTES },
-                    new Setting { Id = Guid.NewGuid(), Key = "CANCELLATION_BAN_DURATION", Value = 15, DataUnit = SettingDataUnit.MINUTES }
-
+                    new Setting { Id = Guid.NewGuid(), Key = "CANCELLATION_BAN_DURATION", Value = 15, DataUnit = SettingDataUnit.MINUTES },
+                    new Setting { Id = Guid.NewGuid(), Key = "RATING_THRESHOLD", Value = 2.5, DataUnit = SettingDataUnit.DEFAULT },
+                    new Setting { Id = Guid.NewGuid(), Key = "WARNING_DURATION", Value = 30, DataUnit = SettingDataUnit.DAYS }
                 );
         }
     }

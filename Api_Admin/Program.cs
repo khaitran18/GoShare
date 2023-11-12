@@ -83,6 +83,7 @@ builder.Services.AddScoped<IRequestHandler<VerifyDriverCommand, bool>, VerifyDri
 builder.Services.AddScoped<IRequestHandler<AdminAuthCommand, TokenResponse>, AdminAuthCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<RefreshTokenCommand, string>, RefreshTokenCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<GetDriverDocumentQuery, List<DriverDocumentDto>>, GetDriverDocumentQueryHandler>();
+builder.Services.AddScoped<IRequestHandler<GetAppfeedbacksQuery, PaginatedResult<AppfeedbackDto>>, GetAppfeedbacksHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
 
