@@ -1,5 +1,6 @@
 ﻿using Application.Commands;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,6 +18,7 @@ namespace Api_Mobile.Controllers
         }
 
         [HttpPost("{dependentId}")]
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> GetLocationOfDependent([FromBody] GetLocationOfDependentCommand command, [FromRoute] Guid dependentId)
         {
             command.DependentId = dependentId;

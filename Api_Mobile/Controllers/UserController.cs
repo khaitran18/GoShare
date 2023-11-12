@@ -1,7 +1,8 @@
 ﻿using Application.Commands;
-using Application.Common.Dtos;
 using Application.Queries;
+using Domain.Enumerations;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,6 +20,7 @@ namespace Api_Mobile.Controllers
         }
 
         [HttpPut("update-fcm")]
+        [Authorize(Roles = "User, Driver")]
         public async Task<IActionResult> UpdateFcmToken([FromBody] UpdateFcmTokenCommand command)
         {
             var response = await _mediator.Send(command);
@@ -39,6 +41,7 @@ namespace Api_Mobile.Controllers
         }
 
         [HttpGet("dependents")]
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> GetDependents([FromQuery] GetDependentsQuery query)
         {
             var result = await _mediator.Send(query);
