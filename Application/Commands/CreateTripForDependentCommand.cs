@@ -11,7 +11,6 @@ namespace Application.Commands
 {
     public class CreateTripForDependentCommand : IRequest<TripDto>
     {
-        public string? Token { get; set; }
         public Guid DependentId { get; set; }
         //public decimal StartLatitude { get; set; }
         //public decimal StartLongitude { get; set; }

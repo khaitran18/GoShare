@@ -22,21 +22,21 @@ namespace Application.Commands.Handlers
     public class CancelTripHandler : IRequestHandler<CancelTripCommand, TripDto>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ITokenService _tokenService;
         private readonly ISettingService _settingService;
         private readonly IMapper _mapper;
-        public CancelTripHandler(IUnitOfWork unitOfWork, ITokenService tokenService, ISettingService settingService, IMapper mapper)
+        private readonly UserClaims _userClaims;
+
+        public CancelTripHandler(IUnitOfWork unitOfWork, ISettingService settingService, IMapper mapper, UserClaims userClaims)
         {
             _unitOfWork = unitOfWork;
-            _tokenService = tokenService;
             _settingService = settingService;
             _mapper = mapper;
+            _userClaims = userClaims;
         }
 
         public async Task<TripDto> Handle(CancelTripCommand request, CancellationToken cancellationToken)
         {
-            ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
-            Guid.TryParse(claims!.FindFirst("id")?.Value, out Guid userId);
+            Guid userId = (Guid)_userClaims.id!;
 
             var user = await _unitOfWork.UserRepository.GetUserById(userId.ToString());
             if (user == null)

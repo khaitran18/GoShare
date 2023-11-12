@@ -20,7 +20,6 @@ namespace Api_Mobile.Controllers
         }
 
         [HttpGet]
-        [ProducesDefaultResponseType(typeof(PaginatedResult<AppfeedbackDto>))]
         public async Task<IActionResult> GetAppfeedbacks([FromQuery] GetAppfeedbacksQuery query)
         {
             var response = await _mediator.Send(query);

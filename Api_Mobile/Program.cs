@@ -135,6 +135,7 @@ builder.Services.AddScoped<IRequestHandler<UpdateFcmTokenCommand, UserDto>, Upda
 builder.Services.AddScoped<IRequestHandler<ConfirmPickupPassengerCommand, TripDto>, ConfirmPickupPassengerHandler>();
 builder.Services.AddScoped<IRequestHandler<EndTripCommand, TripDto>, EndTripHandler>();
 builder.Services.AddScoped<IRequestHandler<CalculateFeesForTripCommand, List<CartypeFeeDto>>, CalculateFeesForTripHandler>();
+builder.Services.AddScoped<IRequestHandler<GetDependentsQuery, PaginatedResult<UserDto>>, GetDependentsHandler>();
 builder.Services.AddScoped<IRequestHandler<DriverRegisterCommand, bool>, DriverRegisterCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<AddCarCommand, Guid>, AddCarCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<CancelTripCommand, TripDto>, CancelTripHandler>();

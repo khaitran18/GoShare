@@ -10,7 +10,6 @@ namespace Application.Commands
 {
     public class GetLocationOfDependentCommand : IRequest<LocationDto>
     {
-        public string? Token { get; set; }
         public Guid DependentId { get; set; }
     }
 }

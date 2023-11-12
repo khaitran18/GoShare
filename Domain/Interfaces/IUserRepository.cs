@@ -13,5 +13,6 @@ namespace Domain.Interfaces
         Task<DateTime?> GetUserRefreshTokenExpiryTimeByUserId(string userId);
         Task<User?> GetUserById(string id);
         Task<bool> VerifyDriver(Guid userGuid);
+        Task<(List<User>, int)> GetDependents(Guid guardianId, string? sortBy, int page, int pageSize);
     }
 }

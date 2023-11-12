@@ -24,25 +24,24 @@ namespace Application.Commands.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly ITokenService _tokenService;
         private readonly IServiceProvider _serviceProvider;
         private readonly ISettingService _settingService;
+        private readonly UserClaims _userClaims;
 
-        public CreateTripHandler(IUnitOfWork unitOfWork, IMapper mapper, ITokenService tokenService, IServiceProvider serviceProvider, ISettingService settingService)
+        public CreateTripHandler(IUnitOfWork unitOfWork, IMapper mapper, IServiceProvider serviceProvider, ISettingService settingService, UserClaims userClaims)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _tokenService = tokenService;
             _serviceProvider = serviceProvider;
             _settingService = settingService;
+            _userClaims = userClaims;
         }
 
         public async Task<TripDto> Handle(CreateTripCommand request, CancellationToken cancellationToken)
         {
             var tripDto = new TripDto();
 
-            ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
-            Guid.TryParse(claims!.FindFirst("id")?.Value, out Guid userId);
+            Guid userId = (Guid)_userClaims.id!;
 
             var passenger = await _unitOfWork.UserRepository.GetUserById(userId.ToString());
             if (passenger == null)

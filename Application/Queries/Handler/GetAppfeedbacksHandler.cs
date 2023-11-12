@@ -15,27 +15,16 @@ namespace Application.Queries.Handler
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        //private readonly ITokenService _tokenService;
 
-        public GetAppfeedbacksHandler(IUnitOfWork unitOfWork, IMapper mapper/*, ITokenService tokenService*/)
+        public GetAppfeedbacksHandler(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            //_tokenService = tokenService;
         }
 
         public async Task<PaginatedResult<AppfeedbackDto>> Handle(GetAppfeedbacksQuery request, CancellationToken cancellationToken)
         {
             var response = new PaginatedResult<AppfeedbackDto>();
-
-            //try
-            //{
-            //ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
-            //if (claims != null)
-            //{
-            //int.TryParse(claims.FindFirst("jti")?.Value, out int userId);
-
-            //var isLecturer = await _unitOfWork.UserRepository.IsUserLecturer(userId);
 
             var (appfeedbacks, totalCount) = await _unitOfWork.AppfeedbackRepository.GetAppfeedbacks(
                 request.SortBy,
@@ -53,22 +42,6 @@ namespace Application.Queries.Handler
             );
 
             response = paginatedResult;
-
-            //response.Result = paginatedResult;
-            //response.Message = "Get feedbacks successfully!";
-            //}
-            //else
-            //{
-            //    response.Error = true;
-            //    response.Exception = new BadRequestException("Invalid credentials");
-            //}
-            //}
-            //catch (Exception ex)
-            //{
-            //    response.Error = true;
-            //    response.Message = ex.Message;
-            //    response.Exception = ex;
-            //}
 
             return response;
         }

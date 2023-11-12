@@ -10,7 +10,6 @@ namespace Application.Commands
 {
     public class EndTripCommand : IRequest<TripDto>
     {
-        public string? Token { get; set; }
         public Guid TripId { get; set; }
         public decimal DriverLatitude { get; set; }
         public decimal DriverLongitude { get; set; }

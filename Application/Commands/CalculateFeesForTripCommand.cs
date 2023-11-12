@@ -10,7 +10,6 @@ namespace Application.Commands
 {
     public class CalculateFeesForTripCommand : IRequest<List<CartypeFeeDto>>
     {
-        public string? Token { get; set; }
         public decimal StartLatitude { get; set; }
         public decimal StartLongitude { get; set; }
         public decimal EndLatitude { get; set; }

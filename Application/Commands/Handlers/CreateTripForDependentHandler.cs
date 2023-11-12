@@ -27,16 +27,16 @@ namespace Application.Commands.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly ITokenService _tokenService;
+        private readonly UserClaims _userClaims;
         private readonly IServiceProvider _serviceProvider;
         private readonly ISettingService _settingService;
         private readonly IHubContext<SignalRHub> _hubContext;
 
-        public CreateTripForDependentHandler(IUnitOfWork unitOfWork, IMapper mapper, ITokenService tokenService, IServiceProvider serviceProvider, ISettingService settingService, IHubContext<SignalRHub> hubContext)
+        public CreateTripForDependentHandler(IUnitOfWork unitOfWork, IMapper mapper, UserClaims userClaims, IServiceProvider serviceProvider, ISettingService settingService, IHubContext<SignalRHub> hubContext)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _tokenService = tokenService;
+            _userClaims = userClaims;
             _serviceProvider = serviceProvider;
             _settingService = settingService;
             _hubContext = hubContext;
@@ -46,8 +46,7 @@ namespace Application.Commands.Handlers
         {
             var tripDto = new TripDto();
 
-            ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
-            Guid.TryParse(claims!.FindFirst("id")?.Value, out Guid userId);
+            Guid userId = (Guid)_userClaims.id!;
 
             var guardian = await _unitOfWork.UserRepository.GetUserById(userId.ToString());
             if (guardian == null)

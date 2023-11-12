@@ -17,14 +17,10 @@ namespace Application.Commands.Handlers
     public class CalculateFeesForTripHandler : IRequestHandler<CalculateFeesForTripCommand, List<CartypeFeeDto>>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ITokenService _tokenService;
-        private readonly IMapper _mapper;
 
-        public CalculateFeesForTripHandler(IUnitOfWork unitOfWork, ITokenService tokenService, IMapper mapper)
+        public CalculateFeesForTripHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _tokenService = tokenService;
-            _mapper = mapper;
         }
 
         public async Task<List<CartypeFeeDto>> Handle(CalculateFeesForTripCommand request, CancellationToken cancellationToken)

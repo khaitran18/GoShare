@@ -19,14 +19,14 @@ namespace Application.Commands.Handlers
     public class EndTripHandler : IRequestHandler<EndTripCommand, TripDto>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ITokenService _tokenService;
+        private readonly UserClaims _userClaims;
         private readonly IMapper _mapper;
         private readonly ISettingService _settingService;
 
-        public EndTripHandler(IUnitOfWork unitOfWork, ITokenService tokenService, IMapper mapper, ISettingService settingService)
+        public EndTripHandler(IUnitOfWork unitOfWork, UserClaims userClaims, IMapper mapper, ISettingService settingService)
         {
             _unitOfWork = unitOfWork;
-            _tokenService = tokenService;
+            _userClaims = userClaims;
             _mapper = mapper;
             _settingService = settingService;
         }
@@ -35,8 +35,7 @@ namespace Application.Commands.Handlers
         {
             var tripDto = new TripDto();
 
-            ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
-            Guid.TryParse(claims!.FindFirst("id")?.Value, out Guid driverId);
+            Guid driverId = (Guid)_userClaims.id!;
 
             var trip = await _unitOfWork.TripRepository.GetByIdAsync(request.TripId);
 

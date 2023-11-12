@@ -17,21 +17,20 @@ namespace Application.Commands.Handlers
     public class UpdateFcmTokenHandler : IRequestHandler<UpdateFcmTokenCommand, UserDto>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ITokenService _tokenService;
+        private readonly UserClaims _userClaims;
         private readonly IMapper _mapper;
 
-        public UpdateFcmTokenHandler(IUnitOfWork unitOfWork, ITokenService tokenService, IMapper mapper)
+        public UpdateFcmTokenHandler(IUnitOfWork unitOfWork, UserClaims userClaims, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
-            _tokenService = tokenService;
+            _userClaims = userClaims;
             _mapper = mapper;
         }
 
         public async Task<UserDto> Handle(UpdateFcmTokenCommand request, CancellationToken cancellationToken)
         {
             var userDto = new UserDto();
-            ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
-            Guid.TryParse(claims!.FindFirst("id")?.Value, out Guid userId);
+            Guid userId = (Guid)_userClaims.id!;
             var user = await _unitOfWork.UserRepository.GetUserById(userId.ToString());
 
             if (user == null)

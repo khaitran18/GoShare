@@ -23,14 +23,14 @@ namespace Application.Commands.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHubContext<SignalRHub> _hubContext;
-        private readonly ITokenService _tokenService;
+        private readonly UserClaims _userClaims;
         private readonly IMapper _mapper;
 
-        public GetLocationOfDependentHandler(IUnitOfWork unitOfWork, IHubContext<SignalRHub> hubContext, ITokenService tokenService, IMapper mapper)
+        public GetLocationOfDependentHandler(IUnitOfWork unitOfWork, IHubContext<SignalRHub> hubContext, UserClaims userClaims, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _hubContext = hubContext;
-            _tokenService = tokenService;
+            _userClaims = userClaims;
             _mapper = mapper;
         }
 
@@ -38,8 +38,7 @@ namespace Application.Commands.Handlers
         {
             var locationDto = new LocationDto();
 
-            ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
-            Guid.TryParse(claims!.FindFirst("id")?.Value, out Guid userId);
+            Guid userId = (Guid)_userClaims.id!;
 
             var guardian = await _unitOfWork.UserRepository.GetUserById(userId.ToString());
             if (guardian == null)

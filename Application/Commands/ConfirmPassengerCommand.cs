@@ -10,7 +10,6 @@ namespace Application.Commands
 {
     public class ConfirmPassengerCommand : IRequest<TripDto>
     {
-        public string? Token { get; set; }
         public Guid TripId { get; set; }
         public bool Accept { get; set; }
     }

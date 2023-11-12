@@ -27,30 +27,12 @@ namespace Infrastructure.Repositories
             {
                 switch (sortBy.ToLower())
                 {
-                    //case "title":
-                    //    query = query.OrderBy(a => a.Title);
-                    //    break;
-                    //case "title_desc":
-                    //    query = query.OrderByDescending(a => a.Title);
-                    //    break;
-                    //case "content":
-                    //    query = query.OrderBy(a => a.Content.Length);
-                    //    break;
-                    //case "content_desc":
-                    //    query = query.OrderByDescending(a => a.Content.Length);
-                    //    break;
                     case "time":
                         query = query.OrderBy(a => a.CreateTime);
                         break;
                     case "time_desc":
                         query = query.OrderByDescending(a => a.CreateTime);
                         break;
-                    //case "username":
-                    //    query = query.OrderBy(a => a.User.Name);
-                    //    break;
-                    //case "username_desc":
-                    //    query = query.OrderByDescending(a => a.User.Name);
-                    //    break;
                 }
             }
 
