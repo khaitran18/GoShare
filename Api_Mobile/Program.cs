@@ -28,7 +28,6 @@ using Application.SignalR;
 using Application.Services.Interfaces;
 using Google.Cloud.Storage.V1;
 using Application.Common.Behaviours;
-using Hangfire.Dashboard.BasicAuthorization;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -214,33 +213,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<LoggingMiddleware>();
 app.UseMiddleware<GetUserClaimsMiddleware>();
 
 app.UseHttpsRedirection();
-
-app.UseHangfireDashboard("/hangfire", new DashboardOptions
-{
-    Authorization = new[]
-        {
-            new BasicAuthAuthorizationFilter(new BasicAuthAuthorizationFilterOptions
-            {
-                SslRedirect = false,
-                RequireSsl = false,
-                LoginCaseSensitive = true,
-                Users = new []
-                {
-                    new BasicAuthAuthorizationUser
-                    {
-                        Login = "admin",
-                        PasswordClear = "1"
-                    }
-                }
-            })
-        }
-});
 
 app.UseRouting();
 

@@ -140,6 +140,10 @@ namespace Infrastructure.Data
 
                 entity.Property(e => e.Capacity).HasColumnName("capacity");
 
+                entity.Property(e => e.Image)
+                    .HasColumnType("character varying")
+                    .HasColumnName("image");
+
                 entity.Property(e => e.CreateTime)
                     .HasColumnType("timestamp without time zone")
                     .HasColumnName("create_time");
@@ -332,7 +336,7 @@ namespace Infrastructure.Data
 
                 entity.Property(e => e.Rater).HasColumnName("rater");
 
-                entity.Property(e => e.Rating1).HasColumnName("rating");
+                entity.Property(e => e.RatingValue).HasColumnName("rating");
 
                 entity.Property(e => e.TripId).HasColumnName("trip_id");
 

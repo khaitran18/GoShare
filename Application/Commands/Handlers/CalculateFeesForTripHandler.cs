@@ -41,18 +41,23 @@ namespace Application.Commands.Handlers
 
             var distance = await GoogleMapsApiUtilities.ComputeDistanceMatrixAsync(origin, destination);
 
-            var carTypes = await _unitOfWork.CartypeRepository.GetAllAsync();
+            var carTypes = await _unitOfWork.CartypeRepository.GetAllCartypeAsync();
 
             foreach (var carType in carTypes)
             {
-                double price = await _unitOfWork.CartypeRepository.CalculatePriceForCarType(carType.Id, distance);
-
-                carTypeFees.Add(new CartypeFeeDto
+                var fee = carType.Fees.FirstOrDefault();
+                if (fee != null)
                 {
-                    CartypeId = carType.Id,
-                    Capacity = carType.Capacity,
-                    TotalPrice = price
-                });
+                    double price = await _unitOfWork.CartypeRepository.CalculatePriceForCarType(carType.Id, distance);
+
+                    carTypeFees.Add(new CartypeFeeDto
+                    {
+                        CartypeId = carType.Id,
+                        Capacity = carType.Capacity,
+                        TotalPrice = price,
+                        Image = carType.Image
+                    });
+                }
             }
 
             return carTypeFees;

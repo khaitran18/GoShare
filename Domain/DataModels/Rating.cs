@@ -9,7 +9,7 @@ namespace Domain.DataModels
         public Guid Rater { get; set; }
         public Guid Ratee { get; set; }
         public Guid TripId { get; set; }
-        public short Rating1 { get; set; }
+        public short RatingValue { get; set; }
         public string? Comment { get; set; }
         public DateTime CreateTime { get; set; }
         public DateTime UpdatedTime { get; set; }

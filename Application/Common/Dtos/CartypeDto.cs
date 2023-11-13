@@ -16,5 +16,6 @@ namespace Application.Common.Dtos
         public Guid CartypeId { get; set; }
         public short Capacity { get; set; }
         public double TotalPrice { get; set; }
+        public string? Image { get; set; }
     }
 }

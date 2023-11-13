@@ -79,7 +79,7 @@ namespace Application.Commands.Handlers
                 Rater = userId,
                 Ratee = trip.DriverId.Value,
                 TripId = request.TripId,
-                Rating1 = request.Rating,
+                RatingValue = request.Rating,
                 Comment = request.Comment,
                 CreateTime = DateTime.Now,
                 UpdatedTime = DateTime.Now
