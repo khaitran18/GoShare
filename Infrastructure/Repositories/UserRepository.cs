@@ -25,7 +25,6 @@ namespace Infrastructure.Repositories
             var users = await _context.Users
                 .Include(u => u.Locations)
                 .Include(u => u.Car)
-                .AsNoTracking()
                 .ToListAsync();
 
             foreach (User user in users)

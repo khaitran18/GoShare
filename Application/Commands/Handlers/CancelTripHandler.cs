@@ -60,7 +60,7 @@ namespace Application.Commands.Handlers
                 throw new BadRequestException("The trip is invalid.");
             }
 
-            var now = DateTime.Now;
+            var now = DateTimeUtilities.GetDateTimeVnNow();
             var cancellationWindowMinutes = _settingService.GetSetting("TRIP_CANCELLATION_WINDOW");
             var cancellationLimit = _settingService.GetSetting("TRIP_CANCELLATION_LIMIT");
 
@@ -84,7 +84,7 @@ namespace Application.Commands.Handlers
             }
 
             trip.Status = TripStatus.CANCELED;
-            trip.UpdatedTime = DateTime.Now;
+            trip.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
 
             await _unitOfWork.TripRepository.UpdateAsync(trip);
 
