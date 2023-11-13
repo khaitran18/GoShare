@@ -1,5 +1,6 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Exceptions;
+using Application.Common.Utilities;
 using Application.Services.Interfaces;
 using AutoMapper;
 using Domain.DataModels;
@@ -81,8 +82,8 @@ namespace Application.Commands.Handlers
                 TripId = request.TripId,
                 RatingValue = request.Rating,
                 Comment = request.Comment,
-                CreateTime = DateTime.Now,
-                UpdatedTime = DateTime.Now
+                CreateTime = DateTimeUtilities.GetDateTimeVnNow(),
+                UpdatedTime = DateTimeUtilities.GetDateTimeVnNow()
             };
 
             await _unitOfWork.RatingRepository.AddAsync(rating);
@@ -100,15 +101,15 @@ namespace Application.Commands.Handlers
                 if (driver.RatingStatus == RatingStatus.GOOD)
                 {
                     driver.RatingStatus = RatingStatus.WARNED;
-                    driver.WarnedTime = DateTime.Now;
-                    driver.UpdatedTime = DateTime.Now;
+                    driver.WarnedTime = DateTimeUtilities.GetDateTimeVnNow();
+                    driver.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
                 }
                 // If driver has been WARNED for more than the warning duration, ban the driver
                 else if (driver.RatingStatus == RatingStatus.WARNED && driver.WarnedTime.HasValue && (DateTime.Now - driver.WarnedTime.Value).TotalDays > warningDuration)
                 {
                     driver.Status = UserStatus.BANNED;
                     driver.DisabledReason = "Tài khoản của bạn đã bị khóa vì đánh giá trung bình quá thấp.";
-                    driver.UpdatedTime = DateTime.Now;
+                    driver.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
                 }
             }
             else if (driver.RatingStatus == RatingStatus.WARNED)
@@ -116,7 +117,7 @@ namespace Application.Commands.Handlers
                 // If driver's rating status is WARNED and their average rating is above the threshold, change their status back to GOOD
                 driver.RatingStatus = RatingStatus.GOOD;
                 driver.WarnedTime = null;
-                driver.UpdatedTime = DateTime.Now;
+                driver.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
             }
 
             await _unitOfWork.UserRepository.UpdateAsync(driver);

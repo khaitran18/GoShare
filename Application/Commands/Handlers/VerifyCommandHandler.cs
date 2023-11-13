@@ -25,7 +25,7 @@ namespace Application.Commands.Handlers
         public async Task<string> Handle(VerifyCommand request, CancellationToken cancellationToken)
         {
             DateTime OtpExpiryTime = await _unitOfWork.UserRepository.GetUserOtpExpiryTimeByPhone(request.Phone);
-            if (OtpExpiryTime.CompareTo(DateTime.Now) < 0)
+            if (OtpExpiryTime.CompareTo(DateTimeUtilities.GetDateTimeVnNow()) < 0)
             {
                 throw new UnauthorizedAccessException("Otp is expired");
             }
@@ -35,7 +35,7 @@ namespace Application.Commands.Handlers
                 string PasscodeResetToken = OtpUtils.Generate();
                 u!.Isverify = true;
                 u!.PasscodeResetToken = PasswordHasher.Hash(PasscodeResetToken);
-                u!.PasscodeResetTokenExpiryTime = DateTime.Now.AddMinutes(60);
+                u!.PasscodeResetTokenExpiryTime = DateTimeUtilities.GetDateTimeVnNow().AddMinutes(60);
                 await _unitOfWork.UserRepository.UpdateAsync(u!);
                 await _unitOfWork.Save();
                 return PasscodeResetToken;

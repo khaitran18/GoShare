@@ -26,7 +26,7 @@ namespace Application.Commands.Handlers
             if (u == null) throw new NotFoundException("Phone number is not found");
             else
             {
-                if (u.PasscodeResetTokenExpiryTime?.CompareTo(DateTime.Now) < 0) throw new UnauthorizedAccessException("Timeout! Please verify the account again");
+                if (u.PasscodeResetTokenExpiryTime?.CompareTo(DateTimeUtilities.GetDateTimeVnNow()) < 0) throw new UnauthorizedAccessException("Timeout! Please verify the account again");
                 else
                 {
                     if (!PasswordHasher.Validate(u.PasscodeResetToken!, request.SetToken)) throw new Exception("Error in receiving data");

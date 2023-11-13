@@ -91,8 +91,8 @@ namespace Application.Commands.Handlers
                     Latitude = dependentLocationData.Latitude,
                     Longtitude = dependentLocationData.Longitude,
                     Type = LocationType.CURRENT_LOCATION,
-                    CreateTime = DateTime.Now,
-                    UpdatedTime = DateTime.Now
+                    CreateTime = DateTimeUtilities.GetDateTimeVnNow(),
+                    UpdatedTime = DateTimeUtilities.GetDateTimeVnNow()
                 };
 
                 await _unitOfWork.LocationRepository.AddAsync(location);
@@ -102,7 +102,7 @@ namespace Application.Commands.Handlers
                 location.Address = dependentLocationData.Address;
                 location.Latitude = dependentLocationData.Latitude;
                 location.Longtitude = dependentLocationData.Longitude;
-                location.UpdatedTime = DateTime.Now;
+                location.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
 
                 await _unitOfWork.LocationRepository.UpdateAsync(location);
             }

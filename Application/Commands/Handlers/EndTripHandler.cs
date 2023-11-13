@@ -63,7 +63,7 @@ namespace Application.Commands.Handlers
 
             driverLocation.Latitude = request.DriverLatitude;
             driverLocation.Longtitude = request.DriverLongitude;
-            driverLocation.UpdatedTime = DateTime.Now;
+            driverLocation.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
 
             await _unitOfWork.LocationRepository.UpdateAsync(driverLocation);
 
@@ -84,8 +84,8 @@ namespace Application.Commands.Handlers
             }
 
             trip.Status = TripStatus.COMPLETED;
-            trip.EndTime = DateTime.Now;
-            trip.UpdatedTime = DateTime.Now;
+            trip.EndTime = DateTimeUtilities.GetDateTimeVnNow();
+            trip.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
 
             await _unitOfWork.TripRepository.UpdateAsync(trip);
 
@@ -94,7 +94,7 @@ namespace Application.Commands.Handlers
             if (driver != null)
             {
                 driver.Status = UserStatus.ACTIVE;
-                driver.UpdatedTime = DateTime.Now;
+                driver.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
                 await _unitOfWork.UserRepository.UpdateAsync(driver);
             }
 
@@ -114,7 +114,7 @@ namespace Application.Commands.Handlers
             if (trip.PaymentMethod == PaymentMethod.CASH)
             {
                 driverWallet.Balance -= trip.Price;
-                driverWallet.UpdatedTime = DateTime.Now;
+                driverWallet.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
                 await _unitOfWork.WalletRepository.UpdateAsync(driverWallet);
             }
             else if (trip.PaymentMethod == PaymentMethod.WALLET)
@@ -132,14 +132,14 @@ namespace Application.Commands.Handlers
                     PaymentMethod = PaymentMethod.WALLET,
                     Status = WalletTransactionStatus.SUCCESSFULL,
                     Type = WalletTransactionType.DRIVER_WAGE,
-                    CreateTime = DateTime.Now,
-                    UpdatedTime = DateTime.Now
+                    CreateTime = DateTimeUtilities.GetDateTimeVnNow(),
+                    UpdatedTime = DateTimeUtilities.GetDateTimeVnNow()
                 };
 
                 await _unitOfWork.WallettransactionRepository.AddAsync(driverTransaction);
 
                 driverWallet.Balance += driverWage;
-                driverWallet.UpdatedTime = DateTime.Now;
+                driverWallet.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
                 await _unitOfWork.WalletRepository.UpdateAsync(driverWallet);
 
                 double systemCommission = trip.Price - driverWage;
@@ -153,14 +153,14 @@ namespace Application.Commands.Handlers
                     PaymentMethod = PaymentMethod.WALLET,
                     Status = WalletTransactionStatus.SUCCESSFULL,
                     Type = WalletTransactionType.SYSTEM_COMMISSION,
-                    CreateTime = DateTime.Now,
-                    UpdatedTime = DateTime.Now
+                    CreateTime = DateTimeUtilities.GetDateTimeVnNow(),
+                    UpdatedTime = DateTimeUtilities.GetDateTimeVnNow()
                 };
 
                 await _unitOfWork.WallettransactionRepository.AddAsync(systemTransaction);
 
                 systemWallet.Balance += systemCommission;
-                systemWallet.UpdatedTime = DateTime.Now;
+                systemWallet.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
                 await _unitOfWork.WalletRepository.UpdateAsync(systemWallet);
             }
 

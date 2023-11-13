@@ -63,7 +63,7 @@ namespace Application.Commands.Handlers
 
             driverLocation.Latitude = request.DriverLatitude;
             driverLocation.Longtitude = request.DriverLongitude;
-            driverLocation.UpdatedTime = DateTime.Now;
+            driverLocation.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
 
             await _unitOfWork.LocationRepository.UpdateAsync(driverLocation);
 
@@ -84,8 +84,8 @@ namespace Application.Commands.Handlers
             }
 
             trip.Status = TripStatus.GOING;
-            trip.PickupTime = DateTime.Now;
-            trip.UpdatedTime = DateTime.Now;
+            trip.PickupTime = DateTimeUtilities.GetDateTimeVnNow();
+            trip.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
 
             await _unitOfWork.TripRepository.UpdateAsync(trip);
 

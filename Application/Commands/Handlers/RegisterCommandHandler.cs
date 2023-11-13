@@ -44,8 +44,8 @@ namespace Application.Commands.Handlers
                     user.Birth = request.Birth;
                     //user.Otp = PasswordHasher.Hash(otp);
                     user.OtpExpiryTime = await _verificationService.GenerateOtpExpiryTime();
-                    user.CreateTime = DateTime.Now;
-                    user.UpdatedTime = DateTime.Now;
+                    user.CreateTime = DateTimeUtilities.GetDateTimeVnNow();
+                    user.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
                     user.Isverify = false;
                     user.Isdriver = false;
                     user.Status = Domain.Enumerations.UserStatus.INACTIVE;

@@ -1,4 +1,5 @@
 ﻿using Application.Common.Exceptions;
+using Application.Common.Utilities;
 using Domain.DataModels;
 using Domain.Interfaces;
 using MediatR;
@@ -29,7 +30,7 @@ namespace Application.Commands.Handlers
             else
             {
                 u.RefreshToken = null;
-                u.RefreshTokenExpiryTime = DateTime.Now;
+                u.RefreshTokenExpiryTime = DateTimeUtilities.GetDateTimeVnNow();
                 await _unitOfWork.UserRepository.UpdateAsync(u);
                 await _unitOfWork.Save();
             }

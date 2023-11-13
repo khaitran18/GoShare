@@ -1,5 +1,6 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Exceptions;
+using Application.Common.Utilities;
 using Application.Services.Interfaces;
 using AutoMapper;
 using Domain.DataModels;
@@ -39,7 +40,7 @@ namespace Application.Commands.Handlers
             }
 
             user.DeviceToken = request.FcmToken;
-            user.UpdatedTime = DateTime.Now;
+            user.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
             await _unitOfWork.UserRepository.UpdateAsync(user);
             await _unitOfWork.Save();
 

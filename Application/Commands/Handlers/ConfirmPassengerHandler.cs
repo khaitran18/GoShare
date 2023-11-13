@@ -69,7 +69,7 @@ namespace Application.Commands.Handlers
                 }
 
                 trip.Status = TripStatus.GOING_TO_PICKUP;
-                trip.UpdatedTime = DateTime.Now;
+                trip.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
 
                 await _unitOfWork.TripRepository.UpdateAsync(trip);
 
@@ -95,7 +95,7 @@ namespace Application.Commands.Handlers
                     }
 
                     walletOwnerWallet.Balance -= trip.Price;
-                    walletOwnerWallet.UpdatedTime = DateTime.Now;
+                    walletOwnerWallet.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
                     await _unitOfWork.WalletRepository.UpdateAsync(walletOwnerWallet);
                 }
 
