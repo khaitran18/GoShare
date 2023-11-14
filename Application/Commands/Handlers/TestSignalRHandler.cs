@@ -20,7 +20,8 @@ namespace Application.Commands.Handlers
 
         public async Task<bool> Handle(TestSignalRCommand request, CancellationToken cancellationToken)
         {
-            await _hubContext.Clients.Group("testGroup").SendAsync("ReceiveMessage", "Test message");
+            await _hubContext.Clients.Group(request.UserId.ToString())
+                .SendAsync("ReceiveMessage", "Test passed!");
             return true;
         }
     }

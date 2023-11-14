@@ -9,6 +9,6 @@ namespace Application.Commands
 {
     public class TestSignalRCommand : IRequest<bool>
     {
-
+        public Guid? UserId { get; set; }
     }
 }

@@ -152,9 +152,6 @@ namespace Application.Services
         private async Task<bool> NotifyDriverAndAwaitResponse(User driver, Trip trip)
         {
             //Console.WriteLine($"Found driver {driver.Id}!");
-            //string content = (trip.StartLocation.Address == null || trip.EndLocation.Address == null)
-            //    ? "Bạn có yêu cầu chuyến xe mới"
-            //    : $"Bạn có muốn đón khách từ {trip.StartLocation.Address} đi {trip.EndLocation.Address} không?";
 
             //await FirebaseUtilities.SendNotificationToDeviceAsync(driver.DeviceToken!,
             //    "Yêu cầu chuyến mới",
@@ -164,7 +161,9 @@ namespace Application.Services
             //        { "tripId", trip.Id.ToString() }
             //    });
 
-            await _hubContext.Clients.User(driver.Id.ToString())
+            var groupName = GetGroupNameForUser(trip.Passenger, trip.Booker);
+
+            await _hubContext.Clients.Group(groupName)
                 .SendAsync("NotifyDriverNewTripRequest", trip);
 
             var timeout = TimeSpan.FromMinutes(_settingService.GetSetting("DRIVER_RESPONSE_TIMEOUT"));
@@ -195,6 +194,8 @@ namespace Application.Services
 
         private async Task NotifyBackToPassenger(Trip trip, User driver)
         {
+            var groupName = GetGroupNameForUser(trip.Passenger, trip.Booker);
+
             //await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken!,
             //    "Đặt chuyến thành công",
             //    $"Tài xế {driver.Name} đang trên đường đến đón bạn.",
@@ -203,25 +204,18 @@ namespace Application.Services
             //        { "tripId", trip.Id.ToString() }
             //    });
 
-            await _hubContext.Groups.AddToGroupAsync(trip.PassengerId.ToString(), trip.Id.ToString());
-
             if (trip.Passenger.GuardianId != null)
             {
-                if (trip.Passenger.GuardianId == trip.BookerId)
-                {
-                    await _hubContext.Groups.AddToGroupAsync(trip.Passenger.GuardianId.ToString(), trip.Id.ToString());
-                }
-
                 //await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian!.DeviceToken!,
                 //    "Đặt chuyến thành công",
-                //    $"Tài xế {driver.Name} đang trên đường đến đón người thân của bạn.",
+                //    $"Tài xế {driver.Name} đang trên đường đến đón người thân {trip.Passenger.Name} của bạn.",
                 //    new Dictionary<string, string>
                 //    {
                 //        { "tripId", trip.Id.ToString() }
                 //    });
             }
 
-            await _hubContext.Clients.Group(trip.Id.ToString())
+            await _hubContext.Clients.Group(groupName)
                 .SendAsync("NotifyPassengerDriverOnTheWay", driver);
         }
 
@@ -231,6 +225,8 @@ namespace Application.Services
 
             await _unitOfWork.TripRepository.UpdateAsync(trip);
             await _unitOfWork.Save();
+
+            var groupName = GetGroupNameForUser(trip.Passenger, trip.Booker);
 
             //await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken!,
             //    "Hết thời gian chờ",
@@ -244,11 +240,6 @@ namespace Application.Services
 
             if (trip.Passenger.GuardianId != null)
             {
-                if (trip.Passenger.GuardianId == trip.BookerId)
-                {
-                    await _hubContext.Groups.AddToGroupAsync(trip.Passenger.GuardianId.ToString(), trip.Id.ToString());
-                }
-
                 //await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian!.DeviceToken!,
                 //    "Hết thời gian chờ",
                 //    $"Chúng tôi thành thật xin lỗi, hiện tại chưa có tài xế phù hợp với người thân của bạn.",
@@ -258,8 +249,19 @@ namespace Application.Services
                 //    });
             }
 
-            await _hubContext.Clients.Group(trip.Id.ToString())
+            await _hubContext.Clients.Group(groupName)
                 .SendAsync("NotifyPassengerTripTimedOut", trip);
+        }
+
+        private string GetGroupNameForUser(User user, User booker)
+        {
+            // If the user is a dependent and the booker is the guardian
+            if (user.GuardianId != null && user.GuardianId == booker.Id)
+            {
+                return $"{user.Id}-{user.GuardianId}";
+            }
+
+            return $"{user.Id}";
         }
 
         public async Task ResetCancellationCountAndTime(Guid userId)

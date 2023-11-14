@@ -27,6 +27,7 @@ namespace Infrastructure.Repositories
                 .Include(t => t.Cartype)
                 .Include(t => t.Passenger)
                     .ThenInclude(p => p.Guardian)
+                .Include(t => t.Booker)
                 .FirstOrDefaultAsync(t => t.Id == id);
         }
     }
