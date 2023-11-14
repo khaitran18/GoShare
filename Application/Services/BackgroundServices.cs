@@ -5,6 +5,7 @@ using Application.Common.Utilities.Google;
 using Application.Common.Utilities.Google.Firebase;
 using Application.Services.Interfaces;
 using Application.SignalR;
+using AutoMapper;
 using Domain.DataModels;
 using Domain.Enumerations;
 using Domain.Interfaces;
@@ -25,14 +26,16 @@ namespace Application.Services
         private readonly IMediator _mediator;
         private readonly IHubContext<SignalRHub> _hubContext;
         private readonly ISettingService _settingService;
+        private readonly IMapper _mapper;
         private static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
 
-        public BackgroundServices(IUnitOfWork unitOfWork, IMediator mediator, IHubContext<SignalRHub> hubContext, ISettingService settingService)
+        public BackgroundServices(IUnitOfWork unitOfWork, IMediator mediator, IHubContext<SignalRHub> hubContext, ISettingService settingService, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mediator = mediator;
             _hubContext = hubContext;
             _settingService = settingService;
+            _mapper = mapper;
         }
 
         public async Task FindDriver(Guid tripId, Guid cartypeId, CancellationToken cancellationToken)
@@ -161,10 +164,8 @@ namespace Application.Services
             //        { "tripId", trip.Id.ToString() }
             //    });
 
-            var groupName = GetGroupNameForUser(trip.Passenger, trip.Booker);
-
-            await _hubContext.Clients.Group(groupName)
-                .SendAsync("NotifyDriverNewTripRequest", trip);
+            await _hubContext.Clients.Group(driver.Id.ToString())
+                .SendAsync("NotifyDriverNewTripRequest", _mapper.Map<TripDto>(trip));
 
             var timeout = TimeSpan.FromMinutes(_settingService.GetSetting("DRIVER_RESPONSE_TIMEOUT"));
             var startTime = DateTime.Now;
@@ -216,7 +217,7 @@ namespace Application.Services
             }
 
             await _hubContext.Clients.Group(groupName)
-                .SendAsync("NotifyPassengerDriverOnTheWay", driver);
+                .SendAsync("NotifyPassengerDriverOnTheWay", _mapper.Map<UserDto>(driver));
         }
 
         private async Task HandleTimeoutScenario(Trip trip)
