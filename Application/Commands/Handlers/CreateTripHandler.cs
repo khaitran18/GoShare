@@ -24,25 +24,24 @@ namespace Application.Commands.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly ITokenService _tokenService;
         private readonly IServiceProvider _serviceProvider;
         private readonly ISettingService _settingService;
+        private readonly UserClaims _userClaims;
 
-        public CreateTripHandler(IUnitOfWork unitOfWork, IMapper mapper, ITokenService tokenService, IServiceProvider serviceProvider, ISettingService settingService)
+        public CreateTripHandler(IUnitOfWork unitOfWork, IMapper mapper, IServiceProvider serviceProvider, ISettingService settingService, UserClaims userClaims)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _tokenService = tokenService;
             _serviceProvider = serviceProvider;
             _settingService = settingService;
+            _userClaims = userClaims;
         }
 
         public async Task<TripDto> Handle(CreateTripCommand request, CancellationToken cancellationToken)
         {
             var tripDto = new TripDto();
 
-            ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
-            Guid.TryParse(claims!.FindFirst("id")?.Value, out Guid userId);
+            Guid userId = (Guid)_userClaims.id!;
 
             var passenger = await _unitOfWork.UserRepository.GetUserById(userId.ToString());
             if (passenger == null)
@@ -50,7 +49,7 @@ namespace Application.Commands.Handlers
                 throw new NotFoundException(nameof(User), userId);
             }
 
-            var now = DateTime.Now;
+            var now = DateTimeUtilities.GetDateTimeVnNow();
             var cancellationWindowMinutes = _settingService.GetSetting("TRIP_CANCELLATION_WINDOW");
             var cancellationLimit = _settingService.GetSetting("TRIP_CANCELLATION_LIMIT");
             var banDurationMinutes = _settingService.GetSetting("CANCELLATION_BAN_DURATION");
@@ -85,8 +84,8 @@ namespace Application.Commands.Handlers
                     Latitude = request.StartLatitude,
                     Longtitude = request.StartLongitude,
                     Type = LocationType.CURRENT_LOCATION,
-                    CreateTime = DateTime.Now,
-                    UpdatedTime = DateTime.Now
+                    CreateTime = DateTimeUtilities.GetDateTimeVnNow(),
+                    UpdatedTime = DateTimeUtilities.GetDateTimeVnNow()
                 };
 
                 await _unitOfWork.LocationRepository.AddAsync(currentLocation);
@@ -96,7 +95,7 @@ namespace Application.Commands.Handlers
                 currentLocation.Address = request.StartAddress;
                 currentLocation.Latitude = request.StartLatitude;
                 currentLocation.Longtitude = request.StartLongitude;
-                currentLocation.UpdatedTime = DateTime.Now;
+                currentLocation.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
 
                 await _unitOfWork.LocationRepository.UpdateAsync(currentLocation);
             }
@@ -109,8 +108,8 @@ namespace Application.Commands.Handlers
                 Latitude = currentLocation.Latitude,
                 Longtitude = currentLocation.Longtitude,
                 Type = LocationType.PAST_ORIGIN,
-                CreateTime = DateTime.Now,
-                UpdatedTime = DateTime.Now
+                CreateTime = DateTimeUtilities.GetDateTimeVnNow(),
+                UpdatedTime = DateTimeUtilities.GetDateTimeVnNow()
             };
 
             await _unitOfWork.LocationRepository.AddAsync(pastOrigin);
@@ -126,8 +125,8 @@ namespace Application.Commands.Handlers
                     Latitude = request.EndLatitude,
                     Longtitude = request.EndLongitude,
                     Type = LocationType.PAST_DESTINATION,
-                    CreateTime = DateTime.Now,
-                    UpdatedTime = DateTime.Now
+                    CreateTime = DateTimeUtilities.GetDateTimeVnNow(),
+                    UpdatedTime = DateTimeUtilities.GetDateTimeVnNow()
                 };
 
                 await _unitOfWork.LocationRepository.AddAsync(destination);
@@ -158,9 +157,9 @@ namespace Application.Commands.Handlers
                 PassengerId = userId,
                 StartLocationId = pastOrigin.Id,
                 EndLocationId = destination.Id,
-                StartTime = DateTime.Now,
-                CreateTime = DateTime.Now,
-                UpdatedTime = DateTime.Now,
+                StartTime = DateTimeUtilities.GetDateTimeVnNow(),
+                CreateTime = DateTimeUtilities.GetDateTimeVnNow(),
+                UpdatedTime = DateTimeUtilities.GetDateTimeVnNow(),
                 Distance = distance,
                 CartypeId = request.CartypeId,
                 Price = totalPrice,

@@ -19,16 +19,16 @@ namespace Application.Commands.Handlers
     public class ConfirmPickupPassengerHandler : IRequestHandler<ConfirmPickupPassengerCommand, TripDto>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ITokenService _tokenService;
         private readonly IMapper _mapper;
         private readonly ISettingService _settingService;
+        private readonly UserClaims _userClaims;
 
-        public ConfirmPickupPassengerHandler(IUnitOfWork unitOfWork, ITokenService tokenService, IMapper mapper, ISettingService settingService)
+        public ConfirmPickupPassengerHandler(IUnitOfWork unitOfWork, IMapper mapper, ISettingService settingService, UserClaims userClaims)
         {
             _unitOfWork = unitOfWork;
-            _tokenService = tokenService;
             _mapper = mapper;
             _settingService = settingService;
+            _userClaims = userClaims;
         }
 
         public async Task<TripDto> Handle(ConfirmPickupPassengerCommand request, CancellationToken cancellationToken)
@@ -47,8 +47,7 @@ namespace Application.Commands.Handlers
                 throw new BadRequestException("The trip is invalid.");
             }
 
-            ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
-            Guid.TryParse(claims!.FindFirst("id")?.Value, out Guid driverId);
+            Guid driverId = (Guid)_userClaims.id!;
 
             if (trip.DriverId != driverId)
             {
@@ -64,7 +63,7 @@ namespace Application.Commands.Handlers
 
             driverLocation.Latitude = request.DriverLatitude;
             driverLocation.Longtitude = request.DriverLongitude;
-            driverLocation.UpdatedTime = DateTime.Now;
+            driverLocation.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
 
             await _unitOfWork.LocationRepository.UpdateAsync(driverLocation);
 
@@ -85,8 +84,8 @@ namespace Application.Commands.Handlers
             }
 
             trip.Status = TripStatus.GOING;
-            trip.PickupTime = DateTime.Now;
-            trip.UpdatedTime = DateTime.Now;
+            trip.PickupTime = DateTimeUtilities.GetDateTimeVnNow();
+            trip.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
 
             await _unitOfWork.TripRepository.UpdateAsync(trip);
 

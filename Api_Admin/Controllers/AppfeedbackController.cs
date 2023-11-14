@@ -1,16 +1,14 @@
-﻿using Application.Common;
-using Application.Common.Dtos;
-using Application.Queries;
+﻿using Application.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
-namespace Api_Mobile.Controllers
+namespace Api_Admin.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class AppfeedbackController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -18,6 +16,13 @@ namespace Api_Mobile.Controllers
         public AppfeedbackController(IMediator mediator)
         {
             _mediator = mediator;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAppfeedbacks([FromQuery] GetAppfeedbacksQuery query)
+        {
+            var response = await _mediator.Send(query);
+            return Ok(response);
         }
     }
 }

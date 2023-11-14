@@ -12,7 +12,6 @@ namespace Application.Commands
 {
     public class CreateTripCommand : IRequest<TripDto>
     {
-        public string? Token { get; set; }
         public decimal StartLatitude { get; set; }
         public decimal StartLongitude { get; set; }
         public string? StartAddress { get; set; }

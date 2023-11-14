@@ -36,7 +36,7 @@ namespace Application.Commands.Handlers
 
                 if (_verificationService.StartVerificationAsync(request.phone, "sms").IsCompletedSuccessfully)
                 {
-                    if (user.OtpExpiryTime!.Value.CompareTo(DateTime.Now) < 0)
+                    if (user.OtpExpiryTime!.Value.CompareTo(DateTimeUtilities.GetDateTimeVnNow()) < 0)
                     {
                         user.OtpExpiryTime = await _verificationService.GenerateOtpExpiryTime();
                     }

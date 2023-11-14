@@ -14,5 +14,6 @@ namespace Domain.Interfaces
         Task<User?> GetUserById(string id);
         Task<bool> VerifyDriver(Guid userGuid);
         Task<bool> IsVerified(Guid id);
+        Task<(List<User>, int)> GetDependents(Guid guardianId, string? sortBy, int page, int pageSize);
     }
 }

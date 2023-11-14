@@ -40,5 +40,10 @@ namespace Application.SignalR
             KeyValueStore.Instance.Set($"CurrentLocation_{dependentId}", location);
             return Task.CompletedTask;
         }
+
+        public async Task TestInvoke(string message)
+        {
+            await Clients.All.SendAsync("ReceiveTestMessage", message);
+        }
     }
 }

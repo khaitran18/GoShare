@@ -144,6 +144,10 @@ namespace Infrastructure.Data
 
                 entity.Property(e => e.Capacity).HasColumnName("capacity");
 
+                entity.Property(e => e.Image)
+                    .HasColumnType("character varying")
+                    .HasColumnName("image");
+
                 entity.Property(e => e.CreateTime)
                     .HasColumnType("timestamp without time zone")
                     .HasColumnName("create_time");
@@ -336,7 +340,7 @@ namespace Infrastructure.Data
 
                 entity.Property(e => e.Rater).HasColumnName("rater");
 
-                entity.Property(e => e.Rating1).HasColumnName("rating");
+                entity.Property(e => e.RatingValue).HasColumnName("rating");
 
                 entity.Property(e => e.TripId).HasColumnName("trip_id");
 
@@ -519,6 +523,18 @@ namespace Infrastructure.Data
                 entity.Property(e => e.CancellationBanUntil)
                     .HasColumnType("timestamp without time zone")
                     .HasColumnName("cancellation_ban_until");
+
+                entity.Property(e => e.TotalRating)
+                    .HasColumnName("total_rating");
+
+                entity.Property(e => e.RatingCount)
+                    .HasColumnName("rating_count");
+
+                entity.Property(e => e.RatingStatus).HasColumnName("rating_status");
+
+                entity.Property(e => e.WarnedTime)
+                    .HasColumnType("timestamp without time zone")
+                    .HasColumnName("warned_time");
 
                 entity.Property(e => e.Name)
                     .HasColumnType("character varying")

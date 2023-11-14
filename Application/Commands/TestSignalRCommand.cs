@@ -1,5 +1,4 @@
-﻿using Application.Common.Dtos;
-using MediatR;
+﻿using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Application.Commands
 {
-    public class UpdateFcmTokenCommand : IRequest<UserDto>
+    public class TestSignalRCommand : IRequest<bool>
     {
-        public string? FcmToken { get; set; }
+
     }
 }

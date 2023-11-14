@@ -41,7 +41,7 @@ namespace Application.Commands.Handlers
                 RefreshToken = await _unitOfWork.UserRepository.GetUserRefreshTokenByUserId(userId);
                 RefreshTokenExpiryTime = await _unitOfWork.UserRepository.GetUserRefreshTokenExpiryTimeByUserId(userId);
             }
-            if (RefreshTokenExpiryTime?.CompareTo(DateTime.Now) < 0) throw new UnauthorizedAccessException("Timeout, please login again");
+            if (RefreshTokenExpiryTime?.CompareTo(DateTimeUtilities.GetDateTimeVnNow()) < 0) throw new UnauthorizedAccessException("Timeout, please login again");
             else
             {
                 if (RefreshToken!.Equals(null)) throw new UnauthorizedAccessException("Token is null");

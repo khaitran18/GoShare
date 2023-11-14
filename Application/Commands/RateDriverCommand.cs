@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 
 namespace Application.Commands
 {
-    public class GetLocationOfDependentCommand : IRequest<LocationDto>
+    public class RateDriverCommand : IRequest<RatingDto>
     {
-        public Guid DependentId { get; set; }
+        public Guid TripId { get; set; }
+        public short Rating { get; set; }
+        public string? Comment { get; set; }
     }
 }

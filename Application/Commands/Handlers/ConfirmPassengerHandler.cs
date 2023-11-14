@@ -19,16 +19,16 @@ namespace Application.Commands.Handlers
     public class ConfirmPassengerHandler : IRequestHandler<ConfirmPassengerCommand, TripDto>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ITokenService _tokenService;
         private readonly ISettingService _settingService;
         private readonly IMapper _mapper;
+        private readonly UserClaims _userClaims;
 
-        public ConfirmPassengerHandler(IUnitOfWork unitOfWork, ITokenService tokenService, ISettingService settingService, IMapper mapper)
+        public ConfirmPassengerHandler(IUnitOfWork unitOfWork, ISettingService settingService, IMapper mapper, UserClaims userClaims)
         {
             _unitOfWork = unitOfWork;
-            _tokenService = tokenService;
             _settingService = settingService;
             _mapper = mapper;
+            _userClaims = userClaims;
         }
 
         public async Task<TripDto> Handle(ConfirmPassengerCommand request, CancellationToken cancellationToken)
@@ -47,8 +47,7 @@ namespace Application.Commands.Handlers
 
             if (request.Accept)
             {
-                ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
-                Guid.TryParse(claims!.FindFirst("id")?.Value, out Guid driverId);
+                Guid driverId = (Guid)_userClaims.id!;
 
                 var driver = await _unitOfWork.UserRepository.GetUserById(driverId.ToString());
 
@@ -70,7 +69,7 @@ namespace Application.Commands.Handlers
                 }
 
                 trip.Status = TripStatus.GOING_TO_PICKUP;
-                trip.UpdatedTime = DateTime.Now;
+                trip.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
 
                 await _unitOfWork.TripRepository.UpdateAsync(trip);
 
@@ -96,7 +95,7 @@ namespace Application.Commands.Handlers
                     }
 
                     walletOwnerWallet.Balance -= trip.Price;
-                    walletOwnerWallet.UpdatedTime = DateTime.Now;
+                    walletOwnerWallet.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
                     await _unitOfWork.WalletRepository.UpdateAsync(walletOwnerWallet);
                 }
 

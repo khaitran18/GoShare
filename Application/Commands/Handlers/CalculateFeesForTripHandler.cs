@@ -17,14 +17,10 @@ namespace Application.Commands.Handlers
     public class CalculateFeesForTripHandler : IRequestHandler<CalculateFeesForTripCommand, List<CartypeFeeDto>>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ITokenService _tokenService;
-        private readonly IMapper _mapper;
 
-        public CalculateFeesForTripHandler(IUnitOfWork unitOfWork, ITokenService tokenService, IMapper mapper)
+        public CalculateFeesForTripHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _tokenService = tokenService;
-            _mapper = mapper;
         }
 
         public async Task<List<CartypeFeeDto>> Handle(CalculateFeesForTripCommand request, CancellationToken cancellationToken)
@@ -45,18 +41,23 @@ namespace Application.Commands.Handlers
 
             var distance = await GoogleMapsApiUtilities.ComputeDistanceMatrixAsync(origin, destination);
 
-            var carTypes = await _unitOfWork.CartypeRepository.GetAllAsync();
+            var carTypes = await _unitOfWork.CartypeRepository.GetAllCartypeAsync();
 
             foreach (var carType in carTypes)
             {
-                double price = await _unitOfWork.CartypeRepository.CalculatePriceForCarType(carType.Id, distance);
-
-                carTypeFees.Add(new CartypeFeeDto
+                var fee = carType.Fees.FirstOrDefault();
+                if (fee != null)
                 {
-                    CartypeId = carType.Id,
-                    Capacity = carType.Capacity,
-                    TotalPrice = price
-                });
+                    double price = await _unitOfWork.CartypeRepository.CalculatePriceForCarType(carType.Id, distance);
+
+                    carTypeFees.Add(new CartypeFeeDto
+                    {
+                        CartypeId = carType.Id,
+                        Capacity = carType.Capacity,
+                        TotalPrice = price,
+                        Image = carType.Image
+                    });
+                }
             }
 
             return carTypeFees;

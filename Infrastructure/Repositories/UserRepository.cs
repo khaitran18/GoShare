@@ -26,7 +26,6 @@ namespace Infrastructure.Repositories
             var users = await _context.Users
                 .Include(u => u.Locations)
                 .Include(u => u.Car)
-                .AsNoTracking()
                 .ToListAsync();
 
             foreach (User user in users)
@@ -45,6 +44,34 @@ namespace Infrastructure.Repositories
                 }
             }
             return result;
+        }
+
+        public async Task<(List<User>, int)> GetDependents(Guid guardianId, string? sortBy, int page, int pageSize)
+        {
+            IQueryable<User> query = _context.Users.Where(u => u.GuardianId == guardianId).AsQueryable();
+
+            // Sort by
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                switch (sortBy.ToLower())
+                {
+                    case "name":
+                        query = query.OrderBy(u => u.Name);
+                        break;
+                    case "name_desc":
+                        query = query.OrderByDescending(u => u.Name);
+                        break;
+                }
+            }
+
+            var totalCount = await query.CountAsync();
+
+            // Pagination
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+            var dependents = await query.ToListAsync();
+
+            return (dependents, totalCount);
         }
 
         public Task<User?> GetUserById(string id)

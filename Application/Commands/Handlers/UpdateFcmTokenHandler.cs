@@ -1,5 +1,6 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Exceptions;
+using Application.Common.Utilities;
 using Application.Services.Interfaces;
 using AutoMapper;
 using Domain.DataModels;
@@ -17,21 +18,20 @@ namespace Application.Commands.Handlers
     public class UpdateFcmTokenHandler : IRequestHandler<UpdateFcmTokenCommand, UserDto>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ITokenService _tokenService;
+        private readonly UserClaims _userClaims;
         private readonly IMapper _mapper;
 
-        public UpdateFcmTokenHandler(IUnitOfWork unitOfWork, ITokenService tokenService, IMapper mapper)
+        public UpdateFcmTokenHandler(IUnitOfWork unitOfWork, UserClaims userClaims, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
-            _tokenService = tokenService;
+            _userClaims = userClaims;
             _mapper = mapper;
         }
 
         public async Task<UserDto> Handle(UpdateFcmTokenCommand request, CancellationToken cancellationToken)
         {
             var userDto = new UserDto();
-            ClaimsPrincipal? claims = _tokenService.ValidateToken(request.Token ?? "");
-            Guid.TryParse(claims!.FindFirst("id")?.Value, out Guid userId);
+            Guid userId = (Guid)_userClaims.id!;
             var user = await _unitOfWork.UserRepository.GetUserById(userId.ToString());
 
             if (user == null)
@@ -40,7 +40,7 @@ namespace Application.Commands.Handlers
             }
 
             user.DeviceToken = request.FcmToken;
-            user.UpdatedTime = DateTime.Now;
+            user.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
             await _unitOfWork.UserRepository.UpdateAsync(user);
             await _unitOfWork.Save();
 

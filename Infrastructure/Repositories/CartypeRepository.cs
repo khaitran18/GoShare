@@ -59,6 +59,13 @@ namespace Infrastructure.Repositories
             return totalPrice;
         }
 
+        public async Task<List<Cartype>> GetAllCartypeAsync()
+        {
+            return await _context.Cartypes
+                .Include(c => c.Fees)
+                .ToListAsync();
+        }
+
         public Task<Guid> GetGuidByCapacity(short capacity) => Task.FromResult(_context.Cartypes.FirstOrDefault(t => t.Capacity == capacity)!.Id);
     }
 }

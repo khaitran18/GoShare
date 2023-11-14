@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GoShareContext))]
-    partial class GoShareContextModelSnapshot : ModelSnapshot
+    [Migration("20231112192033_user_rating_update")]
+    partial class user_rating_update
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -98,15 +100,13 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
-                    b.Property<DateTime?>("VerifiedTo")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("verifiedto");
                     b.HasKey("Id");
 
                     b.HasIndex("TypeId");
 
                     b.HasIndex("UserId")
                         .IsUnique();
+
                     b.ToTable("cars", (string)null);
                 });
 
@@ -123,10 +123,6 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("CreateTime")
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("create_time");
-
-                    b.Property<string>("Image")
-                        .HasColumnType("character varying")
-                        .HasColumnName("image");
 
                     b.Property<DateTime>("UpdateTime")
                         .HasColumnType("timestamp without time zone")
@@ -340,7 +336,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("rater");
 
-                    b.Property<short>("RatingValue")
+                    b.Property<short>("Rating1")
                         .HasColumnType("smallint")
                         .HasColumnName("rating");
 

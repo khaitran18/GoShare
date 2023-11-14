@@ -28,7 +28,6 @@ using Application.SignalR;
 using Application.Services.Interfaces;
 using Google.Cloud.Storage.V1;
 using Application.Common.Behaviours;
-using Hangfire.Dashboard.BasicAuthorization;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -117,10 +116,20 @@ builder.Services.AddSignalR(hubOptions =>
     hubOptions.EnableDetailedErrors = true;
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", builder =>
+    {
+        builder.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .WithExposedHeaders("WWW-Authenticate");
+    });
+});
+
 // Add Handler
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<IRequestHandler<TestQuery, TestDto>, TestQueryHandler>();
-builder.Services.AddScoped<IRequestHandler<GetAppfeedbacksQuery, PaginatedResult<AppfeedbackDto>>, GetAppfeedbacksHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateTripCommand, TripDto>, CreateTripHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateTripForDependentCommand, TripDto>, CreateTripForDependentHandler>();
 builder.Services.AddScoped<IRequestHandler<AuthCommand,TokenResponse>, AuthCommandHandler>();
@@ -136,10 +145,13 @@ builder.Services.AddScoped<IRequestHandler<UpdateFcmTokenCommand, UserDto>, Upda
 builder.Services.AddScoped<IRequestHandler<ConfirmPickupPassengerCommand, TripDto>, ConfirmPickupPassengerHandler>();
 builder.Services.AddScoped<IRequestHandler<EndTripCommand, TripDto>, EndTripHandler>();
 builder.Services.AddScoped<IRequestHandler<CalculateFeesForTripCommand, List<CartypeFeeDto>>, CalculateFeesForTripHandler>();
+builder.Services.AddScoped<IRequestHandler<GetDependentsQuery, PaginatedResult<UserDto>>, GetDependentsHandler>();
 builder.Services.AddScoped<IRequestHandler<DriverRegisterCommand, bool>, DriverRegisterCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<AddCarCommand, Guid>, AddCarCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<CancelTripCommand, TripDto>, CancelTripHandler>();
 builder.Services.AddScoped<IRequestHandler<GetLocationOfDependentCommand, LocationDto>, GetLocationOfDependentHandler>();
+builder.Services.AddScoped<IRequestHandler<RateDriverCommand, RatingDto>, RateDriverHandler>();
+builder.Services.AddScoped<IRequestHandler<TestSignalRCommand, bool>, TestSignalRHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
@@ -214,34 +226,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<LoggingMiddleware>();
 app.UseMiddleware<GetUserClaimsMiddleware>();
 app.UseMiddleware<CheckUserVerificationMiddleware>();
 
-app.UseHttpsRedirection();
+app.UseHangfireDashboard("/hangfire");
 
-app.UseHangfireDashboard("/hangfire", new DashboardOptions
-{
-    Authorization = new[]
-        {
-            new BasicAuthAuthorizationFilter(new BasicAuthAuthorizationFilterOptions
-            {
-                SslRedirect = false,
-                RequireSsl = false,
-                LoginCaseSensitive = true,
-                Users = new []
-                {
-                    new BasicAuthAuthorizationUser
-                    {
-                        Login = "admin",
-                        PasswordClear = "1"
-                    }
-                }
-            })
-        }
-});
+app.UseHttpsRedirection();
 
 app.UseRouting();
 
@@ -250,6 +242,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseCors("CorsPolicy");
 
 app.UseEndpoints(endpoints =>
 {

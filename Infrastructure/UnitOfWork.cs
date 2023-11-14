@@ -18,6 +18,7 @@ namespace Infrastructure
         private IWalletRepository _walletRepository = null!;
         private IWallettransactionRepository _walletTransactionRepository = null!;
         private ISettingRepository _settingRepository = null!;
+        private IRatingRepository _ratingRepository = null!;
         public UnitOfWork(GoShareContext context)
         {
             _context = context;
@@ -33,6 +34,7 @@ namespace Infrastructure
         public IWalletRepository WalletRepository => _walletRepository ??= new WalletRepository(_context);
         public IWallettransactionRepository WallettransactionRepository => _walletTransactionRepository ??= new WallettransactionRepository(_context);
         public ISettingRepository SettingRepository => _settingRepository ??= new SettingRepository(_context);
+        public IRatingRepository RatingRepository => _ratingRepository ??= new RatingRepository(_context);
 
         public void Dispose()
         {
