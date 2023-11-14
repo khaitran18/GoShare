@@ -150,6 +150,7 @@ builder.Services.AddScoped<IRequestHandler<AddCarCommand, Guid>, AddCarCommandHa
 builder.Services.AddScoped<IRequestHandler<CancelTripCommand, TripDto>, CancelTripHandler>();
 builder.Services.AddScoped<IRequestHandler<GetLocationOfDependentCommand, LocationDto>, GetLocationOfDependentHandler>();
 builder.Services.AddScoped<IRequestHandler<RateDriverCommand, RatingDto>, RateDriverHandler>();
+builder.Services.AddScoped<IRequestHandler<TestSignalRCommand, bool>, TestSignalRHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));

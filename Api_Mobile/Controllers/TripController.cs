@@ -87,5 +87,12 @@ namespace Api_Mobile.Controllers
             var response = await _mediator.Send(command);
             return Ok(response);
         }
+
+        [HttpPost("test")]
+        public async Task<IActionResult> TestSignalR([FromBody] TestSignalRCommand command)
+        {
+            var response = await _mediator.Send(command);
+            return Ok(response);
+        }
     }
 }
