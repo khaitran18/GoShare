@@ -1,4 +1,5 @@
-﻿using Domain.DataModels;
+﻿using Application.Common.Exceptions;
+using Domain.DataModels;
 using Domain.Enumerations;
 using Domain.Interfaces;
 using Infrastructure.Data;
@@ -17,6 +18,13 @@ namespace Infrastructure.Repositories
         public WalletRepository(GoShareContext context) : base(context)
         {
             _context = context;
+        }
+
+        public Wallet GetById(Guid walletId)
+        {
+            Wallet? wallet = _context.Wallets.FirstOrDefault(w => w.Id.CompareTo(walletId) == 0);
+            if (wallet is null) throw new NotFoundException("Wallet is not found");
+            return wallet;
         }
 
         public async Task<Wallet?> GetByUserIdAsync(Guid userId)

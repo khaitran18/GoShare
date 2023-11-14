@@ -15,59 +15,6 @@ partial class Program
     static async Task Main(string[] args)
     {
         Configure();
-        string choice = "";
-        List<string> Menu = new List<string>{
-            "Twlio Service - Send otp",
-            "Twlio Service - Verify otp",
-            "Login Service"
-            };
-        while (!choice.Equals("-1"))
-        {
-            try
-            {
-                Console.WriteLine("TEST SERVICE FROM CONSOLE");
-                for (int i = 0; i < Menu.Count; i++)
-                {
-                    Console.WriteLine(i + "." + Menu[i]);
-                };
-                choice = Console.ReadLine()!;
-                switch (choice)
-                {
-                    case "clr":
-                        {
-                            Console.Clear();
-                            break;
-                        }
-                    case "0":
-                        {
-                            Console.WriteLine("Enter phone number:");
-                            string phone = Console.ReadLine()!;
-                            Console.WriteLine("Phone number just entered:" + phone);
-                            await SendSMSUsingTwilio(phone);
-                            break;
-                        }
-                    case "1":
-                        {
-                            Console.WriteLine("Enter phone number:");
-                            string phone = Console.ReadLine()!;
-                            Console.WriteLine("Phone number just entered:" + phone);
-                            Console.WriteLine("Enter code:");
-                            string code = Console.ReadLine()!;
-                            Console.WriteLine("Code just entered:" + code);
-                            await VerifyUsingTwilio(phone,code);
-                            break;
-                        }
-                    
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("-----------------ERROR---------------");
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e.StackTrace);
-                Console.WriteLine("--------------------------------------");
-            }
-        }
     }
     private static async Task SendSMSUsingTwilio(string phone)
     {
@@ -99,6 +46,75 @@ partial class Program
         }
 
     }
+
+    //private static async Task CreatePaymentUrl(OrderInfo order)
+    //{
+    //    //Get Config Info
+    //    string vnp_Returnurl = "facebook.com"; //URL nhan ket qua tra ve 
+    //    string vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"; //URL thanh toan cua VNPAY 
+    //    string vnp_TmnCode = "HVXA1C4M"; //Ma định danh merchant kết nối (Terminal Id)
+    //    string vnp_HashSecret = "QVWQGRJGRLSZCZOLGXIVWIIMCYLSUAVT"; //Secret Key
+
+    //    //Get payment input
+        
+
+    //    //Save order to db
+
+    //    //Build URL for VNPAY
+    //    VnPayLibrary vnpay = new VnPayLibrary();
+    //    vnpay.AddRequestData("vnp_Version", VnPayLibrary.VERSION);
+    //    vnpay.AddRequestData("vnp_Command", "pay");
+    //    vnpay.AddRequestData("vnp_TmnCode", vnp_TmnCode);
+    //    vnpay.AddRequestData("vnp_Amount", (order.Amount * 100).ToString()); //Số tiền thanh toán. Số tiền không mang các ký tự phân tách thập phân, phần nghìn, ký tự tiền tệ. Để gửi số tiền thanh toán là 100,000 VND (một trăm nghìn VNĐ) thì merchant cần nhân thêm 100 lần (khử phần thập phân), sau đó gửi sang VNPAY là: 10000000
+    //    vnpay.AddRequestData("vnp_BankCode", "");
+    //    vnpay.AddRequestData("vnp_CreateDate", order.CreatedDate.ToString("yyyyMMddHHmmss"));
+    //    vnpay.AddRequestData("vnp_CurrCode", "VND");
+    //    vnpay.AddRequestData("vnp_IpAddr", "115.79.219.34");
+    //    vnpay.AddRequestData("vnp_Locale", "vn");
+    //    vnpay.AddRequestData("vnp_OrderInfo", "Thanh toan don hang:" + order.OrderId);
+    //    vnpay.AddRequestData("vnp_OrderType", "other"); //default value: other
+    //    vnpay.AddRequestData("vnp_ReturnUrl", vnp_Returnurl);
+    //    vnpay.AddRequestData("vnp_TxnRef", Guid.NewGuid().ToString()); // Mã tham chiếu của giao dịch tại hệ thống của merchant. Mã này là duy nhất dùng để phân biệt các đơn hàng gửi sang VNPAY. Không được trùng lặp trong ngày
+
+    //    //Add Params of 2.1.0 Version
+    //    //Billing
+
+    //    string paymentUrl = vnpay.CreateRequestUrl(vnp_Url, vnp_HashSecret);
+    //    Console.WriteLine("Payment Url: " + paymentUrl);
+    //}
+
+    //private static async Task CreateIpnUrl(OrderInfo order)
+    //{
+    //    //Get Config Info
+    //    string vnp_Returnurl = "facebook.com"; //URL nhan ket qua tra ve 
+    //    string vnp_Url = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction"; //URL thanh toan cua VNPAY 
+    //    string vnp_TmnCode = "HVXA1C4M"; //Ma định danh merchant kết nối (Terminal Id)
+    //    string vnp_HashSecret = "QVWQGRJGRLSZCZOLGXIVWIIMCYLSUAVT"; //Secret Key
+
+    //    //Save order to db
+
+    //    //Build URL for VNPAY
+    //    VnPayLibrary vnpay = new VnPayLibrary();
+    //    vnpay.AddRequestData("vnp_Version", VnPayLibrary.VERSION);
+    //    vnpay.AddRequestData("vnp_Command", "querydr");
+    //    vnpay.AddRequestData("vnp_TmnCode", vnp_TmnCode);
+    //    vnpay.AddRequestData("vnp_Amount", (order.Amount * 100).ToString()); //Số tiền thanh toán. Số tiền không mang các ký tự phân tách thập phân, phần nghìn, ký tự tiền tệ. Để gửi số tiền thanh toán là 100,000 VND (một trăm nghìn VNĐ) thì merchant cần nhân thêm 100 lần (khử phần thập phân), sau đó gửi sang VNPAY là: 10000000
+    //    vnpay.AddRequestData("vnp_BankCode", "");
+    //    vnpay.AddRequestData("vnp_CreateDate", order.CreatedDate.ToString("yyyyMMddHHmmss"));
+    //    vnpay.AddRequestData("vnp_CurrCode", "VND");
+    //    vnpay.AddRequestData("vnp_IpAddr", "115.79.219.34");
+    //    vnpay.AddRequestData("vnp_Locale", "vn");
+    //    vnpay.AddRequestData("vnp_OrderInfo", "Tra cuu ket qua giao dich:" + order.OrderId);
+    //    vnpay.AddRequestData("vnp_OrderType", "other"); //default value: other
+    //    vnpay.AddRequestData("vnp_ReturnUrl", vnp_Returnurl);
+    //    vnpay.AddRequestData("vnp_TxnRef", Guid.NewGuid().ToString()); // Mã tham chiếu của giao dịch tại hệ thống của merchant. Mã này là duy nhất dùng để phân biệt các đơn hàng gửi sang VNPAY. Không được trùng lặp trong ngày
+
+    //    //Add Params of 2.1.0 Version
+    //    //Billing
+
+    //    string paymentUrl = vnpay.CreateRequestUrl(vnp_Url, vnp_HashSecret);
+    //    Console.WriteLine("Payment Url: " + paymentUrl);
+    //}
 
     private static void Configure()
     {

@@ -1,4 +1,5 @@
-﻿using Domain.DataModels;
+﻿using Application.Common.Exceptions;
+using Domain.DataModels;
 using Domain.Interfaces;
 using Infrastructure.Data;
 using System;
@@ -15,6 +16,13 @@ namespace Infrastructure.Repositories
         public WallettransactionRepository(GoShareContext context) : base(context)
         {
             _context = context;
+        }
+
+        public Wallettransaction GetByIdAsync(Guid id)
+        {
+            Wallettransaction? w = _context.Wallettransactions.FirstOrDefault(w => w.Id.CompareTo(id) == 0);
+            if (w is null) throw new NotFoundException("Transaction does not exist");
+            return w;
         }
     }
 }

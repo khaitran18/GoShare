@@ -9,10 +9,11 @@ namespace Application.Common.Dtos
 {
     public class UserClaims : IDisposable
     {
-        public Guid? id { get; set; } 
+        public Guid? id { get; set; }
         public string? name { get; set; }
         public string? phone { get; set; }
         public UserRoleEnumerations Role { get; set; }
+        public string UserIp { get; set; } = null!;
 
         public void Dispose()
         {
