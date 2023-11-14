@@ -74,6 +74,13 @@ namespace Infrastructure.Repositories
             return (dependents, totalCount);
         }
 
+        public async Task<List<User>> GetDependentsByGuardianId(Guid userId)
+        {
+            return await _context.Users
+                .Where(u => u.GuardianId == userId)
+                .ToListAsync();
+        }
+
         public Task<User?> GetUserById(string id)
         {
             return Task.FromResult(_context.Users.FirstOrDefault(u => u.Id.Equals(new Guid(id))));
