@@ -80,9 +80,18 @@ namespace Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public Task<User?> GetUserById(string id)
+        public async Task<User?> GetUserById(string id)
         {
-            return Task.FromResult(_context.Users.FirstOrDefault(u => u.Id.Equals(new Guid(id))));
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id.Equals(new Guid(id)));
+
+            if (user != null && user.Isdriver)
+            {
+                user = await _context.Users
+                    .Include(u => u.Car)
+                    .FirstOrDefaultAsync(u => u.Id.Equals(new Guid(id)));
+            }
+
+            return user;
         }
 
         public Task<User?> GetUserByPhone(string phone)

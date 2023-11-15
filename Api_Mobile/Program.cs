@@ -46,6 +46,12 @@ builder.Services.AddEndpointsApiExplorer();
 //Add class
 builder.Services.AddScoped<UserClaims>();
 
+// Logging
+builder.Services.AddLogging(loggingBuilder =>
+{
+    loggingBuilder.AddConsole();
+});
+
 // Initialize Configuration
 GoShareConfiguration.Initialize(builder.Configuration);
 
@@ -89,7 +95,7 @@ builder.Services.AddSingleton<ISettingService, SettingService>();
 // Hangfire
 builder.Services.AddHangfire(config => config
     .UsePostgreSqlStorage(c => c.UseNpgsqlConnection(GoShareConfiguration.ConnectionString("GoShareAzure")))
-    .UseFilter(new AutomaticRetryAttribute { Attempts = 5 }));
+    .UseFilter(new AutomaticRetryAttribute { Attempts = 0 }));
 builder.Services.AddHangfireServer(options =>
 {
     options.WorkerCount = Environment.ProcessorCount * 5;

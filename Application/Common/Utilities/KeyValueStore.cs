@@ -21,13 +21,13 @@ namespace Application.Common.Utilities
             store[key] = value;
         }
 
-        public T Get<T>(string key)
+        public T? Get<T>(string key)
         {
             if (store.TryGetValue(key, out var value) && value is T)
             {
                 return (T)value;
             }
-            throw new KeyNotFoundException($"Key '{key}' not found in the key-value store.");
+            return default(T);
         }
 
         public bool ContainsKey(string key)

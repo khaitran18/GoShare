@@ -9,7 +9,9 @@ using Domain.Enumerations;
 using Domain.Interfaces;
 using Hangfire;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,13 +27,15 @@ namespace Application.Commands.Handlers
         private readonly ISettingService _settingService;
         private readonly IMapper _mapper;
         private readonly UserClaims _userClaims;
+        private readonly ILogger<BackgroundServices> _logger;
 
-        public CancelTripHandler(IUnitOfWork unitOfWork, ISettingService settingService, IMapper mapper, UserClaims userClaims)
+        public CancelTripHandler(IUnitOfWork unitOfWork, ISettingService settingService, IMapper mapper, UserClaims userClaims, ILogger<BackgroundServices> logger)
         {
             _unitOfWork = unitOfWork;
             _settingService = settingService;
             _mapper = mapper;
             _userClaims = userClaims;
+            _logger = logger;
         }
 
         public async Task<TripDto> Handle(CancelTripCommand request, CancellationToken cancellationToken)
@@ -66,6 +70,15 @@ namespace Application.Commands.Handlers
 
             var cancellationWindow = now.AddMinutes(-cancellationWindowMinutes);
 
+            // Check if the last cancellation was long ago
+            if (user.CanceledTripCount > 1 && user.CanceledTripCount < cancellationLimit && user.LastTripCancellationTime < cancellationWindow)
+            {
+                user.CanceledTripCount = 0;
+                user.LastTripCancellationTime = null;
+                user.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
+                await _unitOfWork.UserRepository.UpdateAsync(user);
+            }
+
             // Check if the user has cancelled too many trips recently (this is only for blocking dependent)
             if (user.LastTripCancellationTime >= cancellationWindow && user.CanceledTripCount >= cancellationLimit)
             {
@@ -79,6 +92,7 @@ namespace Application.Commands.Handlers
                     user.CanceledTripCount = 0;
                     user.LastTripCancellationTime = null;
                     user.CancellationBanUntil = null;
+                    user.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
                     await _unitOfWork.UserRepository.UpdateAsync(user);
                 }
             }
@@ -98,6 +112,7 @@ namespace Application.Commands.Handlers
                 user.LastTripCancellationTime = now;
 
                 // Scheduled job to reset cancellation count and time
+                _logger.LogInformation("Scheduling job to reset trip cancellation for userId: {userId}", user.Id);
                 var resetJobId = BackgroundJob.Schedule<BackgroundServices>(s => s.ResetCancellationCountAndTime(user.Id), TimeSpan.FromMinutes(cancellationWindowMinutes));
                 KeyValueStore.Instance.Set($"ResetCancellationTask_{user.Id}", resetJobId);
             }
@@ -110,6 +125,7 @@ namespace Application.Commands.Handlers
                 var resetJobId = KeyValueStore.Instance.Get<string>($"ResetCancellationTask_{user.Id}");
                 if (!string.IsNullOrEmpty(resetJobId))
                 {
+                    _logger.LogInformation("Cancelling reset job for userId: {userId} as cancellation limit has been reached", user.Id);
                     BackgroundJob.Delete(resetJobId);
                     KeyValueStore.Instance.Remove($"ResetCancellationTask_{user.Id}");
                 }
@@ -125,19 +141,24 @@ namespace Application.Commands.Handlers
                 {
                     // Reset the status of the driver to active
                     driver.Status = UserStatus.ACTIVE;
+                    driver.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
                     await _unitOfWork.UserRepository.UpdateAsync(driver);
+
+                    trip.DriverId = null;
+                    trip.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
+                    await _unitOfWork.TripRepository.UpdateAsync(trip);
                 }
             }
 
             await _unitOfWork.Save();
 
             // Cancel find driver task
-            string jobId = KeyValueStore.Instance.Get<string>($"FindDriverTask_{trip.Id}");
-            if (!string.IsNullOrEmpty(jobId))
-            {
-                BackgroundJob.Delete(jobId);
-                KeyValueStore.Instance.Remove($"FindDriverTask_{trip.Id}");
-            }
+            _logger.LogInformation("Cancelling find driver task for tripId: {tripId}", trip.Id);
+            //var cts = _serviceProvider.GetRequiredService<CancellationTokenSource>();
+            //BackgroundJob.Delete(jobId);
+            //cts.Cancel();
+            KeyValueStore.Instance.Set($"CancelFindDriverTask_{trip.Id}", "true");
+            //KeyValueStore.Instance.Remove($"FindDriverTask_{trip.Id}");
 
             return _mapper.Map<TripDto>(trip);
         }

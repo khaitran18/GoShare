@@ -11,6 +11,7 @@ using Domain.Interfaces;
 using Hangfire;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,17 +25,17 @@ namespace Application.Commands.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly IServiceProvider _serviceProvider;
         private readonly ISettingService _settingService;
         private readonly UserClaims _userClaims;
+        private readonly ILogger<BackgroundServices> _logger;
 
-        public CreateTripHandler(IUnitOfWork unitOfWork, IMapper mapper, IServiceProvider serviceProvider, ISettingService settingService, UserClaims userClaims)
+        public CreateTripHandler(IUnitOfWork unitOfWork, IMapper mapper, ISettingService settingService, UserClaims userClaims, ILogger<BackgroundServices> logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _serviceProvider = serviceProvider;
             _settingService = settingService;
             _userClaims = userClaims;
+            _logger = logger;
         }
 
         public async Task<TripDto> Handle(CreateTripCommand request, CancellationToken cancellationToken)
@@ -69,6 +70,7 @@ namespace Application.Commands.Handlers
                     passenger.CanceledTripCount = 0;
                     passenger.LastTripCancellationTime = null;
                     passenger.CancellationBanUntil = null;
+                    passenger.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
                     await _unitOfWork.UserRepository.UpdateAsync(passenger);
                 }
             }
@@ -176,9 +178,9 @@ namespace Application.Commands.Handlers
             tripDto = _mapper.Map<TripDto>(trip);
 
             // Background task
-            var cts = _serviceProvider.GetRequiredService<CancellationTokenSource>();
-            string jobId = BackgroundJob.Enqueue<BackgroundServices>(s => s.FindDriver(trip.Id, request.CartypeId, cts.Token));
-            KeyValueStore.Instance.Set($"FindDriverTask_{trip.Id}", jobId);
+            //var cts = _serviceProvider.GetRequiredService<CancellationTokenSource>();
+            string jobId = BackgroundJob.Enqueue<BackgroundServices>(s => s.FindDriver(trip.Id, request.CartypeId));
+            //KeyValueStore.Instance.Set($"FindDriverTask_{trip.Id}", jobId);
 
             return tripDto;
         }

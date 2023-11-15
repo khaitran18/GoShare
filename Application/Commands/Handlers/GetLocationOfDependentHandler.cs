@@ -69,7 +69,7 @@ namespace Application.Commands.Handlers
 
             // Return the obtained location data
             var dependentLocation = KeyValueStore.Instance.Get<string>($"CurrentLocation_{request.DependentId}");
-            if (dependentLocation == null)
+            if (!string.IsNullOrEmpty(dependentLocation))
             {
                 throw new BadRequestException("Unable to get dependent's location");
             }

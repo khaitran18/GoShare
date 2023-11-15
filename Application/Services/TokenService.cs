@@ -1,4 +1,5 @@
 ﻿using Application.Common.Dtos;
+using Application.Common.Utilities;
 using Application.Services.Interfaces;
 using Domain.Enumerations;
 using Microsoft.IdentityModel.Logging;
@@ -43,7 +44,7 @@ namespace Application.Services
                 issuer: _issuer,
                 audience: _audience,
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(Convert.ToDouble(_expiryMinutes)),
+                expires: DateTimeUtilities.GetDateTimeVnNow().AddMinutes(Convert.ToDouble(_expiryMinutes)),
                 signingCredentials: signingCredentials
            );
 
@@ -63,7 +64,7 @@ namespace Application.Services
 
         public DateTime CreateRefreshTokenExpiryTime()
         {
-            return DateTime.Now.AddMinutes(Convert.ToDouble(_refreshTokenExpiryTime));
+            return DateTimeUtilities.GetDateTimeVnNow().AddMinutes(Convert.ToDouble(_refreshTokenExpiryTime));
         }
 
         public ClaimsPrincipal? ValidateToken(string jwtToken)

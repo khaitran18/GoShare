@@ -22,5 +22,6 @@ namespace Application.Common.Dtos
         public DateTime UpdatedTime { get; set; }
         public short? Gender { get; set; }
         public DateTime Birth { get; set; }
+        public CarDto? Car { get; set; }
     }
 }

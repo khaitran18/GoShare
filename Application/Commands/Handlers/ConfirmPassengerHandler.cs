@@ -34,6 +34,7 @@ namespace Application.Commands.Handlers
         public async Task<TripDto> Handle(ConfirmPassengerCommand request, CancellationToken cancellationToken)
         {
             var trip = await _unitOfWork.TripRepository.GetByIdAsync(request.TripId);
+            Guid driverId = (Guid)_userClaims.id!;
 
             if (trip == null)
             {
@@ -45,10 +46,13 @@ namespace Application.Commands.Handlers
                 throw new BadRequestException("The trip is invalid.");
             }
 
+            if (trip.DriverId != driverId)
+            {
+                throw new BadRequestException("Driver is not assigned to this trip.");
+            }
+
             if (request.Accept)
             {
-                Guid driverId = (Guid)_userClaims.id!;
-
                 var driver = await _unitOfWork.UserRepository.GetUserById(driverId.ToString());
 
                 if (driver == null)

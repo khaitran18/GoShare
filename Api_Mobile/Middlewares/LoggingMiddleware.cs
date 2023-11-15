@@ -1,4 +1,6 @@
-﻿namespace Api_Mobile.Middlewares
+﻿using Application.Common.Utilities;
+
+namespace Api_Mobile.Middlewares
 {
     public class LoggingMiddleware : IMiddleware
     {
@@ -11,10 +13,10 @@
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            _logger.LogInformation("Request start:"+DateTime.Now);
+            _logger.LogInformation("Request start:"+DateTimeUtilities.GetDateTimeVnNow());
             _logger.LogInformation("Path:" + context.Request.Path);
             await next(context);
-            _logger.LogInformation("Request end:" + DateTime.Now);
+            _logger.LogInformation("Request end:" + DateTimeUtilities.GetDateTimeVnNow());
         }
     }
 }

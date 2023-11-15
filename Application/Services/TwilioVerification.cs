@@ -1,4 +1,5 @@
 ﻿
+using Application.Common.Utilities;
 using Application.Services.Interfaces;
 using Twilio;
 using Twilio.Exceptions;
@@ -42,7 +43,7 @@ namespace Application.Services
 
         public Task<DateTime> GenerateOtpExpiryTime()
         {
-            return Task.FromResult(DateTime.Now.AddMinutes(_config.OtpLifeSpan));
+            return Task.FromResult(DateTimeUtilities.GetDateTimeVnNow().AddMinutes(_config.OtpLifeSpan));
         }
     }
 }
