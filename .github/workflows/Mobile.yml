@@ -33,6 +33,7 @@ jobs:
        Twilio: ${{ secrets.Twilio }}
        Jwt: ${{ secrets.Jwt }}
        SpeedSMSAPI: ${{ secrets.SpeedSMSAPI }}
+       Vnpay: ${{ secrets.Vnpay }}
 
     - name: Build
       run: dotnet build ./Api_Mobile/Api_Mobile.csproj --configuration Release --no-restore

@@ -94,5 +94,15 @@ namespace Application.Configuration
             Username = Configuration["Admin:Username"]!,
             Password = Configuration["Admin:Password"]!
         };
+        public static VnpayConfig VnpayConfig => new VnpayConfig
+        {
+            BaseUrl = Configuration["Vnpay:BaseUrl"]!,
+            CurrCode = Configuration["Vnpay:CurrCode"]!,
+            HashSecret = Configuration["Vnpay:HashSecret"]!,
+            Locale = Configuration["Vnpay:Locale"]!,
+            TmnCode = Configuration["Vnpay:TmnCode"]!,
+            Version = Configuration["Vnpay:Version"]!,
+            CallBackUrl = Configuration["Vnpay:CallBackUrl"]!,
+        };
     }
 }

@@ -91,10 +91,15 @@ namespace Application.Services
             return principal;
         }
 
-        public Guid GetGuid(string jwtToken)
+        public Guid? GetGuid(string jwtToken)
         {
-            Guid.TryParse(ValidateToken(jwtToken)!.FindFirst("id")!.Value, out Guid id);
-            return id;
+            string? idValue = ValidateToken(jwtToken)!.FindFirst("id")?.Value;
+            if (idValue is null) return null;
+            else
+            {
+                Guid.TryParse(idValue, out Guid id);
+                return id;
+            }
         }
     }
 }

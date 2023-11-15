@@ -36,6 +36,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 builder.Services.AddTransient<LoggingMiddleware>();
 builder.Services.AddTransient<GetUserClaimsMiddleware>();
+builder.Services.AddTransient<CheckUserVerificationMiddleware>();
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -86,6 +87,10 @@ builder.Services.AddAuthentication(x =>
 });
 builder.Services.AddSingleton<ITokenService>(new TokenService(_key,_expirtyMinutes,_refreshTokenExpirtyMinutes,_issuer,_audience));
 builder.Services.AddSingleton<IDriverDocumentService, DriverDocumentService>();
+
+//Add VnPayService
+builder.Services.AddSingleton<IPaymentService>(new PaymentService(GoShareConfiguration.VnpayConfig));
+
 
 // Add dependency injection
 builder.Services.AddDbContext<GoShareContext>(options => options.UseNpgsql(GoShareConfiguration.ConnectionString("GoShareAzure")));
@@ -157,6 +162,8 @@ builder.Services.AddScoped<IRequestHandler<CancelTripCommand, TripDto>, CancelTr
 builder.Services.AddScoped<IRequestHandler<GetLocationOfDependentCommand, LocationDto>, GetLocationOfDependentHandler>();
 builder.Services.AddScoped<IRequestHandler<RateDriverCommand, RatingDto>, RateDriverHandler>();
 builder.Services.AddScoped<IRequestHandler<TestSignalRCommand, bool>, TestSignalRHandler>();
+builder.Services.AddScoped<IRequestHandler<CreateTopUpRequestCommand, string>, CreateTopupRequestCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<PaymentCallbackCommand,bool>, PaymentCallbackCommandHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
@@ -178,6 +185,7 @@ var mapperConfig = new MapperConfiguration(cfg =>
     cfg.AddProfile<LocationProfile>();
     cfg.AddProfile<CartypeProfile>();
     cfg.AddProfile<DriverdocumentProfile>();
+    cfg.AddProfile<WallettransactionProfile>();
 });
 var mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
@@ -234,6 +242,7 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<LoggingMiddleware>();
 app.UseMiddleware<GetUserClaimsMiddleware>();
+app.UseMiddleware<CheckUserVerificationMiddleware>();
 
 app.UseHangfireDashboard("/hangfire");
 

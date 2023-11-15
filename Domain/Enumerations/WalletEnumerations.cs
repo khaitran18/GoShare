@@ -38,4 +38,8 @@ namespace Domain.Enumerations
         //TRIP_PICK = 7,
         //TRIP_PICK_REFUND = 8
     }
+    public enum TopupMethod : short
+    {
+        VnPay = 0
+    }
 }

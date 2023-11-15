@@ -22,15 +22,15 @@ namespace Api_Admin.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet("verify-driver/{UserId}")]
+        [HttpGet("driverdocuments/{UserId}")]
         public async Task<IActionResult> ViewDriverDocument([FromRoute] GetDriverDocumentQuery query)
         {
             var response = await _mediator.Send(query);
             return Ok(response);
         }
 
-        [HttpPost("verify-driver/{id}")]
-        public async Task<IActionResult> VerifyDriver([FromRoute] VerifyDriverCommand command)
+        [HttpPost("verify-driver")]
+        public async Task<IActionResult> VerifyDriver([FromBody] VerifyDriverCommand command)
         {
             var response = await _mediator.Send(command);
             return Ok(response);

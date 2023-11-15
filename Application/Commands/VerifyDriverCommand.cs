@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace Application.Commands
 {
-    public class VerifyDriverCommand : IRequest<bool>
+    public record VerifyDriverCommand : IRequest<bool>
     {
         public Guid id { get; set; }
+        public DateTime verifiedTo { get; set; }
     }
 }

@@ -1,4 +1,6 @@
-﻿using Domain.DataModels;
+﻿using Application.Common.Exceptions;
+using Domain.DataModels;
+using Domain.Enumerations;
 using Domain.Interfaces;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +29,26 @@ namespace Infrastructure.Repositories
         {
             return await _context.Cars
                 .FirstOrDefaultAsync(car => car.UserId == userId);
+        }
+
+        public Task<bool> IsValidByDate(Guid id)
+        {
+            Car? car = _context.Cars.FirstOrDefault(u => u.UserId.CompareTo(id) == 0);
+            if (car is null) throw new NotFoundException("User's car is not found");
+            return Task.FromResult(car.VerifiedTo > DateTime.Now ? true : false);
+        }
+
+        public async Task<bool> VerifyCar(Guid id, DateTime verifiedTo)
+        {
+            Car? car = _context.Cars.FirstOrDefault(c => c.UserId.CompareTo(id) == 0);
+            if (car is not null)
+            {
+                car.Status = (short)CarStatusEnumerations.Verified;
+                car.VerifiedTo = verifiedTo;
+                await _context.SaveChangesAsync();
+            }
+            else throw new NotFoundException("User's car is not found");
+            return true;
         }
     }
 }

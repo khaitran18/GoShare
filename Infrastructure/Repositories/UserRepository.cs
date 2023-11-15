@@ -1,4 +1,5 @@
-﻿using Application.Common.Utilities;
+﻿using Application.Common.Exceptions;
+using Application.Common.Utilities;
 using AutoMapper;
 using Domain.DataModels;
 using Domain.Enumerations;
@@ -119,6 +120,13 @@ namespace Infrastructure.Repositories
             return Task.FromResult(_context.Users.FirstOrDefault(u => u.Id.Equals(new Guid(userId)))!.RefreshTokenExpiryTime);
         }
 
+        public Task<bool> IsVerified(Guid id)
+        {
+            User? u = _context.Users.FirstOrDefaultAsync(u => u.Id.CompareTo(id) == 0).Result;
+            if (u is null) throw new NotFoundException("User is not found");
+            return Task.FromResult(u.Isverify);
+        }
+
         public Task<bool> PhoneExist(string phone)
         {
             return Task.FromResult(_context.Users.Any(u => u.Phone.Equals(phone)));
@@ -126,9 +134,13 @@ namespace Infrastructure.Repositories
 
         public async Task<bool> VerifyDriver(Guid userGuid)
         {
-            User u = _context.Users.FirstOrDefault(u => u.Id.Equals(userGuid))!;
-            u.Isdriver = true;
-            await _context.SaveChangesAsync();
+            User? u = _context.Users.FirstOrDefault(u => u.Id.Equals(userGuid));
+            if (u is not null) 
+            {
+                u.Isdriver = true;
+                await _context.SaveChangesAsync();
+            }
+            else throw new NotFoundException("User not found");
             return true;
         }
     }
