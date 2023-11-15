@@ -40,6 +40,8 @@ namespace Application.SignalR
                 var groupName = await GetGroupNameForUser(user);
 
                 await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
+                // Add to self-group
+                await Groups.AddToGroupAsync(Context.ConnectionId, userId);
             }
 
             await base.OnConnectedAsync();
