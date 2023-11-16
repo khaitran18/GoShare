@@ -45,6 +45,10 @@ namespace Application.Commands.Handlers
                     if (user.Isdriver) role = UserRoleEnumerations.Driver;
                     response.AccessToken = _tokenService.GenerateJWTToken(user.Id,user.Phone,user.Name,role);
                     response.RefreshToken = _tokenService.GenerateRefreshToken();
+                    response.Id = user.Id;
+                    response.Phone = user.Phone;
+                    response.Name = user.Name;
+                    response.Role = role.ToString();
                     user.RefreshToken = response.RefreshToken;
                     user.RefreshTokenExpiryTime = _tokenService.CreateRefreshTokenExpiryTime();
                     await _unitOfWork.UserRepository.UpdateAsync(user);
