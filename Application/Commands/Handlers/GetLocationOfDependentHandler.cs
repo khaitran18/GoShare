@@ -63,7 +63,7 @@ namespace Application.Commands.Handlers
             }
 
             // Request the location from the dependent's device
-            await _hubContext.Clients.User(request.DependentId.ToString()).SendAsync("RequestLocation");
+            await _hubContext.Clients.Group(request.DependentId.ToString()).SendAsync("RequestLocation");
 
             await Task.Delay(TimeSpan.FromSeconds(10));
 
@@ -74,7 +74,7 @@ namespace Application.Commands.Handlers
                 throw new BadRequestException("Unable to get dependent's location");
             }
 
-            var dependentLocationData = JsonConvert.DeserializeObject<LocationData>(dependentLocation);
+            var dependentLocationData = JsonConvert.DeserializeObject<LocationData>(dependentLocation!);
             if (dependentLocationData == null)
             {
                 throw new Exception("Location data is null.");

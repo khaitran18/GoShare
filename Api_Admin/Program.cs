@@ -90,6 +90,8 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.Get
 
 var mapperConfig = new MapperConfiguration(cfg =>
 {
+    cfg.AddProfile<AppfeedbackProfile>();
+    cfg.AddProfile<UserProfile>();
     cfg.AddProfile<DriverdocumentProfile>();
 });
 var mapper = mapperConfig.CreateMapper();

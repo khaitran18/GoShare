@@ -70,6 +70,13 @@ namespace Application.Commands.Handlers
                 throw new BadRequestException("The user is not the guardian of the dependent.");
             }
 
+            // Check if the passenger is already in a trip that hasn't completed
+            var ongoingTrip = await _unitOfWork.TripRepository.GetOngoingTripByPassengerId(request.DependentId);
+            if (ongoingTrip != null)
+            {
+                throw new BadRequestException("Passenger is already in a trip that hasn't completed. Please complete the current trip before creating a new one.");
+            }
+
             var now = DateTimeUtilities.GetDateTimeVnNow();
             var cancellationWindowMinutes = _settingService.GetSetting("TRIP_CANCELLATION_WINDOW");
             var cancellationLimit = _settingService.GetSetting("TRIP_CANCELLATION_LIMIT");

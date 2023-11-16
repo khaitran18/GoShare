@@ -264,8 +264,6 @@ namespace Application.Services
             //        { "tripId", trip.Id.ToString() }
             //    });
 
-            await _hubContext.Groups.AddToGroupAsync(trip.PassengerId.ToString(), trip.Id.ToString());
-
             if (trip.Passenger.GuardianId != null)
             {
                 //await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian!.DeviceToken!,

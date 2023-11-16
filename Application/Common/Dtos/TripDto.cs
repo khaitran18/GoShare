@@ -24,8 +24,12 @@ namespace Application.Common.Dtos
         public DateTime CreateTime { get; set; }
         public DateTime UpdatedTime { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
+        public Guid BookerId { get; set; }
+        public string? Note { get; set; }
 
         public UserDto? Driver { get; set; }
+        public UserDto? Passenger { get; set; }
+        public UserDto Booker { get; set; } = null!;
         public LocationDto EndLocation { get; set; } = null!;
         public LocationDto StartLocation { get; set; } = null!;
         public CartypeDto Cartype { get; set; } = null!;

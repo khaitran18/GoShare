@@ -107,9 +107,6 @@ builder.Services.AddHangfireServer(options =>
     options.Queues = new[] { "critical", "default" };
 });
 
-var cts = new CancellationTokenSource();
-builder.Services.AddSingleton(cts);
-
 // Firebase
 var credential = GoogleCredential.FromFile(Environment.CurrentDirectory! +  "\\" +GoShareConfiguration.FirebaseCredentialFile);
 FirebaseApp.Create(new AppOptions
@@ -263,6 +260,6 @@ app.UseEndpoints(endpoints =>
     endpoints.MapHub<SignalRHub>("/goshareHub");
 });
 
-app.Services.GetService<IHostApplicationLifetime>()?.ApplicationStopping.Register(cts.Cancel);
-
 app.Run();
+
+public partial class Program { }

@@ -10,5 +10,6 @@ namespace Domain.Interfaces
     public interface ITripRepository : IBaseRepository<Trip>
     {
         Task<Trip?> GetByIdAsync(Guid id);
+        Task<Trip?> GetOngoingTripByPassengerId(Guid passengerId);
     }
 }

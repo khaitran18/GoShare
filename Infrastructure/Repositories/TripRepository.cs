@@ -1,4 +1,5 @@
 ﻿using Domain.DataModels;
+using Domain.Enumerations;
 using Domain.Interfaces;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +30,15 @@ namespace Infrastructure.Repositories
                     .ThenInclude(p => p.Guardian)
                 .Include(t => t.Booker)
                 .FirstOrDefaultAsync(t => t.Id == id);
+        }
+
+        public async Task<Trip?> GetOngoingTripByPassengerId(Guid passengerId)
+        {
+            return await _context.Trips
+                .FirstOrDefaultAsync(t => t.PassengerId == passengerId &&
+                                          t.Status != TripStatus.COMPLETED &&
+                                          t.Status != TripStatus.CANCELED &&
+                                          t.Status != TripStatus.TIMEDOUT);
         }
     }
 }
