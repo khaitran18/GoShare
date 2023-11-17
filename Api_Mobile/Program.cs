@@ -161,6 +161,9 @@ builder.Services.AddScoped<IRequestHandler<RateDriverCommand, RatingDto>, RateDr
 builder.Services.AddScoped<IRequestHandler<TestSignalRCommand, bool>, TestSignalRHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateTopUpRequestCommand, string>, CreateTopupRequestCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<PaymentCallbackCommand,bool>, PaymentCallbackCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<SendMessageCommand,Task>, SendMessageHandler>();
+builder.Services.AddScoped<IRequestHandler<GetMessagesQuery,List<ChatDto>>, GetMessageQueryHandler>();
+
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
@@ -179,6 +182,7 @@ var mapperConfig = new MapperConfiguration(cfg =>
     cfg.AddProfile<UserProfile>();
     cfg.AddProfile<TripProfile>();
     cfg.AddProfile<CarProfile>();
+    cfg.AddProfile<ChatProfile>();
     cfg.AddProfile<LocationProfile>();
     cfg.AddProfile<CartypeProfile>();
     cfg.AddProfile<DriverdocumentProfile>();

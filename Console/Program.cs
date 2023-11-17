@@ -25,7 +25,7 @@ partial class Program
         GoShareContext _context;
         (_unitOfWork,_context) = Configure();
         string phone = "+919191919191";
-        User u = _context.Users.FirstOrDefault(u=>u.Phone.Equals(phone));
+        User u = _context.Users.FirstOrDefault(u=>u.Phone.Equals(phone))!;
         string PasscodeResetToken = OtpUtils.Generate();
         Console.WriteLine(PasscodeResetToken);
         u!.Isverify = true;
@@ -80,7 +80,7 @@ partial class Program
         var serviceProvider = services.BuildServiceProvider();
         var _unitOfWork = serviceProvider.GetService<IUnitOfWork>();
         var _context = serviceProvider.GetService<GoShareContext>();
-        return (_unitOfWork, _context);
+        return (_unitOfWork!, _context!);
     }
 
 }
