@@ -109,11 +109,16 @@ builder.Services.AddHangfireServer(options =>
 
 // Firebase
 var credential = GoogleCredential.FromFile(Environment.CurrentDirectory! +  "\\" +GoShareConfiguration.FirebaseCredentialFile);
-FirebaseApp.Create(new AppOptions
+
+if (FirebaseApp.DefaultInstance == null)
 {
-    Credential = credential,
-    ProjectId = GoShareConfiguration.FirebaseProjectId
-});
+    FirebaseApp.Create(new AppOptions
+    {
+        Credential = credential,
+        ProjectId = GoShareConfiguration.FirebaseProjectId
+    });
+}
+
 StorageClient _storageClient = StorageClient.Create(credential);
 builder.Services.AddSingleton<IFirebaseStorage>(new FirebaseStorage(GoShareConfiguration.firebaseBucket, _storageClient));
 

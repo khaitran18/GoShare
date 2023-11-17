@@ -1,0 +1,36 @@
+{
+  "items": [
+    {
+      "id": "48175a54-47ef-416f-9e18-0e702331f90e",
+      "name": "John Doe",
+      "phone": "1234567890",
+      "avatarUrl": "https://example.com/avatar1.jpg",
+      "guardianId": "48176a54-47ef-416f-9e18-0e702331f90e",
+      "status": 1,
+      "createTime": "2023-11-16T00:00:00Z",
+      "updatedTime": "2023-11-16T00:00:00Z",
+      "gender": 1,
+      "birth": "2000-01-01T00:00:00Z",
+      "car": null
+    },
+    {
+      "id": "48175a54-46ef-416f-9e18-0e702331f90e",
+      "name": "Jane Doe",
+      "phone": "0987654321",
+      "avatarUrl": "https://example.com/avatar2.jpg",
+      "guardianId": "48172a54-47ef-416f-9e18-0e702331f90e",
+      "status": 1,
+      "createTime": "2023-11-16T00:00:00Z",
+      "updatedTime": "2023-11-16T00:00:00Z",
+      "gender": 2,
+      "birth": "2000-01-01T00:00:00Z",
+      "car": null
+    }
+  ],
+  "totalCount": 2,
+  "page": 1,
+  "pageSize": 10,
+  "totalPages": 1,
+  "hasPreviousPage": false,
+  "hasNextPage": false
+}
