@@ -1,81 +1,175 @@
 ﻿using Application.Common.Dtos;
+using Application.Queries;
+using Domain.Enumerations;
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Moq;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
-using Application.Queries;
 
 namespace Api_Mobile.Tests.TestClasses
 {
-    public class UserControllerTests : IClassFixture<CustomWebApplicationFactory>, IDisposable
+    public class UserControllerTests : IClassFixture<CustomWebApplicationFactory>
     {
         private readonly CustomWebApplicationFactory _factory;
         private readonly HttpClient _client;
-        //private readonly MockServer _mockServer;
-        //private bool _disposed;
 
         public UserControllerTests(CustomWebApplicationFactory factory)
         {
             _factory = factory;
             _client = _factory.CreateClient();
-            //_mockServer = new MockServer();
-        }
-
-        public void Dispose()
-        {
-            _client.Dispose();
-            _factory.Dispose();
         }
 
         [Fact]
         public async Task GetDependents_ReturnsOkResult_WithDependents()
         {
             // Arrange
-            //var token = await _mockServer.AuthenticateAsync();
-            //_client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            string requestJson = File.ReadAllText("../RequestData/CreateTripRequest.json");
-            var command = JsonConvert.DeserializeObject<GetDependentsQuery>(requestJson);
+            var authorizationHelper = new AuthorizationHelper(_factory);
+            authorizationHelper.ApplyAuthorization(_client);
+
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "TestData", "GetDependentsData.json");
+            string data = File.ReadAllText(path);
+
+            var expectedDependents = JsonConvert.DeserializeObject<PaginatedResult<UserDto>>(data);
+
+            _factory.MediatorMock
+                .Setup(m => m.Send(It.IsAny<GetDependentsQuery>(), It.IsAny<CancellationToken>()))!
+                .ReturnsAsync(expectedDependents);
 
             // Act
-            var response = await _client.GetAsync("/User/dependents");
+            var response = await _client.GetAsync("/api/User/dependents");
 
             // Assert
             response.EnsureSuccessStatusCode(); // Status Code 200-299
-            var actualDependents = JsonConvert.DeserializeObject<List<UserDto>>(
+            var actualDependents = JsonConvert.DeserializeObject<PaginatedResult<UserDto>>(
                 await response.Content.ReadAsStringAsync());
 
-            actualDependents.Should().NotBeNull();
+            actualDependents.Should().BeEquivalentTo(expectedDependents);
         }
 
-        //protected virtual void Dispose(bool disposing)
-        //{
-        //    if (!_disposed)
-        //    {
-        //        if (disposing)
-        //        {
-        //            _client.Dispose();
-        //            _mockServer.Dispose();
-        //        }
+        [Fact]
+        public async Task GetDependents_ReturnsUnauthorized_WhenNoToken()
+        {
+            // Act
+            var response = await _client.GetAsync("/api/User/dependents");
 
-        //        _disposed = true;
-        //    }
-        //}
+            // Assert
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        }
 
-        //~UserControllerTests()
-        //{
-        //    Dispose(disposing: false);
-        //}
+        [Fact]
+        public async Task GetDependents_ReturnsOkResult_WithNoDependents_WhenPageSizeIsInvalid()
+        {
+            // Arrange
+            var authorizationHelper = new AuthorizationHelper(_factory);
+            authorizationHelper.ApplyAuthorization(_client);
 
-        //public void Dispose()
-        //{
-        //    Dispose(disposing: true);
-        //    GC.SuppressFinalize(this);
-        //}
+            var invalidPageSize = -1;
+            var url = $"/api/User/dependents?pageSize={invalidPageSize}";
+
+            var expectedDependents = new PaginatedResult<UserDto>(new List<UserDto>(), 0, 1, 10);
+
+            _factory.MediatorMock
+                .Setup(m => m.Send(It.IsAny<GetDependentsQuery>(), It.IsAny<CancellationToken>()))!
+                .ReturnsAsync(expectedDependents);
+
+            // Act
+            var response = await _client.GetAsync(url);
+
+            // Assert
+            response.EnsureSuccessStatusCode(); // Status Code 200-299
+            var actualDependents = JsonConvert.DeserializeObject<PaginatedResult<UserDto>>(
+                await response.Content.ReadAsStringAsync());
+
+            actualDependents.Should().BeEquivalentTo(expectedDependents);
+        }
+
+        [Fact]
+        public async Task GetDependents_ReturnsOkResult_WithNoDependents_WhenPageIsInvalid()
+        {
+            // Arrange
+            var authorizationHelper = new AuthorizationHelper(_factory);
+            authorizationHelper.ApplyAuthorization(_client);
+
+            var invalidPage = -1;
+            var url = $"/api/User/dependents?page={invalidPage}";
+
+            var expectedDependents = new PaginatedResult<UserDto>(new List<UserDto>(), 0, 1, 10);
+
+            _factory.MediatorMock
+                .Setup(m => m.Send(It.IsAny<GetDependentsQuery>(), It.IsAny<CancellationToken>()))!
+                .ReturnsAsync(expectedDependents);
+
+            // Act
+            var response = await _client.GetAsync(url);
+
+            // Assert
+            response.EnsureSuccessStatusCode(); // Status Code 200-299
+            var actualDependents = JsonConvert.DeserializeObject<PaginatedResult<UserDto>>(
+                await response.Content.ReadAsStringAsync());
+
+            actualDependents.Should().BeEquivalentTo(expectedDependents);
+        }
+
+        [Fact]
+        public async Task GetDependents_ReturnsOkResult_WithNoDependents_WhenSortByIsInvalid()
+        {
+            // Arrange
+            var authorizationHelper = new AuthorizationHelper(_factory);
+            authorizationHelper.ApplyAuthorization(_client);
+
+            var invalidSortBy = "invalidSortBy";
+            var url = $"/api/User/dependents?sortBy={invalidSortBy}";
+
+            var expectedDependents = new PaginatedResult<UserDto>(new List<UserDto>(), 0, 1, 10);
+
+            _factory.MediatorMock
+                .Setup(m => m.Send(It.IsAny<GetDependentsQuery>(), It.IsAny<CancellationToken>()))!
+                .ReturnsAsync(expectedDependents);
+
+            // Act
+            var response = await _client.GetAsync(url);
+
+            // Assert
+            response.EnsureSuccessStatusCode(); // Status Code 200-299
+            var actualDependents = JsonConvert.DeserializeObject<PaginatedResult<UserDto>>(
+                await response.Content.ReadAsStringAsync());
+
+            actualDependents.Should().BeEquivalentTo(expectedDependents);
+        }
+
+        [Fact]
+        public async Task GetDependents_ReturnsOkResult_WithNoDependents()
+        {
+            // Arrange
+            var authorizationHelper = new AuthorizationHelper(_factory);
+            authorizationHelper.ApplyAuthorization(_client);
+
+            var expectedDependents = new PaginatedResult<UserDto>(new List<UserDto>(), 0, 1, 10);
+
+            _factory.MediatorMock
+                .Setup(m => m.Send(It.IsAny<GetDependentsQuery>(), It.IsAny<CancellationToken>()))!
+                .ReturnsAsync(expectedDependents);
+
+            // Act
+            var response = await _client.GetAsync("/api/User/dependents");
+
+            // Assert
+            response.EnsureSuccessStatusCode(); // Status Code 200-299
+            var actualDependents = JsonConvert.DeserializeObject<PaginatedResult<UserDto>>(
+                await response.Content.ReadAsStringAsync());
+
+            actualDependents.Should().BeEquivalentTo(expectedDependents);
+        }
     }
 }
