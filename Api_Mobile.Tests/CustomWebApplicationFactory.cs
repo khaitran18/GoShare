@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Moq;
+using System;
+using System.Threading.Tasks;
 
 namespace Api_Mobile.Tests
 {
@@ -26,10 +28,15 @@ namespace Api_Mobile.Tests
 
             builder.ConfigureTestServices(services =>
             {
-                services.AddSingleton<IHostLifetime, NoopHostLifetime>();
                 services.AddSingleton(MediatorMock.Object);
                 services.AddSingleton(TokenServiceMock.Object);
             });
+        }
+
+        public override async ValueTask DisposeAsync()
+        {
+            await Task.Delay(TimeSpan.FromSeconds(10)); // Increase timeout for stopping hosted services
+            await base.DisposeAsync();
         }
     }
 }

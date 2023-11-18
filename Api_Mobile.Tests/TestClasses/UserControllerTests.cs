@@ -34,18 +34,8 @@ namespace Api_Mobile.Tests.TestClasses
         public async Task GetDependents_ReturnsOkResult_WithDependents()
         {
             // Arrange
-            var expectedToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9.eyJpZCI6IjUzMmQ3M2NhLWFjNWQtNDczMi1hNDhiLTc1MDUwMmQxOWMzNyIsInBob25lIjoiODQ5MzM2ODQ5MDkiLCJuYW1lIjoiVGhvIE5ndXllbiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlVzZXIiLCJleHAiOjE3MDAyMjM2MjgsImlzcyI6Imp3dCIsImF1ZCI6Imp3dCJ9.V384kol-2Is-585pTJBDNGkTax9hyD77LKaWGtpKVK0";
-            var expectedPrincipal = new ClaimsPrincipal();
-
-            _factory.TokenServiceMock
-                .Setup(t => t.ValidateToken(It.IsAny<string>()))
-                .Returns(expectedPrincipal);
-
-            _factory.TokenServiceMock
-                .Setup(t => t.GenerateJWTToken(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<UserRoleEnumerations>()))
-                .Returns(expectedToken);
-
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", expectedToken);
+            var authorizationHelper = new AuthorizationHelper(_factory);
+            authorizationHelper.ApplyAuthorization(_client);
 
             string path = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "TestData", "GetDependentsData.json");
             string data = File.ReadAllText(path);
@@ -81,18 +71,8 @@ namespace Api_Mobile.Tests.TestClasses
         public async Task GetDependents_ReturnsOkResult_WithNoDependents_WhenPageSizeIsInvalid()
         {
             // Arrange
-            var expectedToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9.eyJpZCI6IjUzMmQ3M2NhLWFjNWQtNDczMi1hNDhiLTc1MDUwMmQxOWMzNyIsInBob25lIjoiODQ5MzM2ODQ5MDkiLCJuYW1lIjoiVGhvIE5ndXllbiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlVzZXIiLCJleHAiOjE3MDAyMjM2MjgsImlzcyI6Imp3dCIsImF1ZCI6Imp3dCJ9.V384kol-2Is-585pTJBDNGkTax9hyD77LKaWGtpKVK0";
-            var expectedPrincipal = new ClaimsPrincipal();
-
-            _factory.TokenServiceMock
-                .Setup(t => t.ValidateToken(It.IsAny<string>()))
-                .Returns(expectedPrincipal);
-
-            _factory.TokenServiceMock
-                .Setup(t => t.GenerateJWTToken(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<UserRoleEnumerations>()))
-                .Returns(expectedToken);
-
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", expectedToken);
+            var authorizationHelper = new AuthorizationHelper(_factory);
+            authorizationHelper.ApplyAuthorization(_client);
 
             var invalidPageSize = -1;
             var url = $"/api/User/dependents?pageSize={invalidPageSize}";
@@ -118,18 +98,8 @@ namespace Api_Mobile.Tests.TestClasses
         public async Task GetDependents_ReturnsOkResult_WithNoDependents_WhenPageIsInvalid()
         {
             // Arrange
-            var expectedToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9.eyJpZCI6IjUzMmQ3M2NhLWFjNWQtNDczMi1hNDhiLTc1MDUwMmQxOWMzNyIsInBob25lIjoiODQ5MzM2ODQ5MDkiLCJuYW1lIjoiVGhvIE5ndXllbiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlVzZXIiLCJleHAiOjE3MDAyMjM2MjgsImlzcyI6Imp3dCIsImF1ZCI6Imp3dCJ9.V384kol-2Is-585pTJBDNGkTax9hyD77LKaWGtpKVK0";
-            var expectedPrincipal = new ClaimsPrincipal();
-
-            _factory.TokenServiceMock
-                .Setup(t => t.ValidateToken(It.IsAny<string>()))
-                .Returns(expectedPrincipal);
-
-            _factory.TokenServiceMock
-                .Setup(t => t.GenerateJWTToken(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<UserRoleEnumerations>()))
-                .Returns(expectedToken);
-
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", expectedToken);
+            var authorizationHelper = new AuthorizationHelper(_factory);
+            authorizationHelper.ApplyAuthorization(_client);
 
             var invalidPage = -1;
             var url = $"/api/User/dependents?page={invalidPage}";
@@ -155,18 +125,8 @@ namespace Api_Mobile.Tests.TestClasses
         public async Task GetDependents_ReturnsOkResult_WithNoDependents_WhenSortByIsInvalid()
         {
             // Arrange
-            var expectedToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9.eyJpZCI6IjUzMmQ3M2NhLWFjNWQtNDczMi1hNDhiLTc1MDUwMmQxOWMzNyIsInBob25lIjoiODQ5MzM2ODQ5MDkiLCJuYW1lIjoiVGhvIE5ndXllbiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlVzZXIiLCJleHAiOjE3MDAyMjM2MjgsImlzcyI6Imp3dCIsImF1ZCI6Imp3dCJ9.V384kol-2Is-585pTJBDNGkTax9hyD77LKaWGtpKVK0";
-            var expectedPrincipal = new ClaimsPrincipal();
-
-            _factory.TokenServiceMock
-                .Setup(t => t.ValidateToken(It.IsAny<string>()))
-                .Returns(expectedPrincipal);
-
-            _factory.TokenServiceMock
-                .Setup(t => t.GenerateJWTToken(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<UserRoleEnumerations>()))
-                .Returns(expectedToken);
-
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", expectedToken);
+            var authorizationHelper = new AuthorizationHelper(_factory);
+            authorizationHelper.ApplyAuthorization(_client);
 
             var invalidSortBy = "invalidSortBy";
             var url = $"/api/User/dependents?sortBy={invalidSortBy}";
@@ -192,18 +152,8 @@ namespace Api_Mobile.Tests.TestClasses
         public async Task GetDependents_ReturnsOkResult_WithNoDependents()
         {
             // Arrange
-            var expectedToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9.eyJpZCI6IjUzMmQ3M2NhLWFjNWQtNDczMi1hNDhiLTc1MDUwMmQxOWMzNyIsInBob25lIjoiODQ5MzM2ODQ5MDkiLCJuYW1lIjoiVGhvIE5ndXllbiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlVzZXIiLCJleHAiOjE3MDAyMjM2MjgsImlzcyI6Imp3dCIsImF1ZCI6Imp3dCJ9.V384kol-2Is-585pTJBDNGkTax9hyD77LKaWGtpKVK0";
-            var expectedPrincipal = new ClaimsPrincipal();
-
-            _factory.TokenServiceMock
-                .Setup(t => t.ValidateToken(It.IsAny<string>()))
-                .Returns(expectedPrincipal);
-
-            _factory.TokenServiceMock
-                .Setup(t => t.GenerateJWTToken(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<UserRoleEnumerations>()))
-                .Returns(expectedToken);
-
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", expectedToken);
+            var authorizationHelper = new AuthorizationHelper(_factory);
+            authorizationHelper.ApplyAuthorization(_client);
 
             var expectedDependents = new PaginatedResult<UserDto>(new List<UserDto>(), 0, 1, 10);
 

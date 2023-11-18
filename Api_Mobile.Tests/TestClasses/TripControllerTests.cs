@@ -1,6 +1,8 @@
 ﻿using Application.Commands;
 using Application.Common.Dtos;
+using Application.Common.Validations;
 using Domain.Enumerations;
+using FluentAssertions;
 using Moq;
 using Newtonsoft.Json;
 using System;
@@ -31,18 +33,8 @@ namespace Api_Mobile.Tests.TestClasses
         public async Task CreateTrip_ReturnsOkResult_WithTripId()
         {
             // Arrange
-            var expectedToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9.eyJpZCI6IjUzMmQ3M2NhLWFjNWQtNDczMi1hNDhiLTc1MDUwMmQxOWMzNyIsInBob25lIjoiODQ5MzM2ODQ5MDkiLCJuYW1lIjoiVGhvIE5ndXllbiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlVzZXIiLCJleHAiOjE3MDAyMjM2MjgsImlzcyI6Imp3dCIsImF1ZCI6Imp3dCJ9.V384kol-2Is-585pTJBDNGkTax9hyD77LKaWGtpKVK0";
-            var expectedPrincipal = new ClaimsPrincipal();
-
-            _factory.TokenServiceMock
-                .Setup(t => t.ValidateToken(It.IsAny<string>()))
-                .Returns(expectedPrincipal);
-
-            _factory.TokenServiceMock
-                .Setup(t => t.GenerateJWTToken(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<UserRoleEnumerations>()))
-                .Returns(expectedToken);
-
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", expectedToken);
+            var authorizationHelper = new AuthorizationHelper(_factory);
+            authorizationHelper.ApplyAuthorization(_client);
 
             string path = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "TestData", "CreateTripData.json");
             string createTripCommand = File.ReadAllText(path);
@@ -66,23 +58,23 @@ namespace Api_Mobile.Tests.TestClasses
             Assert.Equal(expectedTrip.Id, actualTrip!.Id);
         }
 
-        //[Fact]
-        //public void CreateTripCommandValidator_ShouldHaveError_WhenCartypeIdIsNull()
-        //{
-        //    // Arrange
-        //    string path = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "TestData", "CreateTripData.json");
-        //    string data = File.ReadAllText(path);
-        //    var createTripCommand = JsonConvert.DeserializeObject<CreateTripCommand>(data);
+        [Fact]
+        public void CreateTripCommandValidator_ShouldHaveError_WhenCartypeIdIsNull()
+        {
+            // Arrange
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "TestData", "CreateTripData.json");
+            string data = File.ReadAllText(path);
+            var createTripCommand = JsonConvert.DeserializeObject<CreateTripCommand>(data);
 
-        //    var validator = new CreateTripCommandValidator();
+            var validator = new CreateTripCommandValidator();
 
-        //    // Act
-        //    var result = validator.Validate(createTripCommand!);
+            // Act
+            var result = validator.Validate(createTripCommand!);
 
-        //    // Assert
-        //    result.IsValid.Should().BeFalse();
-        //    result.Errors.Should().Contain(e => e.PropertyName == "CartypeId");
-        //}
+            // Assert
+            result.IsValid.Should().BeFalse();
+            result.Errors.Should().Contain(e => e.PropertyName == "CartypeId");
+        }
 
         [Fact]
         public async Task CreateTrip_ReturnsUnauthorized_WhenNoToken()

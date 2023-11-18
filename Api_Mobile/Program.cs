@@ -112,11 +112,17 @@ var credential = GoogleCredential.FromFile(Environment.CurrentDirectory! +  "\\"
 
 if (FirebaseApp.DefaultInstance == null)
 {
-    FirebaseApp.Create(new AppOptions
+    lock (_mutex)
     {
-        Credential = credential,
-        ProjectId = GoShareConfiguration.FirebaseProjectId
-    });
+        if (FirebaseApp.DefaultInstance == null)
+        {
+            FirebaseApp.Create(new AppOptions
+            {
+                Credential = credential,
+                ProjectId = GoShareConfiguration.FirebaseProjectId
+            });
+        }
+    }
 }
 
 StorageClient _storageClient = StorageClient.Create(credential);
@@ -267,4 +273,7 @@ app.UseEndpoints(endpoints =>
 
 app.Run();
 
-public partial class Program { }
+public partial class Program
+{
+    private static readonly Mutex _mutex = new Mutex();
+}
