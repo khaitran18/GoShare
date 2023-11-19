@@ -1,0 +1,46 @@
+﻿using Application.Common.Dtos;
+using Application.Common.Exceptions;
+using Application.Common.Utilities;
+using Domain.DataModels;
+using Domain.Enumerations;
+using Domain.Interfaces;
+using MediatR;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Application.Commands.Handlers
+{
+    public class DriverActivateHandler : IRequestHandler<DriverActivateCommand, bool>
+    {
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly UserClaims _userClaims;
+
+        public DriverActivateHandler(IUnitOfWork unitOfWork, UserClaims userClaims)
+        {
+            _unitOfWork = unitOfWork;
+            _userClaims = userClaims;
+        }
+
+        public async Task<bool> Handle(DriverActivateCommand request, CancellationToken cancellationToken)
+        {
+            Guid userId = (Guid)_userClaims.id!;
+            var user = await _unitOfWork.UserRepository.GetUserById(userId.ToString());
+
+            if (user == null)
+            {
+                throw new NotFoundException(nameof(User), userId);
+            }
+
+            user.Status = UserStatus.ACTIVE;
+            user.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
+
+            await _unitOfWork.UserRepository.UpdateAsync(user);
+            await _unitOfWork.Save();
+
+            return true;
+        }
+    }
+}

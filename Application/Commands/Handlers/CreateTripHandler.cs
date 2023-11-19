@@ -185,9 +185,7 @@ namespace Application.Commands.Handlers
             tripDto = _mapper.Map<TripDto>(trip);
 
             // Background task
-            //var cts = _serviceProvider.GetRequiredService<CancellationTokenSource>();
             string jobId = BackgroundJob.Enqueue<BackgroundServices>(s => s.FindDriver(trip.Id, request.CartypeId));
-            //KeyValueStore.Instance.Set($"FindDriverTask_{trip.Id}", jobId);
 
             return tripDto;
         }

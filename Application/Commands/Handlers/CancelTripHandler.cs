@@ -154,11 +154,7 @@ namespace Application.Commands.Handlers
 
             // Cancel find driver task
             _logger.LogInformation("Cancelling find driver task for tripId: {tripId}", trip.Id);
-            //var cts = _serviceProvider.GetRequiredService<CancellationTokenSource>();
-            //BackgroundJob.Delete(jobId);
-            //cts.Cancel();
             KeyValueStore.Instance.Set($"CancelFindDriverTask_{trip.Id}", "true");
-            //KeyValueStore.Instance.Remove($"FindDriverTask_{trip.Id}");
 
             return _mapper.Map<TripDto>(trip);
         }

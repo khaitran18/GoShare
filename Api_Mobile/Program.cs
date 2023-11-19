@@ -85,7 +85,7 @@ builder.Services.AddAuthentication(x =>
         ClockSkew = TimeSpan.FromMinutes(Convert.ToDouble(_expirtyMinutes))
     };
 });
-builder.Services.AddSingleton<ITokenService>(new TokenService(_key,_expirtyMinutes,_refreshTokenExpirtyMinutes,_issuer,_audience));
+builder.Services.AddSingleton<ITokenService>(new TokenService(_key, _expirtyMinutes, _refreshTokenExpirtyMinutes, _issuer, _audience));
 builder.Services.AddSingleton<IDriverDocumentService, DriverDocumentService>();
 
 //Add VnPayService
@@ -108,7 +108,7 @@ builder.Services.AddHangfireServer(options =>
 });
 
 // Firebase
-var credential = GoogleCredential.FromFile(Environment.CurrentDirectory! +  "\\" +GoShareConfiguration.FirebaseCredentialFile);
+var credential = GoogleCredential.FromFile(Environment.CurrentDirectory! + "\\" + GoShareConfiguration.FirebaseCredentialFile);
 
 if (FirebaseApp.DefaultInstance == null)
 {
@@ -150,8 +150,8 @@ builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<IRequestHandler<TestQuery, TestDto>, TestQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateTripCommand, TripDto>, CreateTripHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateTripForDependentCommand, TripDto>, CreateTripForDependentHandler>();
-builder.Services.AddScoped<IRequestHandler<AuthCommand,TokenResponse>, AuthCommandHandler>();
-builder.Services.AddScoped<IRequestHandler<RegisterCommand,Task>, RegisterCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<AuthCommand, TokenResponse>, AuthCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<RegisterCommand, Task>, RegisterCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<VerifyCommand, string>, VerifyCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<ResendOtpCommand, Task>, ResendOtpCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<SetPasscodeCommand, Task>, SetPasscodeCommandHandler>();
@@ -169,9 +169,10 @@ builder.Services.AddScoped<IRequestHandler<AddCarCommand, Guid>, AddCarCommandHa
 builder.Services.AddScoped<IRequestHandler<CancelTripCommand, TripDto>, CancelTripHandler>();
 builder.Services.AddScoped<IRequestHandler<GetLocationOfDependentCommand, LocationDto>, GetLocationOfDependentHandler>();
 builder.Services.AddScoped<IRequestHandler<RateDriverCommand, RatingDto>, RateDriverHandler>();
-builder.Services.AddScoped<IRequestHandler<TestSignalRCommand, bool>, TestSignalRHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateTopUpRequestCommand, string>, CreateTopupRequestCommandHandler>();
-builder.Services.AddScoped<IRequestHandler<PaymentCallbackCommand,bool>, PaymentCallbackCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<PaymentCallbackCommand, bool>, PaymentCallbackCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<DriverActivateCommand, bool>, DriverActivateHandler>();
+builder.Services.AddScoped<IRequestHandler<DriverDeactivateCommand, bool>, DriverDeactivateHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
