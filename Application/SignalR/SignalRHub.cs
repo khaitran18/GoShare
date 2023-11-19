@@ -1,17 +1,22 @@
-﻿using Application.Common.Utilities;
+﻿using Application.Common.Dtos;
+using Application.Common.Utilities;
 using Domain.DataModels;
 using Domain.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Application.SignalR
 {
+    [Authorize]
     public class SignalRHub : Hub
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly UserClaims _userClaims;
 
-        public SignalRHub(IUnitOfWork unitOfWork)
+        public SignalRHub(IUnitOfWork unitOfWork, UserClaims userClaims)
         {
             _unitOfWork = unitOfWork;
+            _userClaims = userClaims;
         }
 
         public async Task JoinGroup(string groupName)
@@ -31,17 +36,16 @@ namespace Application.SignalR
 
         public override async Task OnConnectedAsync()
         {
-            var httpContext = Context.GetHttpContext();
-            var userId = httpContext.Request.Query["userId"].ToString();
+            Guid userId = (Guid)_userClaims.id!;
 
-            var user = await _unitOfWork.UserRepository.GetUserById(userId);
+            var user = await _unitOfWork.UserRepository.GetUserById(userId.ToString());
             if (user != null)
             {
                 var groupName = await GetGroupNameForUser(user);
 
                 await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
                 // Add to self-group
-                await Groups.AddToGroupAsync(Context.ConnectionId, userId);
+                await Groups.AddToGroupAsync(Context.ConnectionId, userId.ToString());
             }
 
             await base.OnConnectedAsync();
@@ -49,10 +53,9 @@ namespace Application.SignalR
 
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-            var httpContext = Context.GetHttpContext();
-            var userId = httpContext.Request.Query["userId"].ToString();
+            Guid userId = (Guid)_userClaims.id!;
 
-            var user = await _unitOfWork.UserRepository.GetUserById(userId);
+            var user = await _unitOfWork.UserRepository.GetUserById(userId.ToString());
             if (user != null)
             {
                 var groupName = await GetGroupNameForUser(user);
