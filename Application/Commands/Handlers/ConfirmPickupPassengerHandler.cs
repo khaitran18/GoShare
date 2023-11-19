@@ -1,12 +1,16 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Exceptions;
 using Application.Common.Utilities;
+using Application.Common.Utilities.Google.Firebase;
+using Application.Common.Utilities.SignalR;
 using Application.Services.Interfaces;
+using Application.SignalR;
 using AutoMapper;
 using Domain.DataModels;
 using Domain.Enumerations;
 using Domain.Interfaces;
 using MediatR;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,13 +26,15 @@ namespace Application.Commands.Handlers
         private readonly IMapper _mapper;
         private readonly ISettingService _settingService;
         private readonly UserClaims _userClaims;
+        private readonly IHubContext<SignalRHub> _hubContext;
 
-        public ConfirmPickupPassengerHandler(IUnitOfWork unitOfWork, IMapper mapper, ISettingService settingService, UserClaims userClaims)
+        public ConfirmPickupPassengerHandler(IUnitOfWork unitOfWork, IMapper mapper, ISettingService settingService, UserClaims userClaims, IHubContext<SignalRHub> hubContext)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _settingService = settingService;
             _userClaims = userClaims;
+            _hubContext = hubContext;
         }
 
         public async Task<TripDto> Handle(ConfirmPickupPassengerCommand request, CancellationToken cancellationToken)
@@ -93,7 +99,41 @@ namespace Application.Commands.Handlers
 
             tripDto = _mapper.Map<TripDto>(trip);
 
+            // Notify passenger using FCM and SignalR
+            await NotifyPassengerAboutDriverOnTheWay(trip);
+
             return tripDto;
+        }
+
+        private async Task NotifyPassengerAboutDriverOnTheWay(Trip trip)
+        {
+            if (trip.Passenger.DeviceToken != null)
+            {
+                await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
+                "Tài xế đã tới",
+                $"Tài xế {trip.Driver!.Name} đã đến địa điểm đón của bạn",
+                new Dictionary<string, string>
+                {
+                    { "tripId", trip.Id.ToString() }
+                });
+            }
+
+            if (trip.Passenger.GuardianId != null)
+            {
+                if (trip.Passenger.Guardian!.DeviceToken != null)
+                {
+                    await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian.DeviceToken,
+                    "Tài xế đã tới",
+                    $"Tài xế {trip.Driver!.Name} đã đến địa điểm đón người thân của bạn",
+                    new Dictionary<string, string>
+                    {
+                        { "tripId", trip.Id.ToString() }
+                    });
+                }
+
+                await _hubContext.Clients.Group(SignalRUtilities.GetGroupNameForUser(trip.Passenger, trip))
+                    .SendAsync("NotifyPassengerDriverPickup", _mapper.Map<TripDto>(trip));
+            }
         }
     }
 }

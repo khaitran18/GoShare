@@ -3,6 +3,7 @@ using Application.Common.Exceptions;
 using Application.Common.Utilities;
 using Application.Common.Utilities.Google;
 using Application.Common.Utilities.Google.Firebase;
+using Application.Common.Utilities.SignalR;
 using Application.Services.Interfaces;
 using Application.SignalR;
 using AutoMapper;
@@ -170,15 +171,18 @@ namespace Application.Services
         {
             _logger.LogInformation("Notifying driver {driverName} about new trip request for tripId: {tripId}", driver.Name, trip.Id);
 
-            //await FirebaseUtilities.SendNotificationToDeviceAsync(driver.DeviceToken!,
-            //    "Yêu cầu chuyến mới",
-            //    "Bạn có yêu cầu chuyến xe mới",
-            //    new Dictionary<string, string>
-            //    {
-            //        { "tripId", trip.Id.ToString() }
-            //    });
+            if (driver.DeviceToken != null)
+            {
+                await FirebaseUtilities.SendNotificationToDeviceAsync(driver.DeviceToken!,
+                "Yêu cầu chuyến mới",
+                "Bạn có yêu cầu chuyến xe mới",
+                new Dictionary<string, string>
+                {
+                    { "tripId", trip.Id.ToString() }
+                });
+            }
 
-            var groupName = GetGroupNameForUser(driver, trip);
+            var groupName = SignalRUtilities.GetGroupNameForUser(driver, trip);
 
             await _hubContext.Clients.Group(groupName)
                 .SendAsync("NotifyDriverNewTripRequest", _mapper.Map<TripDto>(trip));
@@ -221,7 +225,7 @@ namespace Application.Services
         private async Task NotifyBackToPassenger(Trip trip, User driver)
         {
             _logger.LogInformation("Notifying passenger about driver for tripId: {tripId}.", trip.Id);
-            var groupName = GetGroupNameForUser(trip.Passenger, trip);
+            var groupName = SignalRUtilities.GetGroupNameForUser(trip.Passenger, trip);
 
             //await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken!,
             //    "Đặt chuyến thành công",
@@ -254,7 +258,7 @@ namespace Application.Services
             await _unitOfWork.TripRepository.UpdateAsync(trip);
             await _unitOfWork.Save();
 
-            var groupName = GetGroupNameForUser(trip.Passenger, trip);
+            var groupName = SignalRUtilities.GetGroupNameForUser(trip.Passenger, trip);
 
             //await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken!,
             //    "Hết thời gian chờ",
@@ -277,18 +281,6 @@ namespace Application.Services
 
             await _hubContext.Clients.Group(groupName)
                 .SendAsync("NotifyPassengerTripTimedOut", trip);
-        }
-        
-        private string GetGroupNameForUser(User user, Trip trip)
-        {
-            // If the user is a dependent and the booker is the guardian
-            if (user.GuardianId != null && user.GuardianId == trip.BookerId)
-            {
-                return $"{user.Id}-{user.GuardianId}";
-            }
-
-            // Driver, self-book dependent
-            return $"{user.Id}";
         }
 
         public async Task ResetCancellationCountAndTime(Guid userId)
