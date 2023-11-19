@@ -18,7 +18,7 @@ namespace Api_Mobile.Controllers
             _mediator = mediator;
         }
 
-        [HttpPost]
+        [HttpPost("user/create-trip")]
         [Authorize(Roles = "User")]
         public async Task<IActionResult> CreateTrip([FromBody] CreateTripCommand command)
         {
@@ -26,7 +26,7 @@ namespace Api_Mobile.Controllers
             return Ok(response);
         }
 
-        [HttpPost("{dependentId}")]
+        [HttpPost("user/create-trip-for-dependent/{dependentId}")]
         [Authorize(Roles = "User")]
         public async Task<IActionResult> CreateTripForDependent([FromBody] CreateTripForDependentCommand command, [FromRoute] Guid dependentId)
         {
@@ -35,7 +35,7 @@ namespace Api_Mobile.Controllers
             return Ok(response);
         }
 
-        [HttpPost("confirm-passenger/{id}")]
+        [HttpPost("driver/confirm-passenger/{id}")]
         [Authorize(Roles = "Driver")]
         public async Task<IActionResult> ConfirmPassenger([FromBody] ConfirmPassengerCommand command, [FromRoute] Guid id)
         {
@@ -44,7 +44,7 @@ namespace Api_Mobile.Controllers
             return Ok(response);
         }
 
-        [HttpPost("confirm-pickup/{id}")]
+        [HttpPost("driver/confirm-pickup/{id}")]
         [Authorize(Roles = "Driver")]
         public async Task<IActionResult> ConfirmPickupPassenger([FromBody] ConfirmPickupPassengerCommand command, [FromRoute] Guid id)
         {
@@ -53,7 +53,7 @@ namespace Api_Mobile.Controllers
             return Ok(response);
         }
 
-        [HttpPost("end-trip/{id}")]
+        [HttpPost("driver/end-trip/{id}")]
         [Authorize(Roles = "Driver")]
         public async Task<IActionResult> EndTrip([FromBody] EndTripCommand command, [FromRoute] Guid id)
         {
@@ -62,7 +62,7 @@ namespace Api_Mobile.Controllers
             return Ok(response);
         }
 
-        [HttpPost("fees")]
+        [HttpPost("user/fees")]
         [Authorize]
         public async Task<IActionResult> CalculateFeesForTrip([FromBody] CalculateFeesForTripCommand command)
         {
@@ -70,7 +70,7 @@ namespace Api_Mobile.Controllers
             return Ok(response);
         }
 
-        [HttpPost("cancel/{id}")]
+        [HttpPost("user/cancel/{id}")]
         [Authorize(Roles = "User")]
         public async Task<IActionResult> CancelTrip([FromBody] CancelTripCommand command, [FromRoute] Guid id)
         {
@@ -79,18 +79,11 @@ namespace Api_Mobile.Controllers
             return Ok(response);
         }
 
-        [HttpPost("rate-driver/{id}")]
+        [HttpPost("user/rate-driver/{id}")]
         [Authorize(Roles = "User")]
         public async Task<IActionResult> RateDriver([FromBody] RateDriverCommand command, [FromRoute] Guid id)
         {
             command.TripId = id;
-            var response = await _mediator.Send(command);
-            return Ok(response);
-        }
-
-        [HttpPost("test")]
-        public async Task<IActionResult> TestSignalR([FromBody] TestSignalRCommand command)
-        {
             var response = await _mediator.Send(command);
             return Ok(response);
         }
