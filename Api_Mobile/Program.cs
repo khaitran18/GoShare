@@ -169,7 +169,7 @@ builder.Services.AddScoped<IRequestHandler<RegisterCommand, Task>, RegisterComma
 builder.Services.AddScoped<IRequestHandler<VerifyCommand, string>, VerifyCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<ResendOtpCommand, Task>, ResendOtpCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<SetPasscodeCommand, Task>, SetPasscodeCommandHandler>();
-builder.Services.AddScoped<IRequestHandler<RefreshTokenCommand, string>, RefreshTokenCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<RefreshTokenCommand, TokenResponse>, RefreshTokenCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<RevokeCommand, Task>, RevokeCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<UpdateProfilePictureCommand, string>, UpdateProfilePictureHandler>();
 builder.Services.AddScoped<IRequestHandler<ConfirmPassengerCommand, TripDto>, ConfirmPassengerHandler>();

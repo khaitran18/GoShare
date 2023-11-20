@@ -1,4 +1,5 @@
-﻿using Application.Common.Utilities;
+﻿using Application.Common.Dtos;
+using Application.Common.Utilities;
 using Application.Services.Interfaces;
 using Domain.Enumerations;
 using Domain.Interfaces;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Application.Commands.Handlers
 {
-    public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, string>
+    public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, TokenResponse>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ITokenService _tokenService;
@@ -23,21 +24,24 @@ namespace Application.Commands.Handlers
             _tokenService = tokenService;
         }
 
-        public async Task<string> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
+        public async Task<TokenResponse> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
         {
-            string response = "";
+            TokenResponse response = new TokenResponse();
             string? userId = null;
-            ClaimsPrincipal claims = _tokenService.ValidateToken(request.AccessToken)!;
+            //ClaimsPrincipal claims = _tokenService.ValidateToken(request.AccessToken)!;
+            IEnumerable < Claim > claims = _tokenService.GetTokenClaims(request.AccessToken)!;
             string? RefreshToken;
             DateTime? RefreshTokenExpiryTime;
-            if (claims.IsInRole(UserRoleEnumerations.Admin.ToString()))
+            string roleClaims = claims.First(u => u.Type.Equals(ClaimTypes.Role)).Value;
+            //if (claims.IsInRole(UserRoleEnumerations.Admin.ToString()))
+            if (roleClaims.Equals(UserRoleEnumerations.Admin.ToString()))
             {
                 RefreshToken = KeyValueStore.Instance.Get<string>("Admin_RefreshToken");
                 RefreshTokenExpiryTime = KeyValueStore.Instance.Get<DateTime>("Admin_RefreshToken_Expiry");
             }
             else
             {
-                userId = claims.FindFirst("id")!.Value;
+                userId = claims.FirstOrDefault(u => u.Type.Equals("id"))!.Value;
                 RefreshToken = await _unitOfWork.UserRepository.GetUserRefreshTokenByUserId(userId);
                 RefreshTokenExpiryTime = await _unitOfWork.UserRepository.GetUserRefreshTokenExpiryTimeByUserId(userId);
             }
@@ -50,11 +54,16 @@ namespace Application.Commands.Handlers
                     if (!RefreshToken.Equals(request.RefreshToken)) throw new Exception("Refresh token is currupted, please login again");
                     else
                     {
-                        UserRoleEnumerations role = claims.IsInRole(UserRoleEnumerations.User.ToString()) ? UserRoleEnumerations.User : claims.IsInRole(UserRoleEnumerations.Driver.ToString()) ? UserRoleEnumerations.Driver : UserRoleEnumerations.Admin;
-                        response = _tokenService.GenerateJWTToken(userId is not null ? new Guid(userId):null, claims.FindFirst("phone")?.Value, claims.FindFirst("name")?.Value, role);
+
+                        UserRoleEnumerations role = roleClaims.Equals(UserRoleEnumerations.User.ToString()) ? UserRoleEnumerations.User : roleClaims.Equals(UserRoleEnumerations.Driver.ToString()) ? UserRoleEnumerations.Driver : UserRoleEnumerations.Admin;
+                        response.AccessToken = _tokenService.GenerateJWTToken(userId is not null ? new Guid(userId):null, claims.First(u=>u.Type.Equals("phone"))?.Value, claims.First(u=>u.Type.Equals("name"))?.Value, role);
+                        response.Role = roleClaims;
+                        response.RefreshToken = request.RefreshToken;
+                        response.Phone = claims.First(u => u.Type.Equals("phone"))?.Value;
+                        response.Name = claims.First(u => u.Type.Equals("name"))?.Value;
+                        response.Id = new Guid(userId!);
                     }
                 }
-
             }
             return response;
         }
