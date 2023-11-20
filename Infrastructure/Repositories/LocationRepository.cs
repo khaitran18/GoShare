@@ -33,5 +33,10 @@ namespace Infrastructure.Repositories
         {
             return await _context.Locations.FirstOrDefaultAsync(l => l.UserId == userId && l.Type == type);
         }
+
+        public async Task<List<Location>> GetListByUserIdAndTypeAsync(Guid guid, LocationType type)
+        {
+            return await _context.Locations.Where(u => u.UserId.CompareTo(guid) == 0 && u.Type == type).ToListAsync();
+        }
     }
 }

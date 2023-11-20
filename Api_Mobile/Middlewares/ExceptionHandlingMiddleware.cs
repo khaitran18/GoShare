@@ -98,7 +98,7 @@ namespace Api_Mobile.Middlewares
                     context.Response.ContentType = "application/json";
                     var responseBody = new
                     {
-                        Message = ex.Message,
+                        Message = "Token is expired",
                         StackTrace = ex.StackTrace
                     };
                     await context.Response.WriteAsJsonAsync(responseBody);
