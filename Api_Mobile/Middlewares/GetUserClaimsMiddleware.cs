@@ -28,9 +28,10 @@ namespace Api_Mobile.Middlewares
                     userClaims.phone = principal.FindFirst("phone")?.Value.ToString();
                     userClaims.Role = principal.IsInRole(UserRoleEnumerations.User.ToString()) ? UserRoleEnumerations.User : principal.IsInRole(UserRoleEnumerations.Driver.ToString()) ? UserRoleEnumerations.Driver : UserRoleEnumerations.Admin;
                     userClaims.UserIp = UserUltilities.GetIpAddress(context);
+                    await next(context);
                 }
             }
-            await next(context);
+            else await next(context);
         }
     }
 }
