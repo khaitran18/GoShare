@@ -1,6 +1,7 @@
 ﻿using Application.Common.Exceptions;
 using Domain.DataModels;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.IdentityModel.Tokens;
 using Twilio.Exceptions;
 
 namespace Api_Mobile.Middlewares
@@ -83,6 +84,17 @@ namespace Api_Mobile.Middlewares
                 else if (ex is HubException hubEx)
                 {
                     context.Response.StatusCode = 500;
+                    context.Response.ContentType = "application/json";
+                    var responseBody = new
+                    {
+                        Message = ex.Message,
+                        StackTrace = ex.StackTrace
+                    };
+                    await context.Response.WriteAsJsonAsync(responseBody);
+                }
+                else if (ex is SecurityTokenExpiredException)
+                {
+                    context.Response.StatusCode = 401;
                     context.Response.ContentType = "application/json";
                     var responseBody = new
                     {
