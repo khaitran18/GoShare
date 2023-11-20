@@ -71,7 +71,7 @@ namespace Application.Services
         {
             if (jwtToken == "")
             {
-                return null;
+                throw new UnauthorizedAccessException("Token is null");
             }
             // token now include bearer, we dont need bearer
             var index = jwtToken.IndexOf(" ");
@@ -91,6 +91,7 @@ namespace Application.Services
             return principal;
         }
 
+
         public Guid? GetGuid(string jwtToken)
         {
             string? idValue = ValidateToken(jwtToken)!.FindFirst("id")?.Value;
@@ -100,6 +101,26 @@ namespace Application.Services
                 Guid.TryParse(idValue, out Guid id);
                 return id;
             }
+        }
+
+        public IEnumerable<Claim> GetTokenClaims(string jwtToken)
+        {
+            if (jwtToken == "")
+            {
+                throw new UnauthorizedAccessException("Token is null");
+            }
+            // token now include bearer, we dont need bearer
+            var index = jwtToken.IndexOf(" ");
+            if (index != -1)
+            {
+                jwtToken = jwtToken.Substring(index + 1);
+            }
+            // Parse the JWT token
+            JwtSecurityToken jwtSecurityToken = new JwtSecurityToken(jwtToken);
+
+            // Extract claims from the JWT token
+            IEnumerable<Claim> claims = jwtSecurityToken.Claims;
+            return claims;
         }
     }
 }

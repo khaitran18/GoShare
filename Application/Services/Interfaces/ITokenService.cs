@@ -2,6 +2,7 @@
 using Domain.Enumerations;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
@@ -24,5 +25,6 @@ namespace Application.Services.Interfaces
         public ClaimsPrincipal? ValidateToken(string jwtToken);
         public DateTime CreateRefreshTokenExpiryTime();
         public Guid? GetGuid(string jwtToken);
+        public IEnumerable<Claim> GetTokenClaims(string jwtToken);
     }
 }
