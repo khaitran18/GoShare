@@ -1,4 +1,5 @@
 ﻿using Application.Commands;
+using Application.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -23,6 +24,13 @@ namespace Api_Mobile.Controllers
         {
             command.DependentId = dependentId;
             var response = await _mediator.Send(command);
+            return Ok(response);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetStoredLocation()
+        {
+            GetLocationQuery query = new GetLocationQuery();
+            var response = await _mediator.Send(query);
             return Ok(response);
         }
     }

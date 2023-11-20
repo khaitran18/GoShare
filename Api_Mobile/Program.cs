@@ -189,6 +189,7 @@ builder.Services.AddScoped<IRequestHandler<SendMessageCommand,Task>, SendMessage
 builder.Services.AddScoped<IRequestHandler<GetMessagesQuery,List<ChatDto>>, GetMessageQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<DriverActivateCommand, bool>, DriverActivateHandler>();
 builder.Services.AddScoped<IRequestHandler<DriverDeactivateCommand, bool>, DriverDeactivateHandler>();
+builder.Services.AddScoped<IRequestHandler<GetLocationQuery, List<LocationDto>>, GetLocationQueryHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
