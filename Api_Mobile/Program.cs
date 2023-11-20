@@ -170,7 +170,9 @@ builder.Services.AddScoped<IRequestHandler<CancelTripCommand, TripDto>, CancelTr
 builder.Services.AddScoped<IRequestHandler<GetLocationOfDependentCommand, LocationDto>, GetLocationOfDependentHandler>();
 builder.Services.AddScoped<IRequestHandler<RateDriverCommand, RatingDto>, RateDriverHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateTopUpRequestCommand, string>, CreateTopupRequestCommandHandler>();
-builder.Services.AddScoped<IRequestHandler<PaymentCallbackCommand, bool>, PaymentCallbackCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<PaymentCallbackCommand,bool>, PaymentCallbackCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<SendMessageCommand,Task>, SendMessageHandler>();
+builder.Services.AddScoped<IRequestHandler<GetMessagesQuery,List<ChatDto>>, GetMessageQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<DriverActivateCommand, bool>, DriverActivateHandler>();
 builder.Services.AddScoped<IRequestHandler<DriverDeactivateCommand, bool>, DriverDeactivateHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
@@ -191,6 +193,7 @@ var mapperConfig = new MapperConfiguration(cfg =>
     cfg.AddProfile<UserProfile>();
     cfg.AddProfile<TripProfile>();
     cfg.AddProfile<CarProfile>();
+    cfg.AddProfile<ChatProfile>();
     cfg.AddProfile<LocationProfile>();
     cfg.AddProfile<CartypeProfile>();
     cfg.AddProfile<DriverdocumentProfile>();
