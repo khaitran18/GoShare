@@ -89,11 +89,13 @@ builder.Services.AddAuthentication(x =>
         OnMessageReceived = context =>
         {
             var accessToken = context.Request.Query["access_token"];
-            if (string.IsNullOrEmpty(accessToken) == false)
+
+            var path = context.HttpContext.Request.Path;
+            if (!string.IsNullOrEmpty(accessToken) &&
+                (path.StartsWithSegments("/goshareHub")))
             {
                 context.Token = accessToken;
             }
-
             return Task.CompletedTask;
         }
     };
@@ -152,10 +154,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", builder =>
     {
-        builder.AllowAnyOrigin()
+        builder.AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowAnyHeader()
-            .WithExposedHeaders("WWW-Authenticate");
+            .SetIsOriginAllowed((host) => true)
+            .AllowCredentials();
     });
 });
 
