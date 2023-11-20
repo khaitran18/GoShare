@@ -84,7 +84,21 @@ builder.Services.AddAuthentication(x =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key)),
         ClockSkew = TimeSpan.FromMinutes(Convert.ToDouble(_expirtyMinutes))
     };
+    x.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+            if (string.IsNullOrEmpty(accessToken) == false)
+            {
+                context.Token = accessToken;
+            }
+
+            return Task.CompletedTask;
+        }
+    };
 });
+
 builder.Services.AddSingleton<ITokenService>(new TokenService(_key, _expirtyMinutes, _refreshTokenExpirtyMinutes, _issuer, _audience));
 builder.Services.AddSingleton<IDriverDocumentService, DriverDocumentService>();
 
