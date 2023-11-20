@@ -227,23 +227,29 @@ namespace Application.Services
             _logger.LogInformation("Notifying passenger about driver for tripId: {tripId}.", trip.Id);
             var groupName = SignalRUtilities.GetGroupNameForUser(trip.Passenger, trip);
 
-            //await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken!,
-            //    "Đặt chuyến thành công",
-            //    $"Tài xế {driver.Name} đang trên đường đến đón bạn.",
-            //    new Dictionary<string, string>
-            //    {
-            //        { "tripId", trip.Id.ToString() }
-            //    });
+            if (trip.Passenger.DeviceToken != null)
+            {
+                await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
+                "Đặt chuyến thành công",
+                $"Tài xế {driver.Name} đang trên đường đến đón bạn.",
+                new Dictionary<string, string>
+                {
+                    { "tripId", trip.Id.ToString() }
+                });
+            }
 
             if (trip.Passenger.GuardianId != null)
             {
-                //await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian!.DeviceToken!,
-                //    "Đặt chuyến thành công",
-                //    $"Tài xế {driver.Name} đang trên đường đến đón người thân {trip.Passenger.Name} của bạn.",
-                //    new Dictionary<string, string>
-                //    {
-                //        { "tripId", trip.Id.ToString() }
-                //    });
+                if (trip.Passenger.Guardian!.DeviceToken != null)
+                {
+                    await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian.DeviceToken,
+                    "Đặt chuyến thành công",
+                    $"Tài xế {driver.Name} đang trên đường đến đón người thân {trip.Passenger.Name} của bạn.",
+                    new Dictionary<string, string>
+                    {
+                        { "tripId", trip.Id.ToString() }
+                    });
+                }
             }
 
             await _hubContext.Clients.Group(groupName)
@@ -253,30 +259,42 @@ namespace Application.Services
         private async Task HandleTimeoutScenario(Trip trip)
         {
             _logger.LogInformation("Notifying passenger about trip timeout for tripId: {tripId}.", trip.Id);
-            trip.Status = TripStatus.TIMEDOUT;
 
+            trip.Status = TripStatus.TIMEDOUT;
             await _unitOfWork.TripRepository.UpdateAsync(trip);
+
+            // Change status of passenger back to inactive
+            trip.Passenger.Status = UserStatus.INACTIVE;
+            trip.Passenger.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
+            await _unitOfWork.UserRepository.UpdateAsync(trip.Passenger);
+
             await _unitOfWork.Save();
 
             var groupName = SignalRUtilities.GetGroupNameForUser(trip.Passenger, trip);
 
-            //await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken!,
-            //    "Hết thời gian chờ",
-            //    $"Chúng tôi thành thật xin lỗi, hiện tại chưa có tài xế phù hợp với bạn.",
-            //    new Dictionary<string, string>
-            //    {
-            //        { "tripId", trip.Id.ToString() }
-            //    });
+            if (trip.Passenger.DeviceToken != null)
+            {
+                await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
+                "Hết thời gian chờ",
+                $"Chúng tôi thành thật xin lỗi, hiện tại chưa có tài xế phù hợp với bạn.",
+                new Dictionary<string, string>
+                {
+                    { "tripId", trip.Id.ToString() }
+                });
+            }
 
             if (trip.Passenger.GuardianId != null)
             {
-                //await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian!.DeviceToken!,
-                //    "Hết thời gian chờ",
-                //    $"Chúng tôi thành thật xin lỗi, hiện tại chưa có tài xế phù hợp với người thân của bạn.",
-                //    new Dictionary<string, string>
-                //    {
-                //        { "tripId", trip.Id.ToString() }
-                //    });
+                if (trip.Passenger.Guardian!.DeviceToken != null)
+                {
+                    await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian.DeviceToken,
+                    "Hết thời gian chờ",
+                    $"Chúng tôi thành thật xin lỗi, hiện tại chưa có tài xế phù hợp với người thân của bạn.",
+                    new Dictionary<string, string>
+                    {
+                        { "tripId", trip.Id.ToString() }
+                    });
+                }
             }
 
             await _hubContext.Clients.Group(groupName)
