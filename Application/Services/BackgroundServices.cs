@@ -71,7 +71,7 @@ namespace Application.Services
 
                 // Get all the available drivers within the current radius, excluding those in the exclusion list
                 var drivers = (await _unitOfWork.UserRepository.GetActiveDriversWithinRadius(origin, radius))
-                    .Where(driver => !driversToExclude.Any(d => d.Id == driver.Id) &&
+                    .Where(driver => driver.Id != trip.PassengerId && driver.Id != trip.BookerId && !driversToExclude.Any(d => d.Id == driver.Id) &&
                                     driver.Car != null && driver.Car.TypeId == cartypeId)
                     .ToList();
 

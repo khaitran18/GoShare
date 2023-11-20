@@ -8,6 +8,7 @@ namespace Api_Mobile.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "User, Driver")]
     public class LocationController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -18,7 +19,6 @@ namespace Api_Mobile.Controllers
         }
 
         [HttpPost("{dependentId}")]
-        [Authorize(Roles = "User")]
         public async Task<IActionResult> GetLocationOfDependent([FromBody] GetLocationOfDependentCommand command, [FromRoute] Guid dependentId)
         {
             command.DependentId = dependentId;

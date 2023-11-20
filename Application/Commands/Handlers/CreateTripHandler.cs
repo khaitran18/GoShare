@@ -57,6 +57,16 @@ namespace Application.Commands.Handlers
                 throw new BadRequestException("Passenger is already in a trip that hasn't completed. Please complete the current trip before creating a new one.");
             }
 
+            // Prevent users who are in a trip from creating new trip
+            if (passenger.Status == UserStatus.BUSY)
+            {
+                if (passenger.Isdriver)
+                {
+                    throw new BadRequestException("You are not allow to create trip at the moment.");
+                }
+                throw new BadRequestException("You cannot create more trip.");
+            }
+
             var now = DateTimeUtilities.GetDateTimeVnNow();
             var cancellationWindowMinutes = _settingService.GetSetting("TRIP_CANCELLATION_WINDOW");
             var cancellationLimit = _settingService.GetSetting("TRIP_CANCELLATION_LIMIT");
@@ -179,6 +189,10 @@ namespace Application.Commands.Handlers
             };
 
             await _unitOfWork.TripRepository.AddAsync(trip);
+
+            passenger.Status = UserStatus.BUSY;
+            passenger.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
+            await _unitOfWork.UserRepository.UpdateAsync(passenger);
 
             await _unitOfWork.Save();
 

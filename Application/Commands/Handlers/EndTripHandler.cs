@@ -98,6 +98,15 @@ namespace Application.Commands.Handlers
                 await _unitOfWork.UserRepository.UpdateAsync(driver);
             }
 
+            // Set status of passenger back to inactive
+            var passenger = await _unitOfWork.UserRepository.GetUserById(trip.PassengerId.ToString());
+            if (passenger != null)
+            {
+                passenger.Status = UserStatus.INACTIVE;
+                passenger.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
+                await _unitOfWork.UserRepository.UpdateAsync(passenger);
+            }
+
             // Payment
             var driverWallet = await _unitOfWork.WalletRepository.GetByUserIdAsync(driverId);
             if (driverWallet == null)

@@ -9,7 +9,7 @@ namespace Api_Mobile.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "User")]
+    [Authorize(Roles = "User, Driver")]
     public class TripController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -35,7 +35,6 @@ namespace Api_Mobile.Controllers
         }
 
         [HttpPost("fees")]
-        [Authorize]
         public async Task<IActionResult> CalculateFeesForTrip([FromBody] CalculateFeesForTripCommand command)
         {
             var response = await _mediator.Send(command);

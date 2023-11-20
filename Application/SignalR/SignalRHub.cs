@@ -73,8 +73,8 @@ namespace Application.SignalR
             {
                 return $"{user.Id}-{user.GuardianId}";
             }
-            // If the user is a guardian and have dependents
-            else if (!user.Isdriver)
+            // If the user is a guardian or driver and have dependents
+            else
             {
                 var dependents = await _unitOfWork.UserRepository.GetDependentsByGuardianId(user.Id);
                 if (dependents.Any())
@@ -85,10 +85,9 @@ namespace Application.SignalR
                         await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
                     }
                 }
-            }
 
-            // For driver and guardian
-            return $"{user.Id}";
+                return $"{user.Id}";
+            }
         }
 
         public async Task RequestLocation(string dependentId)

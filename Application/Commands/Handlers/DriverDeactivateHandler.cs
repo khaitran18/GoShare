@@ -34,6 +34,11 @@ namespace Application.Commands.Handlers
                 throw new NotFoundException(nameof(User), userId);
             }
 
+            if (user.Status == UserStatus.BUSY)
+            {
+                throw new BadRequestException("You cannot do this function while you are in a trip.");
+            }
+
             user.Status = UserStatus.INACTIVE;
             user.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
 

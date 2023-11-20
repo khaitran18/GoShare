@@ -150,6 +150,11 @@ namespace Application.Commands.Handlers
                 }
             }
 
+            // Change status of user back to inactive
+            user.Status = UserStatus.INACTIVE;
+            user.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
+            await _unitOfWork.UserRepository.UpdateAsync(user);
+
             await _unitOfWork.Save();
 
             // Cancel find driver task

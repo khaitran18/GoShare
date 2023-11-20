@@ -11,7 +11,6 @@ namespace Api_Mobile.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Authorize(Roles = "User,Driver")]
     public class UserController : ControllerBase
     {
@@ -22,7 +21,6 @@ namespace Api_Mobile.Controllers
         }
 
         [HttpPut("update-fcm")]
-        [Authorize(Roles = "User, Driver")]
         public async Task<IActionResult> UpdateFcmToken([FromBody] UpdateFcmTokenCommand command)
         {
             var response = await _mediator.Send(command);
@@ -44,7 +42,6 @@ namespace Api_Mobile.Controllers
         }
 
         [HttpGet("dependents")]
-        [Authorize(Roles = "User")]
         public async Task<IActionResult> GetDependents([FromQuery] GetDependentsQuery query)
         {
             var result = await _mediator.Send(query);
