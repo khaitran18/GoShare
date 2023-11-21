@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Application.Commands
 {
-    public record RefreshTokenCommand : IRequest<TokenResponse>
+    public record RefreshTokenCommand : IRequest<AuthResponse>
     {
         public string AccessToken { get; set; } = null!;
         public string RefreshToken { get; set; } = null!;

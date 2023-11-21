@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Application.Commands
 {
-    public record AuthCommand : IRequest<TokenResponse>
+    public record AuthCommand : IRequest<AuthResponse>
     {
         public string Phone { get; set; } = null!;
         public string Passcode { get; set; } = null!;

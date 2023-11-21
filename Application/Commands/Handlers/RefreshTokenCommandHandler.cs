@@ -1,6 +1,7 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Utilities;
 using Application.Services.Interfaces;
+using AutoMapper;
 using Domain.Enumerations;
 using Domain.Interfaces;
 using MediatR;
@@ -13,20 +14,22 @@ using System.Threading.Tasks;
 
 namespace Application.Commands.Handlers
 {
-    public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, TokenResponse>
+    public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, AuthResponse>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ITokenService _tokenService;
+        private readonly IMapper _mapper;
 
-        public RefreshTokenCommandHandler(IUnitOfWork unitOfWork,ITokenService tokenService)
+        public RefreshTokenCommandHandler(IUnitOfWork unitOfWork, ITokenService tokenService, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _tokenService = tokenService;
+            _mapper = mapper;
         }
 
-        public async Task<TokenResponse> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
+        public async Task<AuthResponse> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
         {
-            TokenResponse response = new TokenResponse();
+            AuthResponse response = new AuthResponse();
             string? userId = null;
             //ClaimsPrincipal claims = _tokenService.ValidateToken(request.AccessToken)!;
             IEnumerable < Claim > claims = _tokenService.GetTokenClaims(request.AccessToken)!;
@@ -62,6 +65,7 @@ namespace Application.Commands.Handlers
                         response.Phone = claims.First(u => u.Type.Equals("phone"))?.Value;
                         response.Name = claims.First(u => u.Type.Equals("name"))?.Value;
                         response.Id = new Guid(userId!);
+                        response.CurrentTrip = _mapper.Map<TripDto>(_unitOfWork.TripRepository.GetOngoingTripByPassengerId(new Guid(userId!)).Result);
                     }
                 }
             }

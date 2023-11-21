@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Application.Commands
 {
-    public class AdminAuthCommand : IRequest<TokenResponse>
+    public class AdminAuthCommand : IRequest<AuthResponse>
     {
         public string Username { get; set; } = null!;
         public string Password { get; set; } = null!;   
