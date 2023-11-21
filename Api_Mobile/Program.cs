@@ -29,6 +29,7 @@ using Application.Services.Interfaces;
 using Google.Cloud.Storage.V1;
 using Application.Common.Behaviours;
 using Microsoft.OpenApi.Models;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,7 +40,8 @@ builder.Services.AddTransient<GetUserClaimsMiddleware>();
 builder.Services.AddTransient<CheckUserVerificationMiddleware>();
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(x =>
+                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -89,11 +91,13 @@ builder.Services.AddAuthentication(x =>
         OnMessageReceived = context =>
         {
             var accessToken = context.Request.Query["access_token"];
-            if (string.IsNullOrEmpty(accessToken) == false)
+
+            var path = context.HttpContext.Request.Path;
+            if (!string.IsNullOrEmpty(accessToken) &&
+                (path.StartsWithSegments("/goshareHub")))
             {
                 context.Token = accessToken;
             }
-
             return Task.CompletedTask;
         }
     };
@@ -152,10 +156,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", builder =>
     {
-        builder.AllowAnyOrigin()
+        builder.AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowAnyHeader()
-            .WithExposedHeaders("WWW-Authenticate");
+            .SetIsOriginAllowed((host) => true)
+            .AllowCredentials();
     });
 });
 

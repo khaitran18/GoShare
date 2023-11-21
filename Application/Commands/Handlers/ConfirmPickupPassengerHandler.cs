@@ -130,10 +130,10 @@ namespace Application.Commands.Handlers
                         { "tripId", trip.Id.ToString() }
                     });
                 }
-
-                await _hubContext.Clients.Group(SignalRUtilities.GetGroupNameForUser(trip.Passenger, trip))
-                    .SendAsync("NotifyPassengerDriverPickup", _mapper.Map<TripDto>(trip));
             }
+
+            await _hubContext.Clients.Group(SignalRUtilities.GetGroupNameForUser(trip.Passenger, trip))
+                    .SendAsync("NotifyPassengerDriverPickup", _mapper.Map<TripDto>(trip));
         }
     }
 }

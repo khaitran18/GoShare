@@ -289,7 +289,7 @@ namespace Application.Services
                 {
                     await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian.DeviceToken,
                     "Hết thời gian chờ",
-                    $"Chúng tôi thành thật xin lỗi, hiện tại chưa có tài xế phù hợp với người thân của bạn.",
+                    $"Chúng tôi xin lỗi, hiện tại chưa có tài xế phù hợp với người thân {trip.Passenger.Name} của bạn.",
                     new Dictionary<string, string>
                     {
                         { "tripId", trip.Id.ToString() }
