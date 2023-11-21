@@ -2,6 +2,8 @@
 using Application.Common.Exceptions;
 using Application.Common.Utilities;
 using Application.Common.Utilities.Google;
+using Application.Common.Utilities.Google.Firebase;
+using Application.Common.Utilities.SignalR;
 using Application.Services;
 using Application.Services.Interfaces;
 using Application.SignalR;
@@ -193,7 +195,27 @@ namespace Application.Commands.Handlers
             // Background task
             string jobId = BackgroundJob.Enqueue<BackgroundServices>(s => s.FindDriver(trip.Id, request.CartypeId));
 
+            // Notify dependent using FCM and SignalR
+            await NotifyDependentNewTripBooked(trip);
+
             return tripDto;
+        }
+
+        private async Task NotifyDependentNewTripBooked(Trip trip)
+        {
+            if (trip.Passenger.DeviceToken != null)
+            {
+                await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
+                "Đã tạo chuyến mới",
+                $"Người thân {trip.Booker!.Name} đã tạo chuyến mới cho bạn",
+                new Dictionary<string, string>
+                {
+                    { "tripId", trip.Id.ToString() }
+                });
+            }
+
+            await _hubContext.Clients.Group(trip.PassengerId.ToString())
+                    .SendAsync("NotifyDependentNewTripBooked", _mapper.Map<TripDto>(trip));
         }
     }
 }
