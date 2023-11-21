@@ -57,7 +57,7 @@ namespace Application.Commands.Handlers
                 throw new BadRequestException("Passenger is already in a trip that hasn't completed. Please complete the current trip before creating a new one.");
             }
 
-            // Prevent users who are in a trip from creating new trip
+            // Prevent users who are busy from creating new trip
             if (passenger.Status == UserStatus.BUSY)
             {
                 if (passenger.Isdriver)

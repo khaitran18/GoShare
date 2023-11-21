@@ -65,11 +65,11 @@ namespace Application.Commands.Handlers
             // Request the location from the dependent's device
             await _hubContext.Clients.Group(request.DependentId.ToString()).SendAsync("RequestLocation");
 
-            await Task.Delay(TimeSpan.FromSeconds(10));
+            await Task.Delay(TimeSpan.FromSeconds(5));
 
             // Return the obtained location data
             var dependentLocation = KeyValueStore.Instance.Get<string>($"CurrentLocation_{request.DependentId}");
-            if (!string.IsNullOrEmpty(dependentLocation))
+            if (string.IsNullOrEmpty(dependentLocation))
             {
                 throw new BadRequestException("Unable to get dependent's location");
             }
