@@ -1,12 +1,16 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Exceptions;
 using Application.Common.Utilities;
+using Application.Common.Utilities.Google.Firebase;
+using Application.Common.Utilities.SignalR;
 using Application.Services.Interfaces;
+using Application.SignalR;
 using AutoMapper;
 using Domain.DataModels;
 using Domain.Enumerations;
 using Domain.Interfaces;
 using MediatR;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,13 +26,15 @@ namespace Application.Commands.Handlers
         private readonly UserClaims _userClaims;
         private readonly IMapper _mapper;
         private readonly ISettingService _settingService;
+        private readonly IHubContext<SignalRHub> _hubContext;
 
-        public EndTripHandler(IUnitOfWork unitOfWork, UserClaims userClaims, IMapper mapper, ISettingService settingService)
+        public EndTripHandler(IUnitOfWork unitOfWork, UserClaims userClaims, IMapper mapper, ISettingService settingService, IHubContext<SignalRHub> hubContext)
         {
             _unitOfWork = unitOfWork;
             _userClaims = userClaims;
             _mapper = mapper;
             _settingService = settingService;
+            _hubContext = hubContext;
         }
 
         public async Task<TripDto> Handle(EndTripCommand request, CancellationToken cancellationToken)
@@ -177,7 +183,41 @@ namespace Application.Commands.Handlers
 
             tripDto = _mapper.Map<TripDto>(trip);
 
+            // Notify passenger using FCM and SignalR
+            await NotifyPassengerTripHasEnded(trip);
+
             return tripDto;
+        }
+
+        private async Task NotifyPassengerTripHasEnded(Trip trip)
+        {
+            if (trip.Passenger.DeviceToken != null)
+            {
+                await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
+                    "Hoàn thành chuyến",
+                    $"Chuyến đi của bạn đã kết thúc. Bạn đã đến nơi an toàn.",
+                    new Dictionary<string, string>
+                    {
+                        { "tripId", trip.Id.ToString() }
+                    });
+            }
+
+            if (trip.Passenger.GuardianId != null)
+            {
+                if (trip.Passenger.Guardian!.DeviceToken != null)
+                {
+                    await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian.DeviceToken,
+                        "Hoàn thành chuyến",
+                        $"Chuyến đi của {trip.Passenger.Name} đã kết thúc. Người thân của bạn đã đến nơi an toàn.",
+                        new Dictionary<string, string>
+                        {
+                            { "tripId", trip.Id.ToString() }
+                        });
+                }
+            }
+
+            await _hubContext.Clients.Group(SignalRUtilities.GetGroupNameForUser(trip.Passenger, trip))
+                    .SendAsync("NotifyPassengerTripEnded", _mapper.Map<TripDto>(trip));
         }
     }
 }
