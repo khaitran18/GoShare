@@ -28,6 +28,13 @@ namespace Api_Mobile.Controllers
             return Ok(response);
         }
 
+        [HttpGet("{TripId}")]
+        public async Task<IActionResult> GetTrip([FromRoute] GetTripQuery query)
+        {
+            var response = await _mediator.Send(query);
+            return Ok(response);
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateTrip([FromBody] CreateTripCommand command)
         {

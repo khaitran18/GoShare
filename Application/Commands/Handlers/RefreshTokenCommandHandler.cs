@@ -18,13 +18,13 @@ namespace Application.Commands.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ITokenService _tokenService;
-        private readonly IMapper _mapper;
+        private readonly IUserService _userService;
 
-        public RefreshTokenCommandHandler(IUnitOfWork unitOfWork, ITokenService tokenService, IMapper mapper)
+        public RefreshTokenCommandHandler(IUnitOfWork unitOfWork, ITokenService tokenService, IUserService userService)
         {
             _unitOfWork = unitOfWork;
             _tokenService = tokenService;
-            _mapper = mapper;
+            _userService = userService;
         }
 
         public async Task<AuthResponse> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
@@ -58,14 +58,16 @@ namespace Application.Commands.Handlers
                     else
                     {
 
-                        UserRoleEnumerations role = roleClaims.Equals(UserRoleEnumerations.User.ToString()) ? UserRoleEnumerations.User : roleClaims.Equals(UserRoleEnumerations.Driver.ToString()) ? UserRoleEnumerations.Driver : UserRoleEnumerations.Admin;
+                        UserRoleEnumerations role = roleClaims.Equals(UserRoleEnumerations.User.ToString())|| roleClaims.Equals(UserRoleEnumerations.Dependent.ToString()) ? UserRoleEnumerations.User : roleClaims.Equals(UserRoleEnumerations.Driver.ToString()) ? UserRoleEnumerations.Driver : roleClaims.Equals(UserRoleEnumerations.Driver.ToString())?UserRoleEnumerations.Dependent:UserRoleEnumerations.Admin;
                         response.AccessToken = _tokenService.GenerateJWTToken(userId is not null ? new Guid(userId):null, claims.First(u=>u.Type.Equals("phone"))?.Value, claims.First(u=>u.Type.Equals("name"))?.Value, role);
                         response.Role = roleClaims;
+                        if (await _unitOfWork.UserRepository.IsDependent(new Guid(userId!))) response.Role = UserRoleEnumerations.Dependent.ToString();
                         response.RefreshToken = request.RefreshToken;
                         response.Phone = claims.First(u => u.Type.Equals("phone"))?.Value;
                         response.Name = claims.First(u => u.Type.Equals("name"))?.Value;
                         response.Id = new Guid(userId!);
-                        response.CurrentTrip = _mapper.Map<TripDto>(_unitOfWork.TripRepository.GetOngoingTripByPassengerId(new Guid(userId!)).Result);
+                        response.CurrentTrip = _unitOfWork.TripRepository.GetOngoingTripByPassengerId(new Guid(userId!)).Result?.Id;
+                        response.DependentCurrentTrips = await _userService.GetCurrentDenpendentTrips(_unitOfWork, new Guid(userId!));
                     }
                 }
             }
