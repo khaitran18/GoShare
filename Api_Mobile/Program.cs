@@ -198,6 +198,7 @@ builder.Services.AddScoped<IRequestHandler<GetLocationQuery, List<LocationDto>>,
 builder.Services.AddScoped<IRequestHandler<GetCurrentTripQuery, TripDto>, GetCurrentTripQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<GetTripQuery, TripDto?>, GetTripQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<CreatePlannedDestinationCommand, LocationDto>, CreatePlannedDestinationHandler>();
+builder.Services.AddScoped<IRequestHandler<DriverUpdateLocationCommand, LocationDto>, DriverUpdateLocationHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));

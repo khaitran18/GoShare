@@ -57,5 +57,12 @@ namespace Api_Mobile.Controllers
             var response = await _mediator.Send(command);
             return Ok(response);
         }
+
+        [HttpPost("update-location")]
+        public async Task<IActionResult> DriverUpdateLocation([FromBody] DriverUpdateLocationCommand command)
+        {
+            var response = await _mediator.Send(command);
+            return Ok(response);
+        }
     }
 }
