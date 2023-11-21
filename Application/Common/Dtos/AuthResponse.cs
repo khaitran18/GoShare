@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Application.Common.Dtos
 {
-    public class TokenResponse
+    public class AuthResponse
     {
         public string AccessToken { get; set; } = null!;
         public string RefreshToken { get; set; } = null!;
@@ -16,6 +16,6 @@ namespace Application.Common.Dtos
         public string? Phone { get; set; }
         public string? Name { get; set; }
         public string Role { get; set; } = null!;
-
+        public TripDto? CurrentTrip;
     }
 }

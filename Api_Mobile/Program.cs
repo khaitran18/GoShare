@@ -168,12 +168,12 @@ builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<IRequestHandler<TestQuery, TestDto>, TestQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateTripCommand, TripDto>, CreateTripHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateTripForDependentCommand, TripDto>, CreateTripForDependentHandler>();
-builder.Services.AddScoped<IRequestHandler<AuthCommand, TokenResponse>, AuthCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<AuthCommand, AuthResponse>, AuthCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<RegisterCommand, Task>, RegisterCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<VerifyCommand, string>, VerifyCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<ResendOtpCommand, Task>, ResendOtpCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<SetPasscodeCommand, Task>, SetPasscodeCommandHandler>();
-builder.Services.AddScoped<IRequestHandler<RefreshTokenCommand, TokenResponse>, RefreshTokenCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<RefreshTokenCommand, AuthResponse>, RefreshTokenCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<RevokeCommand, Task>, RevokeCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<UpdateProfilePictureCommand, string>, UpdateProfilePictureHandler>();
 builder.Services.AddScoped<IRequestHandler<ConfirmPassengerCommand, TripDto>, ConfirmPassengerHandler>();
@@ -194,6 +194,7 @@ builder.Services.AddScoped<IRequestHandler<GetMessagesQuery,List<ChatDto>>, GetM
 builder.Services.AddScoped<IRequestHandler<DriverActivateCommand, bool>, DriverActivateHandler>();
 builder.Services.AddScoped<IRequestHandler<DriverDeactivateCommand, bool>, DriverDeactivateHandler>();
 builder.Services.AddScoped<IRequestHandler<GetLocationQuery, List<LocationDto>>, GetLocationQueryHandler>();
+builder.Services.AddScoped<IRequestHandler<GetCurrentTripQuery, TripDto>, GetCurrentTripQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<CreatePlannedDestinationCommand, LocationDto>, CreatePlannedDestinationHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>))

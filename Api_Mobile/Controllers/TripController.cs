@@ -1,5 +1,6 @@
 ﻿using Application.Commands;
 using Application.Common.Dtos;
+using Application.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -17,6 +18,14 @@ namespace Api_Mobile.Controllers
         public TripController(IMediator mediator)
         {
             _mediator = mediator;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCurrentTrip()
+        {
+            var query = new GetCurrentTripQuery();
+            var response = await _mediator.Send(query);
+            return Ok(response);
         }
 
         [HttpPost]

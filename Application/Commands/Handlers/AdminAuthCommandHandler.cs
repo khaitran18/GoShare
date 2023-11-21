@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Application.Commands.Handlers
 {
-    public class AdminAuthCommandHandler : IRequestHandler<AdminAuthCommand, TokenResponse>
+    public class AdminAuthCommandHandler : IRequestHandler<AdminAuthCommand, AuthResponse>
     {
         private readonly Admin _admin;
         private readonly ITokenService _tokenService;
@@ -24,9 +24,9 @@ namespace Application.Commands.Handlers
             _tokenService = tokenService;
         }
 
-        public async Task<TokenResponse> Handle(AdminAuthCommand request, CancellationToken cancellationToken)
+        public async Task<AuthResponse> Handle(AdminAuthCommand request, CancellationToken cancellationToken)
         {
-            TokenResponse response = new TokenResponse();
+            AuthResponse response = new AuthResponse();
             if ((request.Username.Equals(_admin.Username)) && (request.Password.Equals(_admin.Password)))
             {
                 response.AccessToken = _tokenService.GenerateJWTToken(null,null,null,role:UserRoleEnumerations.Admin);

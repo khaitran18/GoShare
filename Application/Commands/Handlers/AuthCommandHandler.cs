@@ -8,7 +8,7 @@ using Domain.Interfaces;
 using MediatR;
 namespace Application.Commands.Handlers
 {
-    public class AuthCommandHandler : IRequestHandler<AuthCommand, TokenResponse>
+    public class AuthCommandHandler : IRequestHandler<AuthCommand, AuthResponse>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ITokenService _tokenService;
@@ -21,9 +21,9 @@ namespace Application.Commands.Handlers
             _tokenService = tokenService;
         }
 
-        public async Task<TokenResponse> Handle(AuthCommand request, CancellationToken cancellationToken)
+        public async Task<AuthResponse> Handle(AuthCommand request, CancellationToken cancellationToken)
         {
-            TokenResponse response = new TokenResponse();
+            AuthResponse response = new AuthResponse();
             var user = await _unitOfWork.UserRepository.GetUserByPhone(request.Phone);
             if (user == null)
             {
@@ -49,6 +49,7 @@ namespace Application.Commands.Handlers
                     response.Phone = user.Phone;
                     response.Name = user.Name;
                     response.Role = role.ToString();
+                    response.CurrentTrip = _mapper.Map<TripDto>(_unitOfWork.TripRepository.GetOngoingTripByPassengerId(user.Id).Result);
                     user.RefreshToken = response.RefreshToken;
                     user.RefreshTokenExpiryTime = _tokenService.CreateRefreshTokenExpiryTime();
                     await _unitOfWork.UserRepository.UpdateAsync(user);
