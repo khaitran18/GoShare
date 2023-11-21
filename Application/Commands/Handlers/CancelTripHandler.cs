@@ -150,9 +150,9 @@ namespace Application.Commands.Handlers
                 }
             }
 
-            // Change status of user back to inactive
-            user.Status = UserStatus.INACTIVE;
-            user.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
+            // Change status of passenger back to inactive
+            trip.Passenger.Status = UserStatus.INACTIVE;
+            trip.Passenger.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
             await _unitOfWork.UserRepository.UpdateAsync(user);
 
             await _unitOfWork.Save();

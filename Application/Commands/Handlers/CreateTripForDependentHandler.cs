@@ -65,7 +65,7 @@ namespace Application.Commands.Handlers
                 throw new NotFoundException(nameof(User), request.DependentId);
             }
             // Check if dependent is of the user
-            if (dependent == null || dependent.GuardianId != userId)
+            if (dependent.GuardianId != userId)
             {
                 throw new BadRequestException("The user is not the guardian of the dependent.");
             }
@@ -75,6 +75,12 @@ namespace Application.Commands.Handlers
             if (ongoingTrip != null)
             {
                 throw new BadRequestException("Passenger is already in a trip that hasn't completed. Please complete the current trip before creating a new one.");
+            }
+
+            // Prevent creating trip for dependents who are busy
+            if (dependent.Status == UserStatus.BUSY)
+            {
+                throw new BadRequestException("This dependent is busy.");
             }
 
             var now = DateTimeUtilities.GetDateTimeVnNow();
@@ -175,6 +181,10 @@ namespace Application.Commands.Handlers
             };
 
             await _unitOfWork.TripRepository.AddAsync(trip);
+
+            dependent.Status = UserStatus.BUSY;
+            dependent.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
+            await _unitOfWork.UserRepository.UpdateAsync(dependent);
 
             await _unitOfWork.Save();
 

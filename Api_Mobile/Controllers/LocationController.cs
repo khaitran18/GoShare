@@ -26,11 +26,19 @@ namespace Api_Mobile.Controllers
             var response = await _mediator.Send(command);
             return Ok(response);
         }
+
         [HttpGet]
         public async Task<IActionResult> GetStoredLocation()
         {
             GetLocationQuery query = new GetLocationQuery();
             var response = await _mediator.Send(query);
+            return Ok(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateStoredLocation([FromBody] CreatePlannedDestinationCommand command)
+        {
+            var response = await _mediator.Send(command);
             return Ok(response);
         }
     }
