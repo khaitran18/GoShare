@@ -16,6 +16,7 @@ namespace Application.Common.Dtos
         public string? Phone { get; set; }
         public string? Name { get; set; }
         public string Role { get; set; } = null!;
-        public TripDto? CurrentTrip;
+        public Guid? CurrentTrip { get; set; }
+        public List<DependentTripInfo>? DependentCurrentTrips { get; set; }
     }
 }

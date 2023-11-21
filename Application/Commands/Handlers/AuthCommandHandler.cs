@@ -12,13 +12,13 @@ namespace Application.Commands.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ITokenService _tokenService;
-        private readonly IMapper _mapper;
+        private readonly IUserService _userService;
 
-        public AuthCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ITokenService tokenService)
+        public AuthCommandHandler(IUnitOfWork unitOfWork, ITokenService tokenService, IUserService userService)
         {
             _unitOfWork = unitOfWork;
-            _mapper = mapper;
             _tokenService = tokenService;
+            _userService = userService;
         }
 
         public async Task<AuthResponse> Handle(AuthCommand request, CancellationToken cancellationToken)
@@ -49,7 +49,8 @@ namespace Application.Commands.Handlers
                     response.Phone = user.Phone;
                     response.Name = user.Name;
                     response.Role = role.ToString();
-                    response.CurrentTrip = _mapper.Map<TripDto>(_unitOfWork.TripRepository.GetOngoingTripByPassengerId(user.Id).Result);
+                    response.CurrentTrip = _unitOfWork.TripRepository.GetOngoingTripByPassengerId(user.Id).Result?.Id;
+                    response.DependentCurrentTrips = await _userService.GetCurrentDenpendentTrips(_unitOfWork, user.Id);
                     user.RefreshToken = response.RefreshToken;
                     user.RefreshTokenExpiryTime = _tokenService.CreateRefreshTokenExpiryTime();
                     await _unitOfWork.UserRepository.UpdateAsync(user);

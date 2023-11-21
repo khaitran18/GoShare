@@ -105,6 +105,7 @@ builder.Services.AddAuthentication(x =>
 
 builder.Services.AddSingleton<ITokenService>(new TokenService(_key, _expirtyMinutes, _refreshTokenExpirtyMinutes, _issuer, _audience));
 builder.Services.AddSingleton<IDriverDocumentService, DriverDocumentService>();
+builder.Services.AddSingleton<IUserService, UserService>();
 
 //Add VnPayService
 builder.Services.AddSingleton<IPaymentService>(new PaymentService(GoShareConfiguration.VnpayConfig));
@@ -195,6 +196,7 @@ builder.Services.AddScoped<IRequestHandler<DriverActivateCommand, bool>, DriverA
 builder.Services.AddScoped<IRequestHandler<DriverDeactivateCommand, bool>, DriverDeactivateHandler>();
 builder.Services.AddScoped<IRequestHandler<GetLocationQuery, List<LocationDto>>, GetLocationQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<GetCurrentTripQuery, TripDto>, GetCurrentTripQueryHandler>();
+builder.Services.AddScoped<IRequestHandler<GetTripQuery, TripDto?>, GetTripQueryHandler>();
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>))

@@ -19,7 +19,6 @@ namespace Infrastructure.Repositories
             _context = context;
         }
 
-
         public async Task<List<User>> GetActiveDriversWithinRadius(Location origin, double radius)
         {
             var result = new List<User>();
