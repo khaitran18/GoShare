@@ -48,6 +48,7 @@ namespace Application.Commands.Handlers
                     response.Id = user.Id;
                     response.Phone = user.Phone;
                     response.Name = user.Name;
+                    if (user.GuardianId is not null) role = UserRoleEnumerations.Dependent;
                     response.Role = role.ToString();
                     response.CurrentTrip = _unitOfWork.TripRepository.GetOngoingTripByPassengerId(user.Id).Result?.Id;
                     response.DependentCurrentTrips = await _userService.GetCurrentDenpendentTrips(_unitOfWork, user.Id);

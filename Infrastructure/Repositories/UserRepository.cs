@@ -119,6 +119,13 @@ namespace Infrastructure.Repositories
             return Task.FromResult(_context.Users.FirstOrDefault(u => u.Id.Equals(new Guid(userId)))!.RefreshTokenExpiryTime);
         }
 
+        public Task<bool> IsDependent(Guid UserId)
+        {
+            User? u = _context.Users.FirstOrDefault(u => u.Id.CompareTo(UserId) == 0);
+            if (u is null) throw new NotFoundException("User is not found");
+            else return u.GuardianId == null ? Task.FromResult(false) : Task.FromResult(true);
+        }
+
         public Task<bool> IsVerified(Guid id)
         {
             User? u = _context.Users.FirstOrDefaultAsync(u => u.Id.CompareTo(id) == 0).Result;

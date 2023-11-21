@@ -58,9 +58,10 @@ namespace Application.Commands.Handlers
                     else
                     {
 
-                        UserRoleEnumerations role = roleClaims.Equals(UserRoleEnumerations.User.ToString()) ? UserRoleEnumerations.User : roleClaims.Equals(UserRoleEnumerations.Driver.ToString()) ? UserRoleEnumerations.Driver : UserRoleEnumerations.Admin;
+                        UserRoleEnumerations role = roleClaims.Equals(UserRoleEnumerations.User.ToString())|| roleClaims.Equals(UserRoleEnumerations.Dependent.ToString()) ? UserRoleEnumerations.User : roleClaims.Equals(UserRoleEnumerations.Driver.ToString()) ? UserRoleEnumerations.Driver : roleClaims.Equals(UserRoleEnumerations.Driver.ToString())?UserRoleEnumerations.Dependent:UserRoleEnumerations.Admin;
                         response.AccessToken = _tokenService.GenerateJWTToken(userId is not null ? new Guid(userId):null, claims.First(u=>u.Type.Equals("phone"))?.Value, claims.First(u=>u.Type.Equals("name"))?.Value, role);
                         response.Role = roleClaims;
+                        if (await _unitOfWork.UserRepository.IsDependent(new Guid(userId!))) response.Role = UserRoleEnumerations.Dependent.ToString();
                         response.RefreshToken = request.RefreshToken;
                         response.Phone = claims.First(u => u.Type.Equals("phone"))?.Value;
                         response.Name = claims.First(u => u.Type.Equals("name"))?.Value;

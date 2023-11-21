@@ -10,6 +10,7 @@ namespace Domain.Enumerations
     {
         User,
         Driver,
-        Admin
+        Admin,
+        Dependent
     }
 }
