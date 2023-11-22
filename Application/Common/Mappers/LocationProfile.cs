@@ -13,7 +13,9 @@ namespace Application.Common.Mappers
     {
         public LocationProfile()
         {
-            CreateMap<LocationDto, Location>().ReverseMap();
+            CreateMap<LocationDto, Location>()
+                .ForMember(dest => dest.Longtitude, opt => opt.MapFrom(src => src.Longitude))
+                .ReverseMap();
         }
     }
 }
