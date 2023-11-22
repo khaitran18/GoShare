@@ -7,7 +7,6 @@ using Domain.Interfaces;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace Infrastructure.Repositories
 {
     public class UserRepository : BaseRepository<User>, IUserRepository
@@ -25,6 +24,7 @@ namespace Infrastructure.Repositories
             var users = await _context.Users
                 .Include(u => u.Locations)
                 .Include(u => u.Car)
+                .AsNoTracking() // Disable entity tracking for getting updated driver location
                 .ToListAsync();
 
             foreach (User user in users)

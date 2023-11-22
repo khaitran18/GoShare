@@ -85,7 +85,7 @@ namespace Application.Services
                             var distance = await GoogleMapsApiUtilities.ComputeDistanceMatrixAsync(origin, currentLocation);
                             if (distance < shortestDistance)
                             {
-                                nearestDriver = await _unitOfWork.UserRepository.GetUserById(driver.Id.ToString());
+                                nearestDriver = driver;
                                 shortestDistance = distance;
                             }
                         }
