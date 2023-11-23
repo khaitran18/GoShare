@@ -14,6 +14,7 @@ namespace Application.Commands.Handlers
     public class SetPasscodeCommandHandler : IRequestHandler<SetPasscodeCommand, Task>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly string _defaultAvatar = "https://firebasestorage.googleapis.com/v0/b/goshare-bc3c4.appspot.com/o/default-user-avatar.webp?alt=media&token=cd67cce4-611c-49c5-a819-956a33ce90ba";
 
         public SetPasscodeCommandHandler(IUnitOfWork unitOfWork)
         {
@@ -33,17 +34,21 @@ namespace Application.Commands.Handlers
                     else
                     {
                         u.Passcode = PasswordHasher.Hash(request.Passcode);
+                        u.AvatarUrl = _defaultAvatar;
                         await _unitOfWork.UserRepository.UpdateAsync(u);
-                        Wallet w = new Wallet()
+                        if (!await _unitOfWork.UserRepository.IsDependent(u.Id))
                         {
-                            Balance = 0,
-                            CreateTime = DateTimeUtilities.GetDateTimeVnNow(),
-                            UpdatedTime = DateTimeUtilities.GetDateTimeVnNow(),
-                            Id = Guid.NewGuid(),
-                            Type = Domain.Enumerations.WalletStatus.PERSONAL,
-                            UserId = u.Id
-                        };
-                        await _unitOfWork.WalletRepository.AddAsync(w);
+                            Wallet w = new Wallet()
+                            {
+                                Balance = 0,
+                                CreateTime = DateTimeUtilities.GetDateTimeVnNow(),
+                                UpdatedTime = DateTimeUtilities.GetDateTimeVnNow(),
+                                Id = Guid.NewGuid(),
+                                Type = Domain.Enumerations.WalletStatus.PERSONAL,
+                                UserId = u.Id
+                            };
+                            await _unitOfWork.WalletRepository.AddAsync(w);
+                        }
                         await _unitOfWork.Save();
                     }
                 }

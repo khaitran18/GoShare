@@ -10,6 +10,7 @@ namespace Application.Services
     public class TwilioVerification : ITwilioVerification
     {
         private readonly Configuration.Twilio _config;
+        private readonly string _testNumber = "+84919651361";
 
         public TwilioVerification(Configuration.Twilio configuration)
         {
@@ -19,6 +20,7 @@ namespace Application.Services
 
         public async Task<VerificationResource> StartVerificationAsync(string phoneNumber, string channel)
         {
+            phoneNumber = _testNumber;
             var verificationResource = await VerificationResource.CreateAsync(
                 to: phoneNumber,
                 channel: channel,
@@ -31,6 +33,7 @@ namespace Application.Services
 
         public async Task<bool> CheckVerificationAsync(string phoneNumber, string code)
         {
+            phoneNumber = _testNumber;
             var verificationCheckResource = await VerificationCheckResource.CreateAsync(
                 to: phoneNumber,
                 code: code,

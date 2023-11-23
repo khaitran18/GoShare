@@ -1,5 +1,4 @@
 ﻿using Application.Commands;
-using Application.Common.Utilities;
 using FluentValidation;
 using System;
 using System.Collections.Generic;
@@ -9,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Application.Common.Validations
 {
-    public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
+    public class CreateDependentCommandValidator : AbstractValidator<CreateDependentCommand>
     {
-        public RegisterCommandValidator()
+        public CreateDependentCommandValidator()
         {
             RuleFor(x => x.Phone)
                 .Matches("\\+84\\d{9}").WithMessage("Số điện thoại không đúng định dạng");
