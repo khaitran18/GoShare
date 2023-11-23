@@ -171,7 +171,7 @@ namespace Application.Services
         {
             _logger.LogInformation("Notifying driver {driverName} about new trip request for tripId: {tripId}", driver.Name, trip.Id);
 
-            if (driver.DeviceToken != null)
+            if (!string.IsNullOrEmpty(driver.DeviceToken))
             {
                 await FirebaseUtilities.SendNotificationToDeviceAsync(driver.DeviceToken!,
                 "Yêu cầu chuyến mới",
@@ -227,7 +227,7 @@ namespace Application.Services
             _logger.LogInformation("Notifying passenger about driver for tripId: {tripId}.", trip.Id);
             var groupName = SignalRUtilities.GetGroupNameForUser(trip.Passenger, trip);
 
-            if (trip.Passenger.DeviceToken != null)
+            if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
             {
                 await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
                 "Đặt chuyến thành công",
@@ -238,9 +238,9 @@ namespace Application.Services
                 });
             }
 
-            if (trip.Passenger.GuardianId != null)
+            if (trip.Passenger.GuardianId != null && trip.Passenger.GuardianId == trip.BookerId)
             {
-                if (trip.Passenger.Guardian!.DeviceToken != null)
+                if (!string.IsNullOrEmpty(trip.Passenger.Guardian!.DeviceToken))
                 {
                     await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian.DeviceToken,
                     "Đặt chuyến thành công",
@@ -272,7 +272,7 @@ namespace Application.Services
 
             var groupName = SignalRUtilities.GetGroupNameForUser(trip.Passenger, trip);
 
-            if (trip.Passenger.DeviceToken != null)
+            if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
             {
                 await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
                 "Hết thời gian chờ",
@@ -283,9 +283,9 @@ namespace Application.Services
                 });
             }
 
-            if (trip.Passenger.GuardianId != null)
+            if (trip.Passenger.GuardianId != null && trip.Passenger.GuardianId == trip.BookerId)
             {
-                if (trip.Passenger.Guardian!.DeviceToken != null)
+                if (!string.IsNullOrEmpty(trip.Passenger.Guardian!.DeviceToken))
                 {
                     await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian.DeviceToken,
                     "Hết thời gian chờ",

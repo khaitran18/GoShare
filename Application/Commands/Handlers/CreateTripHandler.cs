@@ -119,21 +119,37 @@ namespace Application.Commands.Handlers
                 await _unitOfWork.LocationRepository.UpdateAsync(currentLocation);
             }
 
-            var pastOrigin = new Location
+            // Check if a past origin with the same coordinates already exists
+            var pastOrigin = await _unitOfWork.LocationRepository.GetByUserIdAndLatLongAndTypeAsync(userId, request.StartLatitude, request.StartLongitude, LocationType.PAST_ORIGIN);
+
+            if (pastOrigin == null)
             {
-                Id = Guid.NewGuid(),
-                UserId = userId,
-                Address = currentLocation.Address,
-                Latitude = currentLocation.Latitude,
-                Longtitude = currentLocation.Longtitude,
-                Type = LocationType.PAST_ORIGIN,
-                CreateTime = DateTimeUtilities.GetDateTimeVnNow(),
-                UpdatedTime = DateTimeUtilities.GetDateTimeVnNow()
-            };
+                // If not, create a new past origin location
+                pastOrigin = new Location
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = userId,
+                    Address = request.StartAddress,
+                    Latitude = request.StartLatitude,
+                    Longtitude = request.StartLongitude,
+                    Type = LocationType.PAST_ORIGIN,
+                    CreateTime = DateTimeUtilities.GetDateTimeVnNow(),
+                    UpdatedTime = DateTimeUtilities.GetDateTimeVnNow()
+                };
 
-            await _unitOfWork.LocationRepository.AddAsync(pastOrigin);
+                await _unitOfWork.LocationRepository.AddAsync(pastOrigin);
+            }
+            else
+            {
+                // If a past origin with the same coordinates exists, update its information
+                pastOrigin.Address = request.StartAddress;
+                pastOrigin.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
 
-            var destination = await _unitOfWork.LocationRepository.GetByUserIdAndLatLongAsync(userId, request.EndLatitude, request.EndLongitude);
+                await _unitOfWork.LocationRepository.UpdateAsync(pastOrigin);
+            }
+
+            // Same for destination
+            var destination = await _unitOfWork.LocationRepository.GetByUserIdAndLatLongAndTypeAsync(userId, request.EndLatitude, request.EndLongitude, LocationType.PAST_DESTINATION);
             if (destination == null)
             {
                 destination = new Location
@@ -149,6 +165,13 @@ namespace Application.Commands.Handlers
                 };
 
                 await _unitOfWork.LocationRepository.AddAsync(destination);
+            }
+            else
+            {
+                destination.Address = request.EndAddress;
+                destination.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
+
+                await _unitOfWork.LocationRepository.UpdateAsync(destination);
             }
 
             var distance = await GoogleMapsApiUtilities.ComputeDistanceMatrixAsync(pastOrigin, destination);

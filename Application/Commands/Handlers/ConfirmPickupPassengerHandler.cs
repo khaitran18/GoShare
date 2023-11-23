@@ -107,7 +107,7 @@ namespace Application.Commands.Handlers
 
         private async Task NotifyPassengerAboutDriverOnTheWay(Trip trip)
         {
-            if (trip.Passenger.DeviceToken != null)
+            if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
             {
                 await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
                 "Tài xế đã tới",
@@ -118,9 +118,9 @@ namespace Application.Commands.Handlers
                 });
             }
 
-            if (trip.Passenger.GuardianId != null)
+            if (trip.Passenger.GuardianId != null && trip.Passenger.GuardianId == trip.BookerId)
             {
-                if (trip.Passenger.Guardian!.DeviceToken != null)
+                if (!string.IsNullOrEmpty(trip.Passenger.Guardian!.DeviceToken))
                 {
                     await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian.DeviceToken,
                     "Tài xế đã tới",
