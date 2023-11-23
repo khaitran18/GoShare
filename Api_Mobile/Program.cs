@@ -206,8 +206,21 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.Get
 
 
 // Fluent Validation
+
 builder.Services.AddScoped<IValidator<TestQuery>, TestQueryValidator>();
 builder.Services.AddScoped<IValidator<CreateTripCommand>, CreateTripCommandValidator>();
+builder.Services.AddScoped<IValidator<AddCarCommand>, AddCarCommandValidator>();
+builder.Services.AddScoped<IValidator<AuthCommand>, AuthCommandValidator>();
+builder.Services.AddScoped<IValidator<CalculateFeesForTripCommand>, CalculateFeesForTripValidator>();
+builder.Services.AddScoped<IValidator<ConfirmPickupPassengerCommand>, ConfirmPickupPassengerValidator>();
+builder.Services.AddScoped<IValidator<CreatePlannedDestinationCommand>, CreatePlannedDestinationValidator>();
+builder.Services.AddScoped<IValidator<CreateTopUpRequestCommand>, CreateTopUpRequestValidator>();
+builder.Services.AddScoped<IValidator<CreateTripCommand>, CreateTripCommandValidator>();
+builder.Services.AddScoped<IValidator<CreateTripForDependentCommand>, CreateTripForDependentCommandValidator>();
+builder.Services.AddScoped<IValidator<DriverRegisterCommand>, DriverRegisterCommandValidator>();
+builder.Services.AddScoped<IValidator<DriverUpdateLocationCommand>, DriverUpdateLocationCommandValidator>();
+builder.Services.AddScoped<IValidator<EndTripCommand>, EndtripCommandValidator>();
+builder.Services.AddScoped<IValidator<RegisterCommand>, RegisterCommandValidator>();
 
 // Add AutoMapper
 var mapperConfig = new MapperConfiguration(cfg =>
