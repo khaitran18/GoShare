@@ -177,6 +177,8 @@ namespace Application.Commands.Handlers
                 systemWallet.Balance += systemCommission;
                 systemWallet.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
                 await _unitOfWork.WalletRepository.UpdateAsync(systemWallet);
+
+                //tripDto.SystemComission = systemCommission;
             }
 
             await _unitOfWork.Save();
@@ -233,17 +235,19 @@ namespace Application.Commands.Handlers
                         });
                 }
 
+                bool isSelfBooking = false;
+                bool isNotificationForGuardian;
+
                 if (trip.Passenger.GuardianId == trip.BookerId)
                 {
-                    bool isSelfBooking = false;
-                    bool isNotificationForGuardian = true;
+                    isNotificationForGuardian = true;
                     await _hubContext.Clients.Group(trip.Passenger.GuardianId.ToString())
                         .SendAsync("NotifyPassengerTripEnded", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
-
-                    isNotificationForGuardian = false;
-                    await _hubContext.Clients.Group(trip.PassengerId.ToString())
-                        .SendAsync("NotifyPassengerTripEnded", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
                 }
+
+                isNotificationForGuardian = false;
+                await _hubContext.Clients.Group(trip.PassengerId.ToString())
+                    .SendAsync("NotifyPassengerTripEnded", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
             }
             else
             {
