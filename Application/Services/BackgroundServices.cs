@@ -225,7 +225,7 @@ namespace Application.Services
         private async Task NotifyBackToPassenger(Trip trip, User driver)
         {
             _logger.LogInformation("Notifying passenger about driver for tripId: {tripId}.", trip.Id);
-            var groupName = SignalRUtilities.GetGroupNameForUser(trip.Passenger, trip);
+            //var groupName = SignalRUtilities.GetGroupNameForUser(trip.Passenger, trip);
 
             if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
             {
@@ -250,10 +250,23 @@ namespace Application.Services
                         { "tripId", trip.Id.ToString() }
                     });
                 }
-            }
 
-            await _hubContext.Clients.Group(groupName)
-                .SendAsync("NotifyPassengerDriverOnTheWay", _mapper.Map<UserDto>(driver));
+                bool isSelfBooking = false;
+                bool isNotificationForGuardian = true;
+                await _hubContext.Clients.Group(trip.Passenger.GuardianId.ToString())
+                    .SendAsync("NotifyPassengerDriverOnTheWay", _mapper.Map<UserDto>(driver), isSelfBooking, isNotificationForGuardian);
+
+                isNotificationForGuardian = false;
+                await _hubContext.Clients.Group(trip.PassengerId.ToString())
+                    .SendAsync("NotifyPassengerDriverOnTheWay", _mapper.Map<UserDto>(driver), isSelfBooking, isNotificationForGuardian);
+            }
+            else
+            {
+                bool isSelfBooking = true;
+                bool isNotificationForGuardian = false;
+                await _hubContext.Clients.Group(trip.PassengerId.ToString())
+                    .SendAsync("NotifyPassengerDriverOnTheWay", _mapper.Map<UserDto>(driver), isSelfBooking, isNotificationForGuardian);
+            }
         }
 
         private async Task HandleTimeoutScenario(Trip trip)
@@ -270,7 +283,7 @@ namespace Application.Services
 
             await _unitOfWork.Save();
 
-            var groupName = SignalRUtilities.GetGroupNameForUser(trip.Passenger, trip);
+            //var groupName = SignalRUtilities.GetGroupNameForUser(trip.Passenger, trip);
 
             if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
             {
@@ -295,10 +308,23 @@ namespace Application.Services
                         { "tripId", trip.Id.ToString() }
                     });
                 }
-            }
 
-            await _hubContext.Clients.Group(groupName)
-                .SendAsync("NotifyPassengerTripTimedOut", trip);
+                bool isSelfBooking = false;
+                bool isNotificationForGuardian = true;
+                await _hubContext.Clients.Group(trip.Passenger.GuardianId.ToString())
+                    .SendAsync("NotifyPassengerTripTimedOut", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
+
+                isNotificationForGuardian = false;
+                await _hubContext.Clients.Group(trip.PassengerId.ToString())
+                    .SendAsync("NotifyPassengerTripTimedOut", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
+            }
+            else
+            {
+                bool isSelfBooking = true;
+                bool isNotificationForGuardian = false;
+                await _hubContext.Clients.Group(trip.PassengerId.ToString())
+                    .SendAsync("NotifyPassengerTripTimedOut", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
+            }
         }
 
         public async Task ResetCancellationCountAndTime(Guid userId)

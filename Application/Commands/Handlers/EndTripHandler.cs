@@ -232,10 +232,26 @@ namespace Application.Commands.Handlers
                             { "tripId", trip.Id.ToString() }
                         });
                 }
-            }
 
-            await _hubContext.Clients.Group(SignalRUtilities.GetGroupNameForUser(trip.Passenger, trip))
-                    .SendAsync("NotifyPassengerTripEnded", _mapper.Map<TripDto>(trip));
+                if (trip.Passenger.GuardianId == trip.BookerId)
+                {
+                    bool isSelfBooking = false;
+                    bool isNotificationForGuardian = true;
+                    await _hubContext.Clients.Group(trip.Passenger.GuardianId.ToString())
+                        .SendAsync("NotifyPassengerTripEnded", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
+
+                    isNotificationForGuardian = false;
+                    await _hubContext.Clients.Group(trip.PassengerId.ToString())
+                        .SendAsync("NotifyPassengerTripEnded", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
+                }
+            }
+            else
+            {
+                bool isSelfBooking = true;
+                bool isNotificationForGuardian = false;
+                await _hubContext.Clients.Group(trip.PassengerId.ToString())
+                    .SendAsync("NotifyPassengerTripEnded", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
+            }
         }
     }
 }
