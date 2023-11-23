@@ -199,6 +199,7 @@ builder.Services.AddScoped<IRequestHandler<GetCurrentTripQuery, TripDto>, GetCur
 builder.Services.AddScoped<IRequestHandler<GetTripQuery, TripDto?>, GetTripQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<CreatePlannedDestinationCommand, LocationDto>, CreatePlannedDestinationHandler>();
 builder.Services.AddScoped<IRequestHandler<DriverUpdateLocationCommand, LocationDto>, DriverUpdateLocationHandler>();
+builder.Services.AddScoped<IRequestHandler<CreateDependentCommand, UserDto>, CreateDependentCommandHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
@@ -221,6 +222,7 @@ builder.Services.AddScoped<IValidator<DriverRegisterCommand>, DriverRegisterComm
 builder.Services.AddScoped<IValidator<DriverUpdateLocationCommand>, DriverUpdateLocationCommandValidator>();
 builder.Services.AddScoped<IValidator<EndTripCommand>, EndtripCommandValidator>();
 builder.Services.AddScoped<IValidator<RegisterCommand>, RegisterCommandValidator>();
+builder.Services.AddScoped<IValidator<CreateDependentCommand>, CreateDependentCommandValidator>();
 
 // Add AutoMapper
 var mapperConfig = new MapperConfiguration(cfg =>

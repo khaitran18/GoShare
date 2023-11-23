@@ -11,7 +11,6 @@ namespace Application.Services.Interfaces
     public interface ITwilioVerification
     {
         Task<VerificationResource> StartVerificationAsync(string phoneNumber, string channel);
-
         Task<bool> CheckVerificationAsync(string phoneNumber, string code);
         Task<DateTime> GenerateOtpExpiryTime();
     }
