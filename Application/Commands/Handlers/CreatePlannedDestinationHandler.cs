@@ -73,6 +73,14 @@ namespace Application.Commands.Handlers
                 plannedDestination.UserId = (Guid)request.UserId;
             }
 
+            // Check if a planned destination with the same coordinates already exists
+            var existingPlannedDestination = await _unitOfWork.LocationRepository.GetByUserIdAndLatLongAndTypeAsync(plannedDestination.UserId, request.Latitude, request.Longitude, LocationType.PLANNED_DESTINATION);
+
+            if (existingPlannedDestination != null)
+            {
+                throw new BadRequestException("A planned destination with the same coordinates already exists.");
+            }
+
             await _unitOfWork.LocationRepository.AddAsync(plannedDestination);
             await _unitOfWork.Save();
 

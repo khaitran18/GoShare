@@ -35,10 +35,8 @@ namespace Application.Common.Utilities.Google.Firebase
                 message.Data = data;
             }
 
-            string response = await FirebaseMessaging.DefaultInstance
+            return await FirebaseMessaging.DefaultInstance
                 .SendAsync(message, cancellationToken);
-
-            return response;
         }
 
         public static async Task<string> SendDataToDeviceAsync(string fcmToken,

@@ -29,9 +29,11 @@ namespace Domain.DataModels
         public PaymentMethod PaymentMethod { get; set; }
         public Guid BookerId { get; set; }
         public string? Note { get; set; }
+        public Guid? CanceledBy { get; set; }
 
         public virtual User? Driver { get; set; }
         public virtual User Booker { get; set; } = null!;
+        public virtual User? Canceler { get; set; }
         public virtual Location EndLocation { get; set; } = null!;
         public virtual User Passenger { get; set; } = null!;
         public virtual Location StartLocation { get; set; } = null!;

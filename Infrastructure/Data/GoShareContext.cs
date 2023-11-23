@@ -410,6 +410,8 @@ namespace Infrastructure.Data
 
                 entity.Property(e => e.BookerId).HasColumnName("booker_id");
 
+                entity.Property(e => e.CanceledBy).HasColumnName("canceled_by");
+
                 entity.Property(e => e.PickupTime)
                     .HasColumnType("timestamp without time zone")
                     .HasColumnName("pickup_time");
@@ -456,6 +458,12 @@ namespace Infrastructure.Data
                     .HasForeignKey(d => d.BookerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("fk_booker_trip");
+
+                entity.HasOne(d => d.Canceler)
+                    .WithMany(p => p.TripCancelers)
+                    .HasForeignKey(d => d.CanceledBy)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("fk_canceler_trip");
 
                 entity.HasOne(d => d.StartLocation)
                     .WithMany(p => p.TripStartLocations)

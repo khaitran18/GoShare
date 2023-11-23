@@ -177,6 +177,8 @@ namespace Application.Commands.Handlers
                 systemWallet.Balance += systemCommission;
                 systemWallet.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
                 await _unitOfWork.WalletRepository.UpdateAsync(systemWallet);
+
+                //tripDto.SystemComission = systemCommission;
             }
 
             await _unitOfWork.Save();
@@ -191,7 +193,7 @@ namespace Application.Commands.Handlers
 
         private async Task NotifyPassengerTripHasEnded(Trip trip)
         {
-            if (trip.Passenger.DeviceToken != null)
+            if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
             {
                 await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
                     "Hoàn thành chuyến",
@@ -204,20 +206,63 @@ namespace Application.Commands.Handlers
 
             if (trip.Passenger.GuardianId != null)
             {
-                if (trip.Passenger.Guardian!.DeviceToken != null)
+                if (!string.IsNullOrEmpty(trip.Passenger.Guardian!.DeviceToken))
                 {
+                    string message;
+                    if (trip.StartLocation.Address == null && trip.EndLocation.Address != null)
+                    {
+                        message = $"Người thân {trip.Passenger.Name} vừa hoàn thành một chuyến đi đến {trip.EndLocation.Address}.";
+                    }
+                    else if (trip.StartLocation.Address != null && trip.EndLocation.Address == null)
+                    {
+                        message = $"Người thân {trip.Passenger.Name} vừa hoàn thành một chuyến đi từ {trip.StartLocation.Address}.";
+                    }
+                    else if (trip.StartLocation.Address == null && trip.EndLocation.Address == null)
+                    {
+                        message = $"Người thân {trip.Passenger.Name} vừa hoàn thành một chuyến đi.";
+                    }
+                    else
+                    {
+                        message = $"Người thân {trip.Passenger.Name} vừa hoàn thành chuyến đi từ {trip.StartLocation.Address} đến {trip.EndLocation.Address}.";
+                    }
+
                     await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian.DeviceToken,
-                        "Hoàn thành chuyến",
-                        $"Chuyến đi của {trip.Passenger.Name} đã kết thúc. Người thân của bạn đã đến nơi an toàn.",
+                        "Một chuyến đi đã hoàn thành",
+                        message,
                         new Dictionary<string, string>
                         {
                             { "tripId", trip.Id.ToString() }
                         });
                 }
-            }
 
-            await _hubContext.Clients.Group(SignalRUtilities.GetGroupNameForUser(trip.Passenger, trip))
-                    .SendAsync("NotifyPassengerTripEnded", _mapper.Map<TripDto>(trip));
+                bool isSelfBooking = false;
+                bool isNotificationForGuardian;
+
+                if (trip.Passenger.GuardianId == trip.BookerId)
+                {
+                    isNotificationForGuardian = true;
+                    await _hubContext.Clients.Group(trip.Passenger.GuardianId.ToString())
+                        .SendAsync("NotifyPassengerTripEnded", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
+
+                    isNotificationForGuardian = false;
+                    await _hubContext.Clients.Group(trip.PassengerId.ToString())
+                        .SendAsync("NotifyPassengerTripEnded", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
+                }
+                else
+                {
+                    isSelfBooking = true;
+                    isNotificationForGuardian = false;
+                    await _hubContext.Clients.Group(trip.PassengerId.ToString())
+                        .SendAsync("NotifyPassengerTripEnded", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
+                }
+            }
+            else
+            {
+                bool isSelfBooking = true;
+                bool isNotificationForGuardian = false;
+                await _hubContext.Clients.Group(trip.PassengerId.ToString())
+                    .SendAsync("NotifyPassengerTripEnded", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
+            }
         }
     }
 }

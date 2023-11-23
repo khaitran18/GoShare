@@ -16,6 +16,7 @@ namespace Domain.DataModels
             TripDrivers = new HashSet<Trip>();
             TripPassengers = new HashSet<Trip>();
             TripBookers = new HashSet<Trip>();
+            TripCancelers = new HashSet<Trip>();
             Wallets = new HashSet<Wallet>();
             ChatReceiverNavigations = new HashSet<Chat>();
             ChatSenderNavigations = new HashSet<Chat>();
@@ -61,6 +62,7 @@ namespace Domain.DataModels
         public virtual ICollection<Trip> TripDrivers { get; set; }
         public virtual ICollection<Trip> TripPassengers { get; set; }
         public virtual ICollection<Trip> TripBookers { get; set; }
+        public virtual ICollection<Trip> TripCancelers { get; set; }
         public virtual ICollection<Wallet> Wallets { get; set; }
         public virtual ICollection<Chat> ChatReceiverNavigations { get; set; }
         public virtual ICollection<Chat> ChatSenderNavigations { get; set; }

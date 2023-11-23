@@ -96,7 +96,8 @@ namespace Application.Commands.Handlers
             {
                 if (now < guardian.CancellationBanUntil)
                 {
-                    throw new BadRequestException($"You have exceeded the maximum number of cancellations allowed within {cancellationWindowMinutes} minutes. Please wait until {guardian.CancellationBanUntil} before creating a new trip.");
+                    throw new BadRequestException($"You have exceeded the maximum number of cancellations allowed within {cancellationWindowMinutes} minutes. " +
+                        $"Please wait until {guardian.CancellationBanUntil} before creating a new trip.");
                 }
                 else
                 {
@@ -114,23 +115,43 @@ namespace Application.Commands.Handlers
                 throw new NotFoundException(nameof(Location), request.DependentId);
             }
 
-            var pastOrigin = new Location
+            // Check if a past origin with the same coordinates already exists
+            var dependentPastOrigin = await _unitOfWork.LocationRepository
+                .GetByUserIdAndLatLongAndTypeAsync(request.DependentId, currentLocation.Latitude, currentLocation.Longtitude, LocationType.PAST_ORIGIN);
+
+            if (dependentPastOrigin == null)
             {
-                Id = Guid.NewGuid(),
-                UserId = request.DependentId,
-                Address = currentLocation.Address,
-                Latitude = currentLocation.Latitude,
-                Longtitude = currentLocation.Longtitude,
-                Type = LocationType.PAST_ORIGIN,
-                CreateTime = DateTimeUtilities.GetDateTimeVnNow(),
-                UpdatedTime = DateTimeUtilities.GetDateTimeVnNow()
-            };
+                // If not, create a new past origin location
+                dependentPastOrigin = new Location
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = request.DependentId,
+                    Address = currentLocation.Address,
+                    Latitude = currentLocation.Latitude,
+                    Longtitude = currentLocation.Longtitude,
+                    Type = LocationType.PAST_ORIGIN,
+                    CreateTime = DateTimeUtilities.GetDateTimeVnNow(),
+                    UpdatedTime = DateTimeUtilities.GetDateTimeVnNow()
+                };
 
-            await _unitOfWork.LocationRepository.AddAsync(pastOrigin);
+                await _unitOfWork.LocationRepository.AddAsync(dependentPastOrigin);
+            }
+            else
+            {
+                // If a past origin with the same coordinates exists, update its information
+                dependentPastOrigin.Address = currentLocation.Address;
+                dependentPastOrigin.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
 
-            var destination = await _unitOfWork.LocationRepository.GetByUserIdAndLatLongAsync(request.DependentId, request.EndLatitude, request.EndLongitude);
+                await _unitOfWork.LocationRepository.UpdateAsync(dependentPastOrigin);
+            }
+
+            // Same for destination
+            var destination = await _unitOfWork.LocationRepository
+                .GetByUserIdAndLatLongAndTypeAsync(request.DependentId, request.EndLatitude, request.EndLongitude, LocationType.PAST_DESTINATION);
+
             if (destination == null)
             {
+                // If not, create a new destination location
                 destination = new Location
                 {
                     Id = Guid.NewGuid(),
@@ -145,8 +166,16 @@ namespace Application.Commands.Handlers
 
                 await _unitOfWork.LocationRepository.AddAsync(destination);
             }
+            else
+            {
+                // If a destination with the same coordinates exists, update its information
+                destination.Address = request.EndAddress;
+                destination.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
 
-            var distance = await GoogleMapsApiUtilities.ComputeDistanceMatrixAsync(pastOrigin, destination);
+                await _unitOfWork.LocationRepository.UpdateAsync(destination);
+            }
+
+            var distance = await GoogleMapsApiUtilities.ComputeDistanceMatrixAsync(dependentPastOrigin, destination);
 
             var totalPrice = await _unitOfWork.CartypeRepository.CalculatePriceForCarType(request.CartypeId, distance);
 
@@ -168,7 +197,7 @@ namespace Application.Commands.Handlers
             {
                 Id = Guid.NewGuid(),
                 PassengerId = request.DependentId,
-                StartLocationId = pastOrigin.Id,
+                StartLocationId = dependentPastOrigin.Id,
                 EndLocationId = destination.Id,
                 StartTime = DateTimeUtilities.GetDateTimeVnNow(),
                 CreateTime = DateTimeUtilities.GetDateTimeVnNow(),
@@ -203,7 +232,7 @@ namespace Application.Commands.Handlers
 
         private async Task NotifyDependentNewTripBooked(Trip trip)
         {
-            if (trip.Passenger.DeviceToken != null)
+            if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
             {
                 await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
                 "Đã tạo chuyến mới",
