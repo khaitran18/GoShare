@@ -20,8 +20,9 @@ namespace Api_Mobile.Controllers
         }
 
         [HttpPost("{dependentId}")]
-        public async Task<IActionResult> GetLocationOfDependent([FromBody] GetLocationOfDependentCommand command, [FromRoute] Guid dependentId)
+        public async Task<IActionResult> GetLocationOfDependent([FromRoute] Guid dependentId)
         {
+            var command = new GetLocationOfDependentCommand();
             command.DependentId = dependentId;
             var response = await _mediator.Send(command);
             return Ok(response);

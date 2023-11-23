@@ -101,6 +101,22 @@ namespace Application.Commands.Handlers
                     walletOwnerWallet.Balance -= trip.Price;
                     walletOwnerWallet.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
                     await _unitOfWork.WalletRepository.UpdateAsync(walletOwnerWallet);
+
+                    // New transaction for user's wallet
+                    var userTransaction = new Wallettransaction
+                    {
+                        Id = Guid.NewGuid(),
+                        WalletId = walletOwnerWallet.Id,
+                        TripId = trip.Id,
+                        Amount = -trip.Price, // Negative amount for wallet payment
+                        PaymentMethod = PaymentMethod.WALLET,
+                        Status = WalletTransactionStatus.SUCCESSFULL,
+                        Type = WalletTransactionType.PASSENGER_PAYMENT,
+                        CreateTime = DateTimeUtilities.GetDateTimeVnNow(),
+                        UpdatedTime = DateTimeUtilities.GetDateTimeVnNow()
+                    };
+
+                    await _unitOfWork.WallettransactionRepository.AddAsync(userTransaction);
                 }
 
                 await _unitOfWork.Save();

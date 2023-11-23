@@ -58,8 +58,9 @@ namespace Api_Mobile.Controllers
         }
 
         [HttpPost("cancel/{id}")]
-        public async Task<IActionResult> CancelTrip([FromBody] CancelTripCommand command, [FromRoute] Guid id)
+        public async Task<IActionResult> CancelTrip([FromRoute] Guid id)
         {
+            var command = new CancelTripCommand();
             command.TripId = id;
             var response = await _mediator.Send(command);
             return Ok(response);

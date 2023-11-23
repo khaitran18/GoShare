@@ -49,12 +49,15 @@ namespace Infrastructure.Repositories
                     break;
                 }
 
-                double policyDistance = policy.MaxDistance.HasValue 
-                    ? Math.Min(remainingDistance, policy.MaxDistance.Value - policy.MinDistance) 
+                double policyDistance = policy.MaxDistance.HasValue
+                    ? Math.Min(remainingDistance, policy.MaxDistance.Value - policy.MinDistance)
                     : remainingDistance;
                 totalPrice += policyDistance * policy.PricePerKm;
                 remainingDistance -= policyDistance;
             }
+
+            // Round up to the nearest thousand
+            totalPrice = Math.Ceiling(totalPrice / 1000) * 1000;
 
             return totalPrice;
         }

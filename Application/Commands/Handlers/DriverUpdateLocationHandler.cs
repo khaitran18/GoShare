@@ -46,14 +46,29 @@ namespace Application.Commands.Handlers
             var location = await _unitOfWork.LocationRepository.GetByUserIdAndTypeAsync(userId, LocationType.CURRENT_LOCATION);
             if (location == null)
             {
-                throw new NotFoundException(nameof(Location), userId);
+                // Create a new location if no location is found
+                location = new Location
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = userId,
+                    Type = LocationType.CURRENT_LOCATION,
+                    Latitude = request.Latitude,
+                    Longtitude = request.Longitude,
+                    CreateTime = DateTimeUtilities.GetDateTimeVnNow(),
+                    UpdatedTime = DateTimeUtilities.GetDateTimeVnNow()
+                };
+
+                await _unitOfWork.LocationRepository.AddAsync(location);
+            }
+            else
+            {
+                location.Latitude = request.Latitude;
+                location.Longtitude = request.Longitude;
+                location.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
+
+                await _unitOfWork.LocationRepository.UpdateAsync(location);
             }
 
-            location.Latitude = request.Latitude;
-            location.Longtitude = request.Longitude;
-            location.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
-
-            await _unitOfWork.LocationRepository.UpdateAsync(location);
             await _unitOfWork.Save();
 
             locationDto = _mapper.Map<LocationDto>(location);

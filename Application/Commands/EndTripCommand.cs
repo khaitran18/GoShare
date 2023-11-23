@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Application.Commands
 {
-    public class EndTripCommand : IRequest<TripDto>
+    public class EndTripCommand : IRequest<TripEndDto>
     {
         public Guid TripId { get; set; }
         public decimal DriverLatitude { get; set; }

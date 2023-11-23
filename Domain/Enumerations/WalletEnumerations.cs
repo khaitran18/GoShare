@@ -31,12 +31,9 @@ namespace Domain.Enumerations
         TOPUP = 0,
         DRIVER_WAGE = 1,
         SYSTEM_COMMISSION = 2,
-        //CANCEL_FEE = 4,
-        //BOOKING_PAID = 5,
-        //BOOKING_REFUND = 9,
-        //CANCEL_REFUND = 6,
-        //TRIP_PICK = 7,
-        //TRIP_PICK_REFUND = 8
+        PASSENGER_PAYMENT = 3,
+        DRIVER_DEPOSIT = 4,
+        PASSENGER_REFUND = 5,
     }
     public enum TopupMethod : short
     {

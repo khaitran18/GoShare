@@ -180,7 +180,7 @@ builder.Services.AddScoped<IRequestHandler<UpdateProfilePictureCommand, string>,
 builder.Services.AddScoped<IRequestHandler<ConfirmPassengerCommand, TripDto>, ConfirmPassengerHandler>();
 builder.Services.AddScoped<IRequestHandler<UpdateFcmTokenCommand, UserDto>, UpdateFcmTokenHandler>();
 builder.Services.AddScoped<IRequestHandler<ConfirmPickupPassengerCommand, TripDto>, ConfirmPickupPassengerHandler>();
-builder.Services.AddScoped<IRequestHandler<EndTripCommand, TripDto>, EndTripHandler>();
+builder.Services.AddScoped<IRequestHandler<EndTripCommand, TripEndDto>, EndTripHandler>();
 builder.Services.AddScoped<IRequestHandler<CalculateFeesForTripCommand, List<CartypeFeeDto>>, CalculateFeesForTripHandler>();
 builder.Services.AddScoped<IRequestHandler<GetDependentsQuery, PaginatedResult<UserDto>>, GetDependentsHandler>();
 builder.Services.AddScoped<IRequestHandler<DriverRegisterCommand, bool>, DriverRegisterCommandHandler>();
