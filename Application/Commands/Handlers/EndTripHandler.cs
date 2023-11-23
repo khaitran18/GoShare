@@ -243,11 +243,18 @@ namespace Application.Commands.Handlers
                     isNotificationForGuardian = true;
                     await _hubContext.Clients.Group(trip.Passenger.GuardianId.ToString())
                         .SendAsync("NotifyPassengerTripEnded", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
-                }
 
-                isNotificationForGuardian = false;
-                await _hubContext.Clients.Group(trip.PassengerId.ToString())
-                    .SendAsync("NotifyPassengerTripEnded", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
+                    isNotificationForGuardian = false;
+                    await _hubContext.Clients.Group(trip.PassengerId.ToString())
+                        .SendAsync("NotifyPassengerTripEnded", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
+                }
+                else
+                {
+                    isSelfBooking = true;
+                    isNotificationForGuardian = false;
+                    await _hubContext.Clients.Group(trip.PassengerId.ToString())
+                        .SendAsync("NotifyPassengerTripEnded", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
+                }
             }
             else
             {
