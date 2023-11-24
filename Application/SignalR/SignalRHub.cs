@@ -17,13 +17,11 @@ namespace Application.SignalR
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ITokenService _tokenService;
-        private readonly ILogger _logger;
 
-        public SignalRHub(IUnitOfWork unitOfWork, ITokenService tokenService, ILogger logger)
+        public SignalRHub(IUnitOfWork unitOfWork, ITokenService tokenService)
         {
             _unitOfWork = unitOfWork;
             _tokenService = tokenService;
-            _logger = logger;
         }
 
         public async Task JoinGroup(string groupName)
@@ -118,7 +116,6 @@ namespace Application.SignalR
 
             if (trip == null)
             {
-                _logger.LogWarning("Trip not found.");
                 return;
             }
 
