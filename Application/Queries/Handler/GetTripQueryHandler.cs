@@ -47,6 +47,7 @@ namespace Application.Queries.Handler
             }
             else throw new NotFoundException("Trip is not found");
             response = _mapper.Map<TripDto>(t);
+            if (response.Driver is not null) response.Driver!.Car = _mapper.Map<CarDto>(_unitOfWork.CarRepository.GetByUserId((Guid)t.DriverId!));
             return response;
         }
     }
