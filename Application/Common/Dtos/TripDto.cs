@@ -54,7 +54,7 @@ namespace Application.Common.Dtos
         public PaymentMethod PaymentMethod { get; set; }
         public Guid BookerId { get; set; }
         public string? Note { get; set; }
-        public double? SystemComission { get; set; }
+        public double? SystemCommission { get; set; }
 
         public UserDto? Driver { get; set; }
         public UserDto? Passenger { get; set; }

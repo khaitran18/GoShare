@@ -197,7 +197,7 @@ namespace Application.Commands.Handlers
             await _unitOfWork.Save();
 
             tripDto = _mapper.Map<TripEndDto>(trip);
-            tripDto.SystemComission = systemCommission;
+            tripDto.SystemCommission = systemCommission;
 
             // Notify passenger using FCM and SignalR
             await NotifyPassengerTripHasEnded(trip);
