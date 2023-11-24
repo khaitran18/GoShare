@@ -17,7 +17,7 @@ namespace Application.Services
             int numOfDriverLicense = 1;
             int numOfVehicleRegistration = 1;
             int numOfRegistrationCertificate = 1;
-            int numOfCarPicture = 3;
+            int numOfCarPicture = 1;
             foreach (string type in Enum.GetNames(typeof(DocumentTypeEnumerations)))
             {
                 int dem = 0;
