@@ -24,5 +24,10 @@ namespace Infrastructure.Repositories
             if (w is null) throw new NotFoundException("Transaction does not exist");
             return w;
         }
+
+        public List<Wallettransaction> GetListByWalletId(Guid id)
+        {
+            return _context.Wallettransactions.Where(t => t.WalletId.CompareTo(id) == 0).ToList();
+        }
     }
 }

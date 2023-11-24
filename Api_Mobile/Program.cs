@@ -201,6 +201,7 @@ builder.Services.AddScoped<IRequestHandler<CreatePlannedDestinationCommand, Loca
 builder.Services.AddScoped<IRequestHandler<DriverUpdateLocationCommand, LocationDto>, DriverUpdateLocationHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateDependentCommand, UserDto>, CreateDependentCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<GetWalletBalanceQuery, double>, GetWalletBalanceQueryHandler>();
+builder.Services.AddScoped<IRequestHandler<GetUserTransactionQuery, List<WalletTransactionDto>>, GetUserTransactionQueryHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));

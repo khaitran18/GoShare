@@ -17,5 +17,6 @@ namespace Domain.Interfaces
         Task<(List<User>, int)> GetDependents(Guid guardianId, string? sortBy, int page, int pageSize);
         Task<List<User>> GetDependentsByGuardianId(Guid userId);
         Task<bool> IsDependent(Guid UserId);
+        Task<bool> IsBanned(Guid userId, out string? reason);
     }
 }

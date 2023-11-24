@@ -119,6 +119,12 @@ namespace Infrastructure.Repositories
             return Task.FromResult(_context.Users.FirstOrDefault(u => u.Id.Equals(new Guid(userId)))!.RefreshTokenExpiryTime);
         }
 
+        public Task<bool> IsBanned(Guid userId, out string? reason)
+        {
+            reason = _context.Users.FirstOrDefault(u => u.Id.CompareTo(userId) == 0)?.DisabledReason;
+            return Task.FromResult(reason is null ? false : true);
+        }
+
         public Task<bool> IsDependent(Guid UserId)
         {
             User? u = _context.Users.FirstOrDefault(u => u.Id.CompareTo(UserId) == 0);
