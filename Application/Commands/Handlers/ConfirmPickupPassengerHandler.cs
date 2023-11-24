@@ -107,29 +107,29 @@ namespace Application.Commands.Handlers
 
         private async Task NotifyPassengerAboutDriverOnTheWay(Trip trip)
         {
-            if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
-            {
-                await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
-                "Tài xế đã tới",
-                $"Tài xế {trip.Driver!.Name} đã đến địa điểm đón của bạn",
-                new Dictionary<string, string>
-                {
-                    { "tripId", trip.Id.ToString() }
-                });
-            }
+            //if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
+            //{
+            //    await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
+            //    "Tài xế đã tới",
+            //    $"Tài xế {trip.Driver!.Name} đã đến địa điểm đón của bạn",
+            //    new Dictionary<string, string>
+            //    {
+            //        { "tripId", trip.Id.ToString() }
+            //    });
+            //}
 
             if (trip.Passenger.GuardianId != null && trip.Passenger.GuardianId == trip.BookerId)
             {
-                if (!string.IsNullOrEmpty(trip.Passenger.Guardian!.DeviceToken))
-                {
-                    await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian.DeviceToken,
-                    "Tài xế đã tới",
-                    $"Tài xế {trip.Driver!.Name} đã đến địa điểm đón người thân của bạn",
-                    new Dictionary<string, string>
-                    {
-                        { "tripId", trip.Id.ToString() }
-                    });
-                }
+                //if (!string.IsNullOrEmpty(trip.Passenger.Guardian!.DeviceToken))
+                //{
+                //    await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian.DeviceToken,
+                //    "Tài xế đã tới",
+                //    $"Tài xế {trip.Driver!.Name} đã đến địa điểm đón người thân của bạn",
+                //    new Dictionary<string, string>
+                //    {
+                //        { "tripId", trip.Id.ToString() }
+                //    });
+                //}
 
                 bool isSelfBooking = false;
                 bool isNotificationForGuardian = true;
