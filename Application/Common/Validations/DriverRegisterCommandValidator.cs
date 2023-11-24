@@ -12,6 +12,8 @@ namespace Application.Common.Validations
     {
         public DriverRegisterCommandValidator()
         {
+            RuleFor(x => x.Phone)
+                .Matches("\\+84\\d{9}").WithMessage("Số điện thoại không đúng định dạng");
             RuleFor(x => x.Car.LicensePlate)
                 .MaximumLength(9).WithMessage("Biển số xe phải có nhiều nhất 9 ký tự")
                 .MinimumLength(8).WithMessage("Biển số xe phải có ít nhất 8 ký tự");

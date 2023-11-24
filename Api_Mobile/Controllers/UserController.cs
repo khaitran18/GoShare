@@ -34,12 +34,6 @@ namespace Api_Mobile.Controllers
             return Ok(response);
         }
 
-        [HttpPost("driver-register")]
-        public async Task<IActionResult> DriverRegister([FromForm] DriverRegisterCommand command)
-        {
-            var response = await _mediator.Send(command);
-            return Ok(response);
-        }
 
         [HttpGet("dependents")]
         public async Task<IActionResult> GetDependents([FromQuery] GetDependentsQuery query)
