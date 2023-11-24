@@ -21,8 +21,10 @@ namespace Api_Mobile.Middlewares
             if (_userClaims.id is not null)
             {
                 Guid UserId = (Guid)_userClaims.id;
-                if (!await _unitOfWork.UserRepository.IsVerified(UserId)) 
+                if (!await _unitOfWork.UserRepository.IsVerified(UserId))
                     throw new ForbiddenAccessException("User is not verified");
+                if (await _unitOfWork.UserRepository.IsBanned(UserId, out string? reason))
+                    throw new ForbiddenAccessException("User is banned: " + reason);
                 if (_userClaims.Role.Equals(UserRoleEnumerations.Driver))
                 {
                     if (!await _unitOfWork.CarRepository.IsValidByDate(UserId))
