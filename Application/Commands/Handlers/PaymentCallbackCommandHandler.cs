@@ -31,7 +31,7 @@ namespace Application.Commands.Handlers
         public async Task<bool> Handle(PaymentCallbackCommand request, CancellationToken cancellationToken)
         {
             var callbackResponse = _paymentService.PaymentExecute(request.collection);
-            Wallettransaction transaction = _unitOfWork.WallettransactionRepository.GetByIdAsync(new Guid(callbackResponse.vnp_TxnRef));
+            Wallettransaction transaction = await _unitOfWork.WallettransactionRepository.GetByIdAsync(new Guid(callbackResponse.vnp_TxnRef));
             if (!transaction.Status.Equals(WalletTransactionStatus.PENDING)) throw new BadRequestException("Transaction is closed");
             else
             {

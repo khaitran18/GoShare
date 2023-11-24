@@ -1,10 +1,12 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Exceptions;
 using Application.Common.Utilities;
+using Application.Services;
 using Application.Services.Interfaces;
 using Domain.DataModels;
 using Domain.Enumerations;
 using Domain.Interfaces;
+using Hangfire;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -54,6 +56,7 @@ namespace Application.Commands.Handlers
             }
 
             await _unitOfWork.Save();
+            BackgroundJob.Schedule<BackgroundServices>(s => s.CheckTransactionStatus(transaction.Id),DateTimeUtilities.GetDateTimeVnNow().AddMinutes(15));
             return response;
         }
     }

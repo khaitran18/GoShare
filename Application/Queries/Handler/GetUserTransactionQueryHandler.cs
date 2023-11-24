@@ -29,7 +29,7 @@ namespace Application.Queries.Handler
             var response = new List<WalletTransactionDto>();
             Wallet? w = _unitOfWork.WalletRepository.GetByUserIdAsync((Guid)_claims.id!).Result;
             if (w is null) throw new DirectoryNotFoundException("User wallet is not found! Please contact our support");
-            List<Wallettransaction> transactions = _unitOfWork.WallettransactionRepository.GetListByWalletId(w.Id);
+            List<Wallettransaction> transactions = _unitOfWork.WallettransactionRepository.GetListByWalletId(w.Id).Result;
             return Task.FromResult(_mapper.Map<List<WalletTransactionDto>>(transactions));
         }
     }

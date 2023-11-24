@@ -9,7 +9,7 @@ namespace Domain.Interfaces
 {
     public interface IWallettransactionRepository : IBaseRepository<Wallettransaction>
     {
-        Wallettransaction GetByIdAsync(Guid id);
-        List<Wallettransaction> GetListByWalletId(Guid id);
+        Task<Wallettransaction> GetByIdAsync(Guid id);
+        Task<List<Wallettransaction>> GetListByWalletId(Guid id);
     }
 }

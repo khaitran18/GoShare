@@ -343,5 +343,23 @@ namespace Application.Services
                 _logger.LogWarning("User not found or user is currently banned for userId: {userId}. Skipping reset of cancellation count and time.", userId);
             }
         }
+
+        public async Task CheckTransactionStatus(Guid TransactionId)
+        {
+            _logger.LogInformation("Checking transaction status: {TransactionId}", TransactionId);
+            var transaction = await _unitOfWork.WallettransactionRepository.GetByIdAsync(TransactionId);
+            if (transaction is not null)
+            {
+                if (transaction.Status.Equals(WalletTransactionStatus.PENDING))
+                {
+                    transaction.Status = WalletTransactionStatus.FAILED;
+                    transaction.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
+                    await _unitOfWork.Save();
+                    _logger.LogWarning("Transaction: {TransactionId} Failed due to timeout", transaction.Id);
+                }
+                else _logger.LogInformation("Transaction: {TransactionId} is completed", TransactionId);
+            }
+            else _logger.LogWarning("Transaction: {TransactionId} is not found", TransactionId);
+        }
     }
 }

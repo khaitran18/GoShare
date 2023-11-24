@@ -18,16 +18,16 @@ namespace Infrastructure.Repositories
             _context = context;
         }
 
-        public Wallettransaction GetByIdAsync(Guid id)
+        public Task<Wallettransaction> GetByIdAsync(Guid id)
         {
             Wallettransaction? w = _context.Wallettransactions.FirstOrDefault(w => w.Id.CompareTo(id) == 0);
             if (w is null) throw new NotFoundException("Transaction does not exist");
-            return w;
+            return Task.FromResult(w);
         }
 
-        public List<Wallettransaction> GetListByWalletId(Guid id)
+        public Task<List<Wallettransaction>> GetListByWalletId(Guid id)
         {
-            return _context.Wallettransactions.Where(t => t.WalletId.CompareTo(id) == 0).ToList();
+            return Task.FromResult(_context.Wallettransactions.Where(t => t.WalletId.CompareTo(id) == 0).ToList());
         }
     }
 }
