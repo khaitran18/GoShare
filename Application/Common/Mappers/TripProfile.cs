@@ -14,6 +14,7 @@ namespace Application.Common.Mappers
         public TripProfile()
         {
             CreateMap<TripDto, Trip>().ReverseMap();
+            CreateMap<TripEndDto, Trip>().ReverseMap();
         }
     }
 }
