@@ -1,10 +1,13 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Utilities;
+using Application.Common.Utilities.SignalR;
 using Application.Services.Interfaces;
 using Domain.DataModels;
+using Domain.Enumerations;
 using Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 
 namespace Application.SignalR
@@ -14,11 +17,13 @@ namespace Application.SignalR
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ITokenService _tokenService;
+        private readonly ILogger _logger;
 
-        public SignalRHub(IUnitOfWork unitOfWork, ITokenService tokenService)
+        public SignalRHub(IUnitOfWork unitOfWork, ITokenService tokenService, ILogger logger)
         {
             _unitOfWork = unitOfWork;
             _tokenService = tokenService;
+            _logger = logger;
         }
 
         public async Task JoinGroup(string groupName)
@@ -107,9 +112,33 @@ namespace Application.SignalR
             return Task.CompletedTask;
         }
 
-        public async Task TestInvoke(string message)
+        public async Task SendDriverLocation(string driverLocation, string tripId)
         {
-            await Clients.All.SendAsync("ReceiveTestMessage", message);
+            var trip = await _unitOfWork.TripRepository.GetByIdAsync(Guid.Parse(tripId));
+
+            if (trip == null)
+            {
+                _logger.LogWarning("Trip not found.");
+                return;
+            }
+
+            var groupName = SignalRUtilities.GetGroupNameForUser(trip.Passenger, trip);
+
+            // Check the trip status
+            if (trip.Status == TripStatus.GOING)
+            {
+                // Only update driver location for guardian
+                if (trip.Passenger.GuardianId != null && trip.Passenger.GuardianId == trip.BookerId)
+                {
+                    await Clients.Group(trip.Passenger.GuardianId.ToString())
+                        .SendAsync("UpdateDriverLocation", driverLocation);
+                }
+            }
+            else if (trip.Status == TripStatus.GOING_TO_PICKUP)
+            {
+                await Clients.Group(groupName)
+                        .SendAsync("UpdateDriverLocation", driverLocation);
+            }
         }
     }
 }

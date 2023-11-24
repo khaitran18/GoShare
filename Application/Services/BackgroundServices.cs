@@ -255,7 +255,7 @@ namespace Application.Services
                 bool isNotificationForGuardian = true;
                 await _hubContext.Clients.Group(trip.Passenger.GuardianId.ToString())
                     .SendAsync("NotifyPassengerDriverOnTheWay", _mapper.Map<UserDto>(driver), isSelfBooking, isNotificationForGuardian);
-
+                
                 isNotificationForGuardian = false;
                 await _hubContext.Clients.Group(trip.PassengerId.ToString())
                     .SendAsync("NotifyPassengerDriverOnTheWay", _mapper.Map<UserDto>(driver), isSelfBooking, isNotificationForGuardian);
