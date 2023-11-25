@@ -180,55 +180,55 @@ namespace Application.Commands.Handlers
             if (trip.Passenger.GuardianId != null && trip.Passenger.GuardianId == trip.BookerId)
             {
                 // Canceled by dependent
-                if (trip.CanceledBy == trip.PassengerId)
-                {
-                    if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
-                    {
-                        await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
-                        "Chuyến đã bị hủy",
-                        $"Bạn đã hủy chuyến thành công",
-                        new Dictionary<string, string>
-                        {
-                        { "tripId", trip.Id.ToString() }
-                        });
-                    }
+                //if (trip.CanceledBy == trip.PassengerId)
+                //{
+                //    if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
+                //    {
+                //        await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
+                //        "Chuyến đã bị hủy",
+                //        $"Bạn đã hủy chuyến thành công",
+                //        new Dictionary<string, string>
+                //        {
+                //        { "tripId", trip.Id.ToString() }
+                //        });
+                //    }
 
-                    if (!string.IsNullOrEmpty(trip.Passenger.Guardian!.DeviceToken))
-                    {
-                        await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian.DeviceToken,
-                        "Chuyến đã bị hủy",
-                        $"Người thân {trip.Passenger.Name} đã hủy chuyến",
-                        new Dictionary<string, string>
-                        {
-                            { "tripId", trip.Id.ToString() }
-                        });
-                    }
-                }
+                //    if (!string.IsNullOrEmpty(trip.Passenger.Guardian!.DeviceToken))
+                //    {
+                //        await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian.DeviceToken,
+                //        "Chuyến đã bị hủy",
+                //        $"Người thân {trip.Passenger.Name} đã hủy chuyến",
+                //        new Dictionary<string, string>
+                //        {
+                //            { "tripId", trip.Id.ToString() }
+                //        });
+                //    }
+                //}
                 // Canceled by booker/guardian
-                else if (trip.CanceledBy == trip.BookerId)
-                {
-                    if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
-                    {
-                        await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
-                        "Chuyến đã bị hủy",
-                        $"Người thân {trip.Passenger.Guardian!.Name} của bạn đã hủy chuyến",
-                        new Dictionary<string, string>
-                        {
-                            { "tripId", trip.Id.ToString() }
-                        });
-                    }
+                //else if (trip.CanceledBy == trip.BookerId)
+                //{
+                //    if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
+                //    {
+                //        await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
+                //        "Chuyến đã bị hủy",
+                //        $"Người thân {trip.Passenger.Guardian!.Name} của bạn đã hủy chuyến",
+                //        new Dictionary<string, string>
+                //        {
+                //            { "tripId", trip.Id.ToString() }
+                //        });
+                //    }
 
-                    if (!string.IsNullOrEmpty(trip.Passenger.Guardian!.DeviceToken))
-                    {
-                        await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian.DeviceToken,
-                        "Chuyến đã bị hủy",
-                        $"Bạn đã hủy chuyến thành công",
-                        new Dictionary<string, string>
-                        {
-                            { "tripId", trip.Id.ToString() }
-                        });
-                    }
-                }
+                //    if (!string.IsNullOrEmpty(trip.Passenger.Guardian!.DeviceToken))
+                //    {
+                //        await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian.DeviceToken,
+                //        "Chuyến đã bị hủy",
+                //        $"Bạn đã hủy chuyến thành công",
+                //        new Dictionary<string, string>
+                //        {
+                //            { "tripId", trip.Id.ToString() }
+                //        });
+                //    }
+                //}
 
                 bool isSelfBooking = false;
                 bool isNotificationForGuardian = true;
@@ -241,16 +241,16 @@ namespace Application.Commands.Handlers
             }
             else
             {
-                if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
-                {
-                    await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
-                    "Chuyến đã bị hủy",
-                    $"Bạn đã hủy chuyến thành công",
-                    new Dictionary<string, string>
-                    {
-                        { "tripId", trip.Id.ToString() }
-                    });
-                }
+                //if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
+                //{
+                //    await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
+                //    "Chuyến đã bị hủy",
+                //    $"Bạn đã hủy chuyến thành công",
+                //    new Dictionary<string, string>
+                //    {
+                //        { "tripId", trip.Id.ToString() }
+                //    });
+                //}
 
                 bool isSelfBooking = true;
                 bool isNotificationForGuardian = false;

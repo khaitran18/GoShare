@@ -10,6 +10,6 @@ namespace Application.Queries
 {
     public class GetTripHistoryQuery : IRequest<List<TripDto>>
     {
-
+        public string? SortBy { get; set; }
     }
 }

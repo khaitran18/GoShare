@@ -73,5 +73,12 @@ namespace Api_Mobile.Controllers
             var response = await _mediator.Send(command);
             return Ok(response);
         }
+
+        [HttpGet("history")]
+        public async Task<IActionResult> GetTripHistory([FromQuery] GetTripHistoryQuery query)
+        {
+            var response = await _mediator.Send(query);
+            return Ok(response);
+        }
     }
 }
