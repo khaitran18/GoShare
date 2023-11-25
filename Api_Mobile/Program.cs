@@ -242,6 +242,7 @@ var mapperConfig = new MapperConfiguration(cfg =>
     cfg.AddProfile<CartypeProfile>();
     cfg.AddProfile<DriverdocumentProfile>();
     cfg.AddProfile<WallettransactionProfile>();
+    cfg.AddProfile<RatingProfile>();
 });
 var mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
