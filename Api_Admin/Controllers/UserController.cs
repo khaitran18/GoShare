@@ -35,5 +35,12 @@ namespace Api_Admin.Controllers
             var response = await _mediator.Send(command);
             return Ok(response);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetListUser([FromQuery] GetUsersQuery query)
+        {
+            var response = await _mediator.Send(query);
+            return Ok(response);
+        }
     }
 }
