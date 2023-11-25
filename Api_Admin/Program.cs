@@ -25,9 +25,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 //Add middleware instances
-builder.Services.AddTransient<LoggingMiddleware>();
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();
+builder.Services.AddTransient<LoggingMiddleware>();
+builder.Services.AddTransient<GetUserClaimsMiddleware>();
 
+builder.Services.AddScoped<UserClaims>();
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -71,7 +73,7 @@ builder.Services.AddSingleton<ITokenService>(new TokenService(_key, _expirtyMinu
 // Add dependency injection
 builder.Services.AddDbContext<GoShareContext>(options => options.UseNpgsql(GoShareConfiguration.ConnectionString("GoShareAzure")));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
+builder.Services.AddSingleton<IUserService, UserService>();
 
 //Add Admin Account
 builder.Services.AddSingleton<Admin>(GoShareConfiguration.admin);
@@ -84,6 +86,7 @@ builder.Services.AddScoped<IRequestHandler<AdminAuthCommand, AuthResponse>, Admi
 builder.Services.AddScoped<IRequestHandler<RefreshTokenCommand, AuthResponse>, RefreshTokenCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<GetDriverDocumentQuery, List<DriverDocumentDto>>, GetDriverDocumentQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<GetAppfeedbacksQuery, PaginatedResult<AppfeedbackDto>>, GetAppfeedbacksHandler>();
+builder.Services.AddScoped<IRequestHandler<GetUsersQuery, PaginatedResult<AdminUserResponse>>, GetUsersQueryHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
 
@@ -136,6 +139,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseMiddleware<LoggingMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<GetUserClaimsMiddleware>();
+
 
 app.UseHttpsRedirection();
 

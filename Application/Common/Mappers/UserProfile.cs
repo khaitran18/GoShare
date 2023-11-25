@@ -14,6 +14,10 @@ namespace Application.Common.Mappers
         public UserProfile()
         {
             CreateMap<UserDto, User>().ReverseMap();
+
+            CreateMap<User, AdminUserResponse>()
+                .ForMember(des=>des.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+                .ReverseMap();
         }
     }
 }

@@ -119,6 +119,64 @@ namespace Infrastructure.Repositories
             return Task.FromResult(_context.Users.FirstOrDefault(u => u.Id.Equals(new Guid(userId)))!.RefreshTokenExpiryTime);
         }
 
+        public async Task<(List<User>, int)> GetUsersAsync(int page, int pageSize, string? sortBy)
+        {
+            IQueryable<User> query = _context.Users.Include(u=>u.Guardian);
+
+            // Sort by
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                switch (sortBy.ToLower())
+                {
+                    case "name":
+                        query = query.OrderBy(u => u.Name);
+                        break;
+                    case "name_desc":
+                        query = query.OrderByDescending(u => u.Name);
+                        break;
+                    case "create_asc":
+                        query = query.OrderBy(u => u.CreateTime);
+                        break;
+                    case "create":
+                        query = query.OrderByDescending(u => u.CreateTime);
+                        break;
+                    case "update":
+                        query = query.OrderByDescending(u => u.UpdatedTime);
+                        break;
+                    case "update_asc":
+                        query = query.OrderBy(u => u.UpdatedTime);
+                        break;
+                    case "verify":
+                        query = query.OrderBy(u => u.Isverify);
+                        break;
+                    case "verify_desc":
+                        query= query.OrderByDescending(u => u.Isverify);
+                        break;
+                    case "disabled":
+                        query = query.OrderBy(u => u.Status.Equals(UserStatus.BANNED));
+                        break;
+                    case "dependent":
+                        query = query.OrderByDescending(u => !u.GuardianId.Equals(null));
+                        break;
+                    case "guardian":
+                        query = query.OrderBy(u => !u.GuardianId.Equals(null));
+                        break;
+                    default:
+                        query = query.OrderByDescending(u => u.CreateTime);
+                        break;
+                }
+            }
+
+            var totalCount = await query.CountAsync();
+
+            // Pagination
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+            var dependents = await query.ToListAsync();
+
+            return (dependents, totalCount);
+        }
+
         public Task<bool> IsBanned(Guid userId, out string? reason)
         {
             reason = _context.Users.FirstOrDefault(u => u.Id.CompareTo(userId) == 0)?.DisabledReason;

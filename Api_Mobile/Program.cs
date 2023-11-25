@@ -105,17 +105,16 @@ builder.Services.AddAuthentication(x =>
 
 builder.Services.AddSingleton<ITokenService>(new TokenService(_key, _expirtyMinutes, _refreshTokenExpirtyMinutes, _issuer, _audience));
 builder.Services.AddSingleton<IDriverDocumentService, DriverDocumentService>();
-builder.Services.AddSingleton<IUserService, UserService>();
+
 
 //Add VnPayService
 builder.Services.AddSingleton<IPaymentService>(new PaymentService(GoShareConfiguration.VnpayConfig));
-
 
 // Add dependency injection
 builder.Services.AddDbContext<GoShareContext>(options => options.UseNpgsql(GoShareConfiguration.ConnectionString("GoShareAzure")));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddSingleton<ISettingService, SettingService>();
-
+builder.Services.AddSingleton<IUserService, UserService>();
 // Hangfire
 builder.Services.AddHangfire(config => config
     .UsePostgreSqlStorage(c => c.UseNpgsqlConnection(GoShareConfiguration.ConnectionString("GoShareAzure")))
