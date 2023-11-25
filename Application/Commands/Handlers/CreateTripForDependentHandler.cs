@@ -232,16 +232,23 @@ namespace Application.Commands.Handlers
 
         private async Task NotifyDependentNewTripBooked(Trip trip)
         {
-            //if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
-            //{
-            //    await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
-            //    "Đã tạo chuyến mới",
-            //    $"Người thân {trip.Booker!.Name} đã tạo chuyến mới cho bạn",
-            //    new Dictionary<string, string>
-            //    {
-            //        { "tripId", trip.Id.ToString() }
-            //    });
-            //}
+            if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
+            {
+                var result = await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
+                    "Đã tạo chuyến mới",
+                    $"Người thân {trip.Booker!.Name} đã tạo chuyến mới cho bạn",
+                    new Dictionary<string, string>
+                    {
+                        { "tripId", trip.Id.ToString() }
+                    });
+
+                if (result == string.Empty)
+                {
+                    trip.Passenger.DeviceToken = null;
+                    await _unitOfWork.UserRepository.UpdateAsync(trip.Passenger);
+                    await _unitOfWork.Save();
+                }
+            }
 
             await _hubContext.Clients.Group(trip.PassengerId.ToString())
                     .SendAsync("NotifyDependentNewTripBooked", _mapper.Map<TripDto>(trip));

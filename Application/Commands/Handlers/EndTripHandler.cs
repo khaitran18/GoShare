@@ -207,47 +207,59 @@ namespace Application.Commands.Handlers
 
         private async Task NotifyPassengerTripHasEnded(Trip trip)
         {
-            //if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
-            //{
-            //    await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
-            //        "Hoàn thành chuyến",
-            //        $"Chuyến đi của bạn đã kết thúc. Bạn đã đến nơi an toàn.",
-            //        new Dictionary<string, string>
-            //        {
-            //            { "tripId", trip.Id.ToString() }
-            //        });
-            //}
+            if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
+            {
+                var result = await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
+                    "Hoàn thành chuyến",
+                    $"Chuyến đi của bạn đã kết thúc. Bạn đã đến nơi an toàn.",
+                    new Dictionary<string, string>
+                    {
+                        { "tripId", trip.Id.ToString() }
+                    });
+
+                if (result == string.Empty)
+                {
+                    trip.Passenger.DeviceToken = null;
+                    await _unitOfWork.UserRepository.UpdateAsync(trip.Passenger);
+                }
+            }
 
             if (trip.Passenger.GuardianId != null)
             {
-                //if (!string.IsNullOrEmpty(trip.Passenger.Guardian!.DeviceToken))
-                //{
-                //    string message;
-                //    if (trip.StartLocation.Address == null && trip.EndLocation.Address != null)
-                //    {
-                //        message = $"Người thân {trip.Passenger.Name} vừa hoàn thành một chuyến đi đến {trip.EndLocation.Address}.";
-                //    }
-                //    else if (trip.StartLocation.Address != null && trip.EndLocation.Address == null)
-                //    {
-                //        message = $"Người thân {trip.Passenger.Name} vừa hoàn thành một chuyến đi từ {trip.StartLocation.Address}.";
-                //    }
-                //    else if (trip.StartLocation.Address == null && trip.EndLocation.Address == null)
-                //    {
-                //        message = $"Người thân {trip.Passenger.Name} vừa hoàn thành một chuyến đi.";
-                //    }
-                //    else
-                //    {
-                //        message = $"Người thân {trip.Passenger.Name} vừa hoàn thành chuyến đi từ {trip.StartLocation.Address} đến {trip.EndLocation.Address}.";
-                //    }
+                if (!string.IsNullOrEmpty(trip.Passenger.Guardian!.DeviceToken))
+                {
+                    string message;
+                    if (trip.StartLocation.Address == null && trip.EndLocation.Address != null)
+                    {
+                        message = $"Người thân {trip.Passenger.Name} vừa hoàn thành một chuyến đi đến {trip.EndLocation.Address}.";
+                    }
+                    else if (trip.StartLocation.Address != null && trip.EndLocation.Address == null)
+                    {
+                        message = $"Người thân {trip.Passenger.Name} vừa hoàn thành một chuyến đi từ {trip.StartLocation.Address}.";
+                    }
+                    else if (trip.StartLocation.Address == null && trip.EndLocation.Address == null)
+                    {
+                        message = $"Người thân {trip.Passenger.Name} vừa hoàn thành một chuyến đi.";
+                    }
+                    else
+                    {
+                        message = $"Người thân {trip.Passenger.Name} vừa hoàn thành chuyến đi từ {trip.StartLocation.Address} đến {trip.EndLocation.Address}.";
+                    }
 
-                //    await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian.DeviceToken,
-                //        "Một chuyến đi đã hoàn thành",
-                //        message,
-                //        new Dictionary<string, string>
-                //        {
-                //            { "tripId", trip.Id.ToString() }
-                //        });
-                //}
+                    var result = await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian.DeviceToken,
+                        "Một chuyến đi đã hoàn thành",
+                        message,
+                        new Dictionary<string, string>
+                        {
+                            { "tripId", trip.Id.ToString() }
+                        });
+
+                    if (result == string.Empty)
+                    {
+                        trip.Passenger.Guardian.DeviceToken = null;
+                        await _unitOfWork.UserRepository.UpdateAsync(trip.Passenger.Guardian);
+                    }
+                }
 
                 bool isSelfBooking = false;
                 bool isNotificationForGuardian;
@@ -277,6 +289,8 @@ namespace Application.Commands.Handlers
                 await _hubContext.Clients.Group(trip.PassengerId.ToString())
                     .SendAsync("NotifyPassengerTripEnded", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
             }
+
+            await _unitOfWork.Save();
         }
     }
 }

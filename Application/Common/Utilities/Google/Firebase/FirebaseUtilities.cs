@@ -1,9 +1,12 @@
-﻿using FirebaseAdmin.Messaging;
+﻿using Domain.Interfaces;
+using FirebaseAdmin;
+using FirebaseAdmin.Messaging;
 
 namespace Application.Common.Utilities.Google.Firebase
 {
     public static class FirebaseUtilities
     {
+
         public static Dictionary<string, string> GenerateFirebaseMessageData(
             string action, Dictionary<string, string> data)
         {
@@ -19,24 +22,37 @@ namespace Application.Common.Utilities.Google.Firebase
             string title, string content, Dictionary<string, string>? data = null,
             string? imageUrl = null, CancellationToken cancellationToken = default)
         {
-            Notification notification = new Notification
+            try
             {
-                Title = title,
-                Body = content,
-                ImageUrl = imageUrl,
-            };
-            Message message = new Message
-            {
-                Notification = notification,
-                Token = fcmToken,
-            };
-            if (data != null)
-            {
-                message.Data = data;
-            }
+                Notification notification = new Notification
+                {
+                    Title = title,
+                    Body = content,
+                    ImageUrl = imageUrl,
+                };
+                Message message = new Message
+                {
+                    Notification = notification,
+                    Token = fcmToken,
+                };
+                if (data != null)
+                {
+                    message.Data = data;
+                }
 
-            return await FirebaseMessaging.DefaultInstance
-                .SendAsync(message, cancellationToken);
+                return await FirebaseMessaging.DefaultInstance
+                    .SendAsync(message, cancellationToken);
+            }
+            catch (FirebaseMessagingException ex)
+            {
+                Console.WriteLine($"Error sending FCM notification: {ex.Message}");
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error sending FCM notification: {ex.Message}");
+                return string.Empty;
+            }
         }
 
         public static async Task<string> SendDataToDeviceAsync(string fcmToken,

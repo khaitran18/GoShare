@@ -171,16 +171,23 @@ namespace Application.Services
         {
             _logger.LogInformation("Notifying driver {driverName} about new trip request for tripId: {tripId}", driver.Name, trip.Id);
 
-            //if (!string.IsNullOrEmpty(driver.DeviceToken))
-            //{
-            //    await FirebaseUtilities.SendNotificationToDeviceAsync(driver.DeviceToken!,
-            //    "Yêu cầu chuyến mới",
-            //    "Bạn có yêu cầu chuyến xe mới",
-            //    new Dictionary<string, string>
-            //    {
-            //        { "tripId", trip.Id.ToString() }
-            //    });
-            //}
+            if (!string.IsNullOrEmpty(driver.DeviceToken))
+            {
+                var result = await FirebaseUtilities.SendNotificationToDeviceAsync(driver.DeviceToken!,
+                    "Yêu cầu chuyến mới",
+                    "Bạn có yêu cầu chuyến xe mới",
+                    new Dictionary<string, string>
+                    {
+                        { "tripId", trip.Id.ToString() }
+                    });
+
+                if (result == string.Empty)
+                {
+                    driver.DeviceToken = null;
+                    await _unitOfWork.UserRepository.UpdateAsync(driver);
+                    await _unitOfWork.Save();
+                }
+            }
 
             var groupName = SignalRUtilities.GetGroupNameForUser(driver, trip);
 
@@ -227,35 +234,47 @@ namespace Application.Services
             _logger.LogInformation("Notifying passenger about driver for tripId: {tripId}.", trip.Id);
             //var groupName = SignalRUtilities.GetGroupNameForUser(trip.Passenger, trip);
 
-            //if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
-            //{
-            //    await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
-            //    "Đặt chuyến thành công",
-            //    $"Tài xế {driver.Name} đang trên đường đến đón bạn.",
-            //    new Dictionary<string, string>
-            //    {
-            //        { "tripId", trip.Id.ToString() }
-            //    });
-            //}
+            if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
+            {
+                var result = await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
+                "Đặt chuyến thành công",
+                $"Tài xế {driver.Name} đang trên đường đến đón bạn.",
+                new Dictionary<string, string>
+                {
+                    { "tripId", trip.Id.ToString() }
+                });
+
+                if (result == string.Empty)
+                {
+                    trip.Passenger.DeviceToken = null;
+                    await _unitOfWork.UserRepository.UpdateAsync(trip.Passenger);
+                }
+            }
 
             if (trip.Passenger.GuardianId != null && trip.Passenger.GuardianId == trip.BookerId)
             {
-                //if (!string.IsNullOrEmpty(trip.Passenger.Guardian!.DeviceToken))
-                //{
-                //    await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian.DeviceToken,
-                //    "Đặt chuyến thành công",
-                //    $"Tài xế {driver.Name} đang trên đường đến đón người thân {trip.Passenger.Name} của bạn.",
-                //    new Dictionary<string, string>
-                //    {
-                //        { "tripId", trip.Id.ToString() }
-                //    });
-                //}
+                if (!string.IsNullOrEmpty(trip.Passenger.Guardian!.DeviceToken))
+                {
+                    var result = await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian.DeviceToken,
+                        "Đặt chuyến thành công",
+                        $"Tài xế {driver.Name} đang trên đường đến đón người thân {trip.Passenger.Name} của bạn.",
+                        new Dictionary<string, string>
+                        {
+                            { "tripId", trip.Id.ToString() }
+                        });
+
+                    if (result == string.Empty)
+                    {
+                        trip.Passenger.Guardian.DeviceToken = null;
+                        await _unitOfWork.UserRepository.UpdateAsync(trip.Passenger.Guardian);
+                    }
+                }
 
                 bool isSelfBooking = false;
                 bool isNotificationForGuardian = true;
                 await _hubContext.Clients.Group(trip.Passenger.GuardianId.ToString())
                     .SendAsync("NotifyPassengerDriverOnTheWay", _mapper.Map<UserDto>(driver), isSelfBooking, isNotificationForGuardian);
-                
+
                 isNotificationForGuardian = false;
                 await _hubContext.Clients.Group(trip.PassengerId.ToString())
                     .SendAsync("NotifyPassengerDriverOnTheWay", _mapper.Map<UserDto>(driver), isSelfBooking, isNotificationForGuardian);
@@ -267,6 +286,8 @@ namespace Application.Services
                 await _hubContext.Clients.Group(trip.PassengerId.ToString())
                     .SendAsync("NotifyPassengerDriverOnTheWay", _mapper.Map<UserDto>(driver), isSelfBooking, isNotificationForGuardian);
             }
+
+            await _unitOfWork.Save();
         }
 
         private async Task HandleTimeoutScenario(Trip trip)
@@ -285,29 +306,41 @@ namespace Application.Services
 
             //var groupName = SignalRUtilities.GetGroupNameForUser(trip.Passenger, trip);
 
-            //if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
-            //{
-            //    await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
-            //    "Hết thời gian chờ",
-            //    $"Chúng tôi thành thật xin lỗi, hiện tại chưa có tài xế phù hợp với bạn.",
-            //    new Dictionary<string, string>
-            //    {
-            //        { "tripId", trip.Id.ToString() }
-            //    });
-            //}
+            if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
+            {
+                var result = await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
+                    "Hết thời gian chờ",
+                    $"Chúng tôi thành thật xin lỗi, hiện tại chưa có tài xế phù hợp với bạn.",
+                    new Dictionary<string, string>
+                    {
+                        { "tripId", trip.Id.ToString() }
+                    });
+
+                if (result == string.Empty)
+                {
+                    trip.Passenger.DeviceToken = null;
+                    await _unitOfWork.UserRepository.UpdateAsync(trip.Passenger);
+                }
+            }
 
             if (trip.Passenger.GuardianId != null && trip.Passenger.GuardianId == trip.BookerId)
             {
-                //if (!string.IsNullOrEmpty(trip.Passenger.Guardian!.DeviceToken))
-                //{
-                //    await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian.DeviceToken,
-                //    "Hết thời gian chờ",
-                //    $"Chúng tôi xin lỗi, hiện tại chưa có tài xế phù hợp với người thân {trip.Passenger.Name} của bạn.",
-                //    new Dictionary<string, string>
-                //    {
-                //        { "tripId", trip.Id.ToString() }
-                //    });
-                //}
+                if (!string.IsNullOrEmpty(trip.Passenger.Guardian!.DeviceToken))
+                {
+                    var result = await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian.DeviceToken,
+                        "Hết thời gian chờ",
+                        $"Chúng tôi xin lỗi, hiện tại chưa có tài xế phù hợp với người thân {trip.Passenger.Name} của bạn.",
+                        new Dictionary<string, string>
+                        {
+                            { "tripId", trip.Id.ToString() }
+                        });
+
+                    if (result == string.Empty)
+                    {
+                        trip.Passenger.Guardian.DeviceToken = null;
+                        await _unitOfWork.UserRepository.UpdateAsync(trip.Passenger.Guardian);
+                    }
+                }
 
                 bool isSelfBooking = false;
                 bool isNotificationForGuardian = true;
@@ -325,6 +358,8 @@ namespace Application.Services
                 await _hubContext.Clients.Group(trip.PassengerId.ToString())
                     .SendAsync("NotifyPassengerTripTimedOut", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
             }
+
+            await _unitOfWork.Save();
         }
 
         public async Task ResetCancellationCountAndTime(Guid userId)
