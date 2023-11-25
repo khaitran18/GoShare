@@ -12,8 +12,8 @@ namespace Application.Common.Validations
     {
         public ConfirmPickupPassengerValidator()
         {
-            RuleFor(x => x.DriverLatitude).InclusiveBetween(-90, 90).WithMessage("StartLatitude must be between -90 and 90.");
-            RuleFor(x => x.DriverLongitude).InclusiveBetween(-180, 180).WithMessage("StartLongitude must be between -180 and 180.");
+            RuleFor(x => x.DriverLatitude).InclusiveBetween(-90, 90).WithMessage("Vĩ độ tài xế không hợp lệ.");
+            RuleFor(x => x.DriverLongitude).InclusiveBetween(-180, 180).WithMessage("Kinh độ tài xế không hợp lệ.");
         }
     }
 }

@@ -203,6 +203,7 @@ builder.Services.AddScoped<IRequestHandler<CreateDependentCommand, UserDto>, Cre
 builder.Services.AddScoped<IRequestHandler<GetWalletBalanceQuery, double>, GetWalletBalanceQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<GetUserTransactionQuery, List<WalletTransactionDto>>, GetUserTransactionQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<GetTripHistoryQuery, List<TripDto>>, GetTripHistoryHandler>();
+builder.Services.AddScoped<IRequestHandler<CreateFeedbackCommand, AppfeedbackDto>, CreateFeedbackHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
@@ -226,6 +227,7 @@ builder.Services.AddScoped<IValidator<DriverUpdateLocationCommand>, DriverUpdate
 builder.Services.AddScoped<IValidator<EndTripCommand>, EndtripCommandValidator>();
 builder.Services.AddScoped<IValidator<RegisterCommand>, RegisterCommandValidator>();
 builder.Services.AddScoped<IValidator<CreateDependentCommand>, CreateDependentCommandValidator>();
+builder.Services.AddScoped<IValidator<CreateFeedbackCommand>, CreateFeedbackCommandValidator>();
 
 // Add AutoMapper
 var mapperConfig = new MapperConfiguration(cfg =>

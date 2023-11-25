@@ -1,4 +1,5 @@
-﻿using Application.Common;
+﻿using Application.Commands;
+using Application.Common;
 using Application.Common.Dtos;
 using Application.Queries;
 using MediatR;
@@ -11,6 +12,7 @@ namespace Api_Mobile.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "User,Driver")]
     public class AppfeedbackController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -18,6 +20,13 @@ namespace Api_Mobile.Controllers
         public AppfeedbackController(IMediator mediator)
         {
             _mediator = mediator;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateFeedback([FromBody] CreateFeedbackCommand command)
+        {
+            var feedback = await _mediator.Send(command);
+            return Ok(feedback);
         }
     }
 }
