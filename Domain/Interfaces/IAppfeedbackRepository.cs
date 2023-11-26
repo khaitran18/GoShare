@@ -10,5 +10,6 @@ namespace Domain.Interfaces
     public interface IAppfeedbackRepository : IBaseRepository<Appfeedback>
     {
         Task<(List<Appfeedback>, int)> GetAppfeedbacks(string? sortBy, int page, int pageSize);
+        Task<Appfeedback?> GetByIdAsync(Guid id);
     }
 }

@@ -46,5 +46,11 @@ namespace Infrastructure.Repositories
 
             return (appFeedbacks, totalCount);
         }
+
+        public async Task<Appfeedback?> GetByIdAsync(Guid id)
+        {
+            return await _context.Appfeedbacks
+                .FirstOrDefaultAsync(f => f.Id == id);
+        }
     }
 }

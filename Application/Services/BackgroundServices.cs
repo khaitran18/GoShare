@@ -273,18 +273,18 @@ namespace Application.Services
                 bool isSelfBooking = false;
                 bool isNotificationForGuardian = true;
                 await _hubContext.Clients.Group(trip.Passenger.GuardianId.ToString())
-                    .SendAsync("NotifyPassengerDriverOnTheWay", _mapper.Map<UserDto>(driver), isSelfBooking, isNotificationForGuardian);
+                    .SendAsync("NotifyPassengerDriverOnTheWay", _mapper.Map<UserDto>(driver), isSelfBooking, isNotificationForGuardian, trip.Id);
 
                 isNotificationForGuardian = false;
                 await _hubContext.Clients.Group(trip.PassengerId.ToString())
-                    .SendAsync("NotifyPassengerDriverOnTheWay", _mapper.Map<UserDto>(driver), isSelfBooking, isNotificationForGuardian);
+                    .SendAsync("NotifyPassengerDriverOnTheWay", _mapper.Map<UserDto>(driver), isSelfBooking, isNotificationForGuardian, trip.Id);
             }
             else
             {
                 bool isSelfBooking = true;
                 bool isNotificationForGuardian = false;
                 await _hubContext.Clients.Group(trip.PassengerId.ToString())
-                    .SendAsync("NotifyPassengerDriverOnTheWay", _mapper.Map<UserDto>(driver), isSelfBooking, isNotificationForGuardian);
+                    .SendAsync("NotifyPassengerDriverOnTheWay", _mapper.Map<UserDto>(driver), isSelfBooking, isNotificationForGuardian, trip.Id);
             }
 
             await _unitOfWork.Save();

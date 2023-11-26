@@ -88,6 +88,7 @@ builder.Services.AddScoped<IRequestHandler<GetDriverDocumentQuery, List<DriverDo
 builder.Services.AddScoped<IRequestHandler<GetAppfeedbacksQuery, PaginatedResult<AppfeedbackDto>>, GetAppfeedbacksHandler>();
 builder.Services.AddScoped<IRequestHandler<GetUsersQuery, PaginatedResult<AdminUserResponse>>, GetUsersQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<GetDriverQuery, PaginatedResult<AdminDriverResponse>>, GetDriverQueryHandler>();
+builder.Services.AddScoped<IRequestHandler<GetFeedbackQuery, AppfeedbackDto>, GetFeedbackHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
 
