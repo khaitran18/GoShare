@@ -25,7 +25,7 @@ namespace Api_Admin.Controllers
             return Ok(response);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{Id}")]
         public async Task<IActionResult> GetFeedback([FromRoute] GetFeedbackQuery query)
         {
             var feedback = await _mediator.Send(query);

@@ -50,6 +50,7 @@ namespace Infrastructure.Repositories
         public async Task<Appfeedback?> GetByIdAsync(Guid id)
         {
             return await _context.Appfeedbacks
+                .Include(f => f.User)
                 .FirstOrDefaultAsync(f => f.Id == id);
         }
     }

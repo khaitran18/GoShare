@@ -34,13 +34,13 @@ namespace Api_Mobile.Controllers
             return Ok(response);
         }
 
-
         [HttpGet("dependents")]
         public async Task<IActionResult> GetDependents([FromQuery] GetDependentsQuery query)
         {
             var result = await _mediator.Send(query);
             return Ok(result);
         }
+
         [HttpPost("dependent")]
         public async Task<IActionResult> CreateDependents([FromBody] CreateDependentCommand command)
         {

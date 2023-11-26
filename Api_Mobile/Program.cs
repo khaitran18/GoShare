@@ -203,6 +203,7 @@ builder.Services.AddScoped<IRequestHandler<GetWalletBalanceQuery, double>, GetWa
 builder.Services.AddScoped<IRequestHandler<GetUserTransactionQuery, List<WalletTransactionDto>>, GetUserTransactionQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<GetTripHistoryQuery, List<TripDto>>, GetTripHistoryHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateFeedbackCommand, AppfeedbackDto>, CreateFeedbackHandler>();
+builder.Services.AddScoped<IRequestHandler<DeletePlannedDestinationCommand, bool>, DeletePlannedDestinationHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));

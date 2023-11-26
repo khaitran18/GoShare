@@ -42,5 +42,12 @@ namespace Api_Mobile.Controllers
             var response = await _mediator.Send(command);
             return Ok(response);
         }
+
+        [HttpDelete("{Id}")]
+        public async Task<ActionResult<bool>> DeletePlannedDestination([FromRoute] DeletePlannedDestinationCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
     }
 }

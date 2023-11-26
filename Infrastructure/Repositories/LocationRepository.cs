@@ -21,7 +21,9 @@ namespace Infrastructure.Repositories
 
         public async Task<Location?> GetByIdAsync(Guid id)
         {
-            return await _context.Locations.FirstOrDefaultAsync(t => t.Id == id);
+            return await _context.Locations
+                .Include(l => l.User)
+                .FirstOrDefaultAsync(t => t.Id == id);
         }
 
         public async Task<Location?> GetByUserIdAndLatLongAndTypeAsync(Guid userId, decimal latitude, decimal longitude, LocationType type)
