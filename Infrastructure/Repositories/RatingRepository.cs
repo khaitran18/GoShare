@@ -18,6 +18,11 @@ namespace Infrastructure.Repositories
             _context = context;
         }
 
+        public async Task<List<Rating>> GetListByRatee(Guid guid)
+        {
+            return await _context.Ratings.Where(r=>r.Ratee.CompareTo(guid)==0).ToListAsync();
+        }
+
         public async Task<Rating?> GetRatingByUserAndTrip(Guid userId, Guid tripId)
         {
             return await _context.Ratings

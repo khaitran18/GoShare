@@ -16,6 +16,13 @@ namespace Application.Common.Utilities
                 TimeZoneInfo.FindSystemTimeZoneById(vnTimeZoneString));
         }
 
+        public static DateTime GetTodayDateTimeVn()
+        {
+            return TimeZoneInfo.ConvertTime(
+                DateTime.SpecifyKind(DateTime.Today, DateTimeKind.Utc),
+                TimeZoneInfo.FindSystemTimeZoneById(vnTimeZoneString));
+        }
+
         public static DateTime ToDateTime(DateOnly date, TimeOnly time)
         {
             return date.ToDateTime(time);

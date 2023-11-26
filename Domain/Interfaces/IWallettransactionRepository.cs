@@ -11,5 +11,6 @@ namespace Domain.Interfaces
     {
         Task<Wallettransaction> GetByIdAsync(Guid id);
         Task<List<Wallettransaction>> GetListByWalletId(Guid id);
+        Task<List<Wallettransaction>> GetListByDay(Guid guid);
     }
 }

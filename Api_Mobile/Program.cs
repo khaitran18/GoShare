@@ -105,6 +105,7 @@ builder.Services.AddAuthentication(x =>
 
 builder.Services.AddSingleton<ITokenService>(new TokenService(_key, _expirtyMinutes, _refreshTokenExpirtyMinutes, _issuer, _audience));
 builder.Services.AddSingleton<IDriverDocumentService, DriverDocumentService>();
+builder.Services.AddSingleton<IDriverService, DriverService>();
 
 
 //Add VnPayService
@@ -204,6 +205,7 @@ builder.Services.AddScoped<IRequestHandler<GetUserTransactionQuery, List<WalletT
 builder.Services.AddScoped<IRequestHandler<GetTripHistoryQuery, List<TripDto>>, GetTripHistoryHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateFeedbackCommand, AppfeedbackDto>, CreateFeedbackHandler>();
 builder.Services.AddScoped<IRequestHandler<DriverUpdateDocumentCommand, bool>, DriverUpdateDocumentCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<GetDriverInformationQuery, DriverInformationResponse>, GetDriverInformationHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
