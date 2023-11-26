@@ -8,7 +8,6 @@ namespace Api_Mobile.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "User, Driver")]
     public class PaymentController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -17,6 +16,7 @@ namespace Api_Mobile.Controllers
             _mediator = mediator;
         }
 
+        [Authorize(Roles = "User, Driver")]
         [HttpPost("topup")]
         public async Task<IActionResult> CreateTopupRequest([FromBody] CreateTopUpRequestCommand command)
         {
@@ -24,6 +24,7 @@ namespace Api_Mobile.Controllers
             return Ok(response);
         }
 
+        [AllowAnonymous]
         [HttpGet("callback")]
         public async Task<IActionResult> PaymentCallback()
         {

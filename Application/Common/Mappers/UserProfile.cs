@@ -18,6 +18,11 @@ namespace Application.Common.Mappers
             CreateMap<User, AdminUserResponse>()
                 .ForMember(des=>des.Status, opt => opt.MapFrom(src => src.Status.ToString()))
                 .ReverseMap();
+
+            CreateMap<User, AdminDriverResponse>()
+                .ForMember(des => des.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+                .ForMember(des => des.VerifyTo, opt => opt.MapFrom(src => src.Car!.VerifiedTo))
+                .ReverseMap();
         }
     }
 }

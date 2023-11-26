@@ -40,12 +40,5 @@ namespace Api_Mobile.Controllers
             var result = await _mediator.Send(query);
             return Ok(result);
         }
-
-        [HttpPost("dependent")]
-        public async Task<IActionResult> CreateDependents([FromBody] CreateDependentCommand command)
-        {
-            var result = await _mediator.Send(command);
-            return Ok(result);
-        }
     }
 }

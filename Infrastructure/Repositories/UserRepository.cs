@@ -80,6 +80,54 @@ namespace Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        public async Task<(List<User>, int)> GetDriverAsync(int page, int pageSize, string? sortBy)
+        {
+            IQueryable<User> query = _context.Users
+                .Where(u => u.Isdriver.Equals(true))
+                .Include(u=>u.Car)
+                .AsQueryable();
+
+            // Sort by
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                switch (sortBy.ToLower())
+                {
+                    case "name":
+                        query = query.OrderBy(u => u.Name);
+                        break;
+                    case "name_desc":
+                        query = query.OrderByDescending(u => u.Name);
+                        break;
+                    case "verify":
+                        query = query.OrderBy(u => u.Car!.VerifiedTo);
+                        break;
+                    case "verify_desc":
+                        query = query.OrderByDescending(u => u.Car!.VerifiedTo);
+                        break;
+                    case "update":
+                        query = query.OrderByDescending(u => u.UpdatedTime);
+                        break;
+                    case "update_asc":
+                        query = query.OrderBy(u => u.UpdatedTime);
+                        break;
+                    case "disabled":
+                        query = query.OrderBy(u => u.Status.Equals(UserStatus.BANNED));
+                        break;
+                    default:
+                        query = query.OrderByDescending(u => u.CreateTime);
+                        break;
+                }
+            }
+            var totalCount = await query.CountAsync();
+
+            // Pagination
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+            var drivers = await query.ToListAsync();
+
+            return (drivers, totalCount);
+        }
+
         public async Task<User?> GetUserById(string id)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id.Equals(new Guid(id)));

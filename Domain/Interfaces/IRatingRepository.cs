@@ -10,5 +10,6 @@ namespace Domain.Interfaces
     public interface IRatingRepository : IBaseRepository<Rating>
     {
         Task<Rating?> GetRatingByUserAndTrip(Guid userId, Guid tripId);
+        Task<List<Rating>> GetListByRatee(Guid guid);
     }
 }

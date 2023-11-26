@@ -15,6 +15,7 @@ namespace Domain.Interfaces
         Task<bool> VerifyDriver(Guid userGuid);
         Task<bool> IsVerified(Guid id);
         Task<(List<User>, int)> GetDependents(Guid guardianId, string? sortBy, int page, int pageSize);
+        Task<(List<User>, int)> GetDriverAsync(int page, int pageSize, string? sortBy);
         Task<List<User>> GetDependentsByGuardianId(Guid userId);
         Task<(List<User>, int)> GetUsersAsync(int page, int pageSize, string? sortBy);
         Task<bool> IsDependent(Guid UserId);

@@ -1,4 +1,5 @@
 ﻿using Application.Commands;
+using Application.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -18,6 +19,14 @@ namespace Api_Mobile.Controllers
         public DriverController(IMediator mediator)
         {
             _mediator = mediator;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDriverInformation()
+        {
+            GetDriverInformationQuery query = new GetDriverInformationQuery();
+            var response = await _mediator.Send(query);
+            return Ok(response);
         }
 
         [HttpPost("activate")]
@@ -60,6 +69,13 @@ namespace Api_Mobile.Controllers
 
         [HttpPut("update-location")]
         public async Task<IActionResult> DriverUpdateLocation([FromBody] DriverUpdateLocationCommand command)
+        {
+            var response = await _mediator.Send(command);
+            return Ok(response);
+        }
+
+        [HttpPut("documents")]
+        public async Task<IActionResult> UpdateDriverProfile([FromForm] DriverUpdateDocumentCommand command)
         {
             var response = await _mediator.Send(command);
             return Ok(response);
