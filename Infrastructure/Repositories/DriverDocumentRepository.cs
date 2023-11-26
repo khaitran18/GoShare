@@ -17,9 +17,9 @@ namespace Infrastructure.Repositories
             _context = context;
         }
 
-        public List<Driverdocument> GetByUserId(Guid userId) { 
+        public Task<List<Driverdocument>> GetByUserIdAsync(Guid userId) { 
             Guid id = _context.Cars.FirstOrDefault(c=>c.UserId.Equals(userId))!.Id;
-            return _context.Driverdocuments.Where(d => d.CarId.Equals(id)).ToList();
+            return Task.FromResult(_context.Driverdocuments.Where(d => d.CarId.Equals(id)).ToList());
         }
     }
 }

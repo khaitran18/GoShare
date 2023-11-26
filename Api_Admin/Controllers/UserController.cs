@@ -42,5 +42,11 @@ namespace Api_Admin.Controllers
             var response = await _mediator.Send(query);
             return Ok(response);
         }
+        [HttpGet("drivers")]
+        public async Task<IActionResult> GetListDriver([FromQuery] GetDriverQuery query)
+        {
+            var response = await _mediator.Send(query);
+            return Ok(response);
+        }
     }
 }

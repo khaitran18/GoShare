@@ -21,11 +21,11 @@ namespace Application.Queries.Handler
             _mapper = mapper;
         }
 
-        public Task<List<DriverDocumentDto>> Handle(GetDriverDocumentQuery request, CancellationToken cancellationToken)
+        public async Task<List<DriverDocumentDto>> Handle(GetDriverDocumentQuery request, CancellationToken cancellationToken)
         {
             List <DriverDocumentDto> response = new List<DriverDocumentDto>();
-            response = _mapper.Map<List<DriverDocumentDto>>(_unitOfWork.DriverDocumentRepository.GetByUserId(request.UserId));
-            return Task.FromResult(response);
+            response = _mapper.Map<List<DriverDocumentDto>>(await _unitOfWork.DriverDocumentRepository.GetByUserIdAsync(request.UserId));
+            return response;
         }
     }
 }

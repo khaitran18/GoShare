@@ -87,6 +87,7 @@ builder.Services.AddScoped<IRequestHandler<RefreshTokenCommand, AuthResponse>, R
 builder.Services.AddScoped<IRequestHandler<GetDriverDocumentQuery, List<DriverDocumentDto>>, GetDriverDocumentQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<GetAppfeedbacksQuery, PaginatedResult<AppfeedbackDto>>, GetAppfeedbacksHandler>();
 builder.Services.AddScoped<IRequestHandler<GetUsersQuery, PaginatedResult<AdminUserResponse>>, GetUsersQueryHandler>();
+builder.Services.AddScoped<IRequestHandler<GetDriverQuery, PaginatedResult<AdminDriverResponse>>, GetDriverQueryHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
 
@@ -95,6 +96,7 @@ var mapperConfig = new MapperConfiguration(cfg =>
 {
     cfg.AddProfile<AppfeedbackProfile>();
     cfg.AddProfile<UserProfile>();
+    cfg.AddProfile<CarProfile>();
     cfg.AddProfile<DriverdocumentProfile>();
 });
 var mapper = mapperConfig.CreateMapper();
