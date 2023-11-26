@@ -53,5 +53,4 @@ namespace Infrastructure.Repositories
                 .FirstOrDefaultAsync(f => f.Id == id);
         }
     }
-    }
 }
