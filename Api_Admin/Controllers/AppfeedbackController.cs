@@ -24,5 +24,12 @@ namespace Api_Admin.Controllers
             var response = await _mediator.Send(query);
             return Ok(response);
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetFeedback([FromRoute] GetFeedbackQuery query)
+        {
+            var feedback = await _mediator.Send(query);
+            return Ok(feedback);
+        }
     }
 }
