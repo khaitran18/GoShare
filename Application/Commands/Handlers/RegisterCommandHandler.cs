@@ -18,6 +18,7 @@ namespace Application.Commands.Handlers
     {
         private readonly ITwilioVerification _verificationService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly string _defaultAvatarUrl = "https://firebasestorage.googleapis.com/v0/b/goshare-bc3c4.appspot.com/o/default-user-avatar.webp?alt=media&token=cd67cce4-611c-49c5-a819-956a33ce90ba";
 
         public RegisterCommandHandler(ITwilioVerification verificationService, IUnitOfWork unitOfWork)
         {
@@ -42,6 +43,7 @@ namespace Application.Commands.Handlers
                     user.Name = request.Name;
                     user.Gender = request.Gender;
                     user.Birth = request.Birth;
+                    user.AvatarUrl = _defaultAvatarUrl;
                     //user.Otp = PasswordHasher.Hash(otp);
                     user.OtpExpiryTime = await _verificationService.GenerateOtpExpiryTime();
                     user.CreateTime = DateTimeUtilities.GetDateTimeVnNow();

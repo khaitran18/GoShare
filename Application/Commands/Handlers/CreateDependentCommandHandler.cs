@@ -21,6 +21,7 @@ namespace Application.Commands.Handlers
         private readonly UserClaims _claims;
         private readonly IMapper _mapper;
         private readonly ITwilioVerification _verificationService;
+        private readonly string _defaultAvatarUrl = "https://firebasestorage.googleapis.com/v0/b/goshare-bc3c4.appspot.com/o/default-user-avatar.webp?alt=media&token=cd67cce4-611c-49c5-a819-956a33ce90ba";
 
         public CreateDependentCommandHandler(IUnitOfWork unitOfWork, UserClaims claims, IMapper mapper, ITwilioVerification verificationService)
         {
@@ -49,6 +50,7 @@ namespace Application.Commands.Handlers
                     user.Name = request.Name;
                     user.Gender = request.Gender;
                     user.Birth = request.Birth;
+                    user.AvatarUrl = _defaultAvatarUrl;
                     user.CreateTime = DateTimeUtilities.GetDateTimeVnNow();
                     user.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
                     user.OtpExpiryTime = await _verificationService.GenerateOtpExpiryTime();
