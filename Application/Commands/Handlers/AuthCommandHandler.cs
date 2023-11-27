@@ -59,7 +59,9 @@ namespace Application.Commands.Handlers
                     //------------------------------------------------------------------------------------
 
                     //Check if user is in any running trip
-                    response.CurrentTrip = _unitOfWork.TripRepository.GetOngoingTripByPassengerId(user.Id).Result?.Id;
+                    var trip = await _unitOfWork.TripRepository.GetCurrentTripByUserId(user.Id);
+                    response.CurrentTrip = trip?.Id;
+
                     //Check if user's dependent is in any trip
                     response.DependentCurrentTrips = await _userService.GetCurrentDenpendentTrips(_unitOfWork, user.Id);
                     user.RefreshToken = response.RefreshToken;

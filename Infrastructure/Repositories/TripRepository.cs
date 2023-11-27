@@ -32,6 +32,14 @@ namespace Infrastructure.Repositories
                 .FirstOrDefaultAsync(t => t.Id == id);
         }
 
+        public async Task<Trip?> GetCurrentTripByUserId(Guid id)
+        {
+            var list = await _context.Trips.Where(t => t.PassengerId == id || t.DriverId==id).ToListAsync();
+            return list.FirstOrDefault(t => t.Status != TripStatus.COMPLETED &&
+                                          t.Status != TripStatus.CANCELED &&
+                                          t.Status != TripStatus.TIMEDOUT);
+        }
+
         public async Task<Trip?> GetOngoingTripByPassengerId(Guid passengerId)
         {
             return await _context.Trips

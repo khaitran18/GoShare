@@ -12,5 +12,6 @@ namespace Domain.Interfaces
         Task<Trip?> GetByIdAsync(Guid id);
         Task<Trip?> GetOngoingTripByPassengerId(Guid passengerId);
         Task<List<Trip>> GetTripsByUserId(Guid userId, string? sortBy);
+        Task<Trip?> GetCurrentTripByUserId(Guid id);
     }
 }

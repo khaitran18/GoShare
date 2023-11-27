@@ -66,7 +66,8 @@ namespace Application.Commands.Handlers
                         response.Phone = claims.First(u => u.Type.Equals("phone"))?.Value;
                         response.Name = claims.First(u => u.Type.Equals("name"))?.Value;
                         response.Id = new Guid(userId!);
-                        response.CurrentTrip = _unitOfWork.TripRepository.GetOngoingTripByPassengerId(new Guid(userId!)).Result?.Id;
+                        var trip = await _unitOfWork.TripRepository.GetCurrentTripByUserId((Guid)response.Id);
+                        response.CurrentTrip = trip?.Id;
                         response.DependentCurrentTrips = await _userService.GetCurrentDenpendentTrips(_unitOfWork, new Guid(userId!));
                     }
                 }
