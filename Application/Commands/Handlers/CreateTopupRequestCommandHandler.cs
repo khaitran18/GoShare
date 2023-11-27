@@ -56,7 +56,7 @@ namespace Application.Commands.Handlers
             }
 
             await _unitOfWork.Save();
-            BackgroundJob.Schedule<BackgroundServices>(s => s.CheckTransactionStatus(transaction.Id),DateTimeUtilities.GetDateTimeVnNow().AddMinutes(15));
+            BackgroundJob.Schedule<BackgroundServices>(s => s.CheckTransactionStatus(transaction.Id), TimeSpan.FromMinutes(15));
             return response;
         }
     }
