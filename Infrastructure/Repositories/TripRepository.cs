@@ -54,8 +54,9 @@ namespace Infrastructure.Repositories
             IQueryable<Trip> query = _context.Trips
                 .Where(t => t.PassengerId == userId && t.Status == TripStatus.COMPLETED)
                 .Include(t => t.StartLocation)
-                .Include(t => t.EndLocation)
                 .Include(t => t.Driver)
+                .Include(t => t.EndLocation)
+                .Include(t => t.Driver!.Car)
                 .Include(t => t.Cartype)
                 .Include(t => t.Booker)
                 .AsQueryable();
