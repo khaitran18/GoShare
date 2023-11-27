@@ -44,15 +44,23 @@ namespace Application.Commands.Handlers
                 else
                 {
                     UserRoleEnumerations role = UserRoleEnumerations.User;
-                    if (user.Isdriver) role = UserRoleEnumerations.Driver;
+                    //Generate tokens
                     response.AccessToken = _tokenService.GenerateJWTToken(user.Id,user.Phone,user.Name,role);
                     response.RefreshToken = _tokenService.GenerateRefreshToken();
+                    //-------------------------------------------------------------------------------------
+                    //Mapping
                     response.Id = user.Id;
                     response.Phone = user.Phone;
                     response.Name = user.Name;
-                    if (user.GuardianId is not null) role = UserRoleEnumerations.Dependent;
+                    //if user is a dependent response with dependent role, but jwt token keep role as user
+                    if (user.GuardianId is not null) 
+                        role = UserRoleEnumerations.Dependent;
                     response.Role = role.ToString();
+                    //------------------------------------------------------------------------------------
+
+                    //Check if user is in any running trip
                     response.CurrentTrip = _unitOfWork.TripRepository.GetOngoingTripByPassengerId(user.Id).Result?.Id;
+                    //Check if user's dependent is in any trip
                     response.DependentCurrentTrips = await _userService.GetCurrentDenpendentTrips(_unitOfWork, user.Id);
                     user.RefreshToken = response.RefreshToken;
                     user.RefreshTokenExpiryTime = _tokenService.CreateRefreshTokenExpiryTime();

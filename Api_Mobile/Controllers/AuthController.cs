@@ -20,6 +20,13 @@ namespace Api_Mobile.Controllers
         {
             var response = await _mediator.Send(command);
             return Ok(response);
+        }        
+        
+        [HttpPost("driver/login")]
+        public async Task<IActionResult> LoginDriver([FromBody] AuthDriverCommand command)
+        {
+            var response = await _mediator.Send(command);
+            return Ok(response);
         }
 
         [HttpPost("register")]

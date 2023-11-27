@@ -170,6 +170,7 @@ builder.Services.AddScoped<IRequestHandler<TestQuery, TestDto>, TestQueryHandler
 builder.Services.AddScoped<IRequestHandler<CreateTripCommand, TripDto>, CreateTripHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateTripForDependentCommand, TripDto>, CreateTripForDependentHandler>();
 builder.Services.AddScoped<IRequestHandler<AuthCommand, AuthResponse>, AuthCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<AuthDriverCommand, AuthResponse>, AuthDriverCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<RegisterCommand, Task>, RegisterCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<VerifyCommand, string>, VerifyCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<ResendOtpCommand, Task>, ResendOtpCommandHandler>();
