@@ -1,6 +1,7 @@
 ﻿using Application.Common.Dtos;
 using AutoMapper;
 using Domain.DataModels;
+using Domain.Enumerations;
 using Domain.Interfaces;
 using MediatR;
 using System;
@@ -29,7 +30,10 @@ namespace Application.Queries.Handler
             var response = new List<WalletTransactionDto>();
             Wallet? w = _unitOfWork.WalletRepository.GetByUserIdAsync((Guid)_claims.id!).Result;
             if (w is null) throw new DirectoryNotFoundException("User wallet is not found! Please contact our support");
+            //get wallet transactions
             List<Wallettransaction> transactions = _unitOfWork.WallettransactionRepository.GetListByWalletId(w.Id).Result;
+            //get transaction that is success or failed
+            transactions = transactions.Where(t => !t.Status.Equals(WalletTransactionStatus.PENDING)).ToList();
             return Task.FromResult(_mapper.Map<List<WalletTransactionDto>>(transactions));
         }
     }

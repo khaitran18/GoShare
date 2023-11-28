@@ -44,7 +44,10 @@ namespace Infrastructure.Repositories
 
         public Task<List<Wallettransaction>> GetListByWalletId(Guid id)
         {
-            return Task.FromResult(_context.Wallettransactions.Where(t => t.WalletId.CompareTo(id) == 0).ToList());
+            return Task.FromResult(_context.Wallettransactions
+                .Where(t => t.WalletId.CompareTo(id) == 0)
+                .OrderByDescending(t=>t.CreateTime)
+                .ToList());
         }
     }
 }

@@ -32,6 +32,14 @@ namespace Infrastructure.Repositories
                 .FirstOrDefaultAsync(t => t.Id == id);
         }
 
+        public async Task<Trip?> GetCurrentTripByUserId(Guid id)
+        {
+            var list = await _context.Trips.Where(t => t.PassengerId == id || t.DriverId==id).ToListAsync();
+            return list.FirstOrDefault(t => t.Status != TripStatus.COMPLETED &&
+                                          t.Status != TripStatus.CANCELED &&
+                                          t.Status != TripStatus.TIMEDOUT);
+        }
+
         public async Task<Trip?> GetOngoingTripByPassengerId(Guid passengerId)
         {
             return await _context.Trips
@@ -46,8 +54,9 @@ namespace Infrastructure.Repositories
             IQueryable<Trip> query = _context.Trips
                 .Where(t => t.PassengerId == userId && t.Status == TripStatus.COMPLETED)
                 .Include(t => t.StartLocation)
-                .Include(t => t.EndLocation)
                 .Include(t => t.Driver)
+                .Include(t => t.EndLocation)
+                .Include(t => t.Driver!.Car)
                 .Include(t => t.Cartype)
                 .Include(t => t.Booker)
                 .AsQueryable();

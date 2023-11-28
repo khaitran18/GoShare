@@ -260,6 +260,17 @@ builder.Services.AddSingleton<SpeedSMS>();
 builder.Services.AddScoped<ISpeedSMSAPI, SpeedSMSAPI>();
 builder.Services.AddSingleton<ISpeedSMSAPI>(new SpeedSMSAPI(GoShareConfiguration.SpeedSMSAccount));
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", builder =>
+    {
+        builder.AllowAnyHeader()
+            .AllowAnyMethod()
+            .SetIsOriginAllowed((host) => true)
+            .AllowCredentials();
+    });
+});
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -304,6 +315,8 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<LoggingMiddleware>();
 app.UseMiddleware<GetUserClaimsMiddleware>();
 app.UseMiddleware<CheckUserVerificationMiddleware>();
+
+app.UseCors("CorsPolicy");
 
 app.UseHangfireDashboard("/hangfire");
 

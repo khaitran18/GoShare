@@ -38,10 +38,14 @@ namespace Application.Queries.Handler
                 //if user is booker of the trip
                 if (!_claims.id.Equals(t.BookerId))
                 {
-                    //if user is passenger dependent
-                    if (!await _userService.CheckDependentStatus(_unitOfWork, t.PassengerId, (Guid)_claims.id! ))
+                    //if driver is driver of the trip
+                    if (!_claims.id.Equals(t.DriverId))
                     {
-                        throw new UnauthorizedAccessException();
+                        //if user is passenger dependent
+                        if (!await _userService.CheckDependentStatus(_unitOfWork, t.PassengerId, (Guid)_claims.id!))
+                        {
+                            throw new UnauthorizedAccessException();
+                        }
                     }
                 }
             }

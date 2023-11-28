@@ -130,6 +130,7 @@ namespace Infrastructure.Repositories
 
         public async Task<User?> GetUserById(string id)
         {
+
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id.Equals(new Guid(id)));
 
             if (user != null && user.Isdriver)
