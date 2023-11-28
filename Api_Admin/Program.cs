@@ -91,7 +91,16 @@ builder.Services.AddScoped<IRequestHandler<GetDriverQuery, PaginatedResult<Admin
 builder.Services.AddScoped<IRequestHandler<GetFeedbackQuery, AppfeedbackDto>, GetFeedbackHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", builder =>
+    {
+        builder.AllowAnyHeader()
+            .AllowAnyMethod()
+            .SetIsOriginAllowed((host) => true)
+            .AllowCredentials();
+    });
+});
 
 var mapperConfig = new MapperConfiguration(cfg =>
 {

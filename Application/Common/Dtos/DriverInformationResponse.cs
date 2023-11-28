@@ -11,5 +11,6 @@ namespace Application.Common.Dtos
         public int RatingNum { get; set; }
         public double Rating { get; set; }
         public double DailyIncome { get; set; }
+
     }
 }
