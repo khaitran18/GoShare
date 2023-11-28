@@ -98,7 +98,7 @@ builder.Services.AddCors(options =>
         builder.AllowAnyHeader()
             .AllowAnyMethod()
             .SetIsOriginAllowed((host) => true)
-            .AllowCredentials();
+            .AllowAnyOrigin();
     });
 });
 
