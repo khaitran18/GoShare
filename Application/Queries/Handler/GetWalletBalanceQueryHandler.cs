@@ -28,7 +28,7 @@ namespace Application.Queries.Handler
             // if the user has a wallet
             if (w is not null) response = w.Balance;
             else {
-                var u = await _unitOfWork.UserRepository.GetUserById(_claims.ToString()!);
+                var u = await _unitOfWork.UserRepository.GetUserById(_claims.id.ToString()!);
                 // if user is not a guardian
                 if (u?.GuardianId is null) throw new BadRequestException("User wallet is not found, please contact our support");
                 else
