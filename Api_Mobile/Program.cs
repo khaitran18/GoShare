@@ -319,8 +319,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.UseCors("CorsPolicy");
-
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapHub<SignalRHub>("/goshareHub");
