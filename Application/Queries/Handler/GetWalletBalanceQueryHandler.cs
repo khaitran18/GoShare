@@ -21,13 +21,24 @@ namespace Application.Queries.Handler
             _claims = claims;
         }
 
-        public Task<double> Handle(GetWalletBalanceQuery request, CancellationToken cancellationToken)
+        public async Task<double> Handle(GetWalletBalanceQuery request, CancellationToken cancellationToken)
         {
             double response;
             var w = _unitOfWork.WalletRepository.GetByUserIdAsync((Guid)_claims.id!).Result;
+            // if the user has a wallet
             if (w is not null) response = w.Balance;
-            else throw new BadRequestException("User wallet is not found, please contact our support");
-            return Task.FromResult(response);
+            else {
+                var u = await _unitOfWork.UserRepository.GetUserById(_claims.ToString()!);
+                // if user is not a guardian
+                if (u?.GuardianId is null) throw new BadRequestException("User wallet is not found, please contact our support");
+                else
+                {
+                    var gWallet = await _unitOfWork.WalletRepository.GetByUserIdAsync((Guid)u.GuardianId);
+                    if (gWallet is not null) response = gWallet.Balance;
+                    else throw new BadRequestException("User wallet is not found, please contact our support");
+                }
+            }
+            return response;
         }
     }
 }
