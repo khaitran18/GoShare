@@ -17,11 +17,13 @@ namespace Application.SignalR
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ITokenService _tokenService;
+        private readonly ILogger<SignalRHub> _logger;
 
-        public SignalRHub(IUnitOfWork unitOfWork, ITokenService tokenService)
+        public SignalRHub(IUnitOfWork unitOfWork, ITokenService tokenService, ILogger<SignalRHub> logger)
         {
             _unitOfWork = unitOfWork;
             _tokenService = tokenService;
+            _logger = logger;
         }
 
         public async Task JoinGroup(string groupName)
@@ -55,6 +57,8 @@ namespace Application.SignalR
                 await Groups.AddToGroupAsync(Context.ConnectionId, userId.ToString());
             }
 
+            _logger.LogInformation("Client connected with ID: {userId}", userId.ToString());
+
             await base.OnConnectedAsync();
         }
 
@@ -72,6 +76,8 @@ namespace Application.SignalR
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, userId.ToString());
             }
+
+            _logger.LogInformation("Client disconnected with ID: {userId}", userId.ToString());
 
             await base.OnDisconnectedAsync(exception);
         }
