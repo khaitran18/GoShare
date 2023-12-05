@@ -70,6 +70,7 @@ namespace Application.SignalR
                 var groupName = await GetGroupNameForUser(user);
 
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
+                await Groups.RemoveFromGroupAsync(Context.ConnectionId, userId.ToString());
             }
 
             await base.OnDisconnectedAsync(exception);
