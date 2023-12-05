@@ -82,10 +82,17 @@ namespace Infrastructure.Repositories
 
         public async Task<(List<User>, int)> GetDriverAsync(int page, int pageSize, string? sortBy)
         {
-            IQueryable<User> query = _context.Users
-                .Where(u => u.Isdriver.Equals(true))
+            IQueryable<User> drivers = _context.Users
                 .Include(u=>u.Car)
+                .Where(u => u.Isdriver.Equals(true))
                 .AsQueryable();
+            IQueryable<User> users = _context.Users
+                .Include(u => u.Car)
+                .Where(u => u.Isdriver.Equals(false))
+                .Where(u => !u.Car.Equals(null))
+//                .Where(u => u.Car!.Status.Equals(CarStatusEnumerations.Not_Verified))
+                .AsQueryable();
+            var query = drivers.Concat(users);
 
             // Sort by
             if (!string.IsNullOrEmpty(sortBy))
@@ -123,9 +130,9 @@ namespace Infrastructure.Repositories
             // Pagination
             query = query.Skip((page - 1) * pageSize).Take(pageSize);
 
-            var drivers = await query.ToListAsync();
+            var list = await query.ToListAsync();
 
-            return (drivers, totalCount);
+            return (list, totalCount);
         }
 
         public async Task<User?> GetUserById(string id)
