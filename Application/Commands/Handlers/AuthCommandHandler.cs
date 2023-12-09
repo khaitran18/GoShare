@@ -44,6 +44,8 @@ namespace Application.Commands.Handlers
                 else
                 {
                     UserRoleEnumerations role = UserRoleEnumerations.User;
+                    if (user.GuardianId is not null)
+                        role = UserRoleEnumerations.Dependent;
                     //Generate tokens
                     response.AccessToken = _tokenService.GenerateJWTToken(user.Id,user.Phone,user.Name,role);
                     response.RefreshToken = _tokenService.GenerateRefreshToken();
@@ -53,8 +55,8 @@ namespace Application.Commands.Handlers
                     response.Phone = user.Phone;
                     response.Name = user.Name;
                     //if user is a dependent response with dependent role, but jwt token keep role as user
-                    if (user.GuardianId is not null) 
-                        role = UserRoleEnumerations.Dependent;
+                    //if (user.GuardianId is not null) 
+                    //    role = UserRoleEnumerations.Dependent;
                     response.Role = role.ToString();
                     //------------------------------------------------------------------------------------
 

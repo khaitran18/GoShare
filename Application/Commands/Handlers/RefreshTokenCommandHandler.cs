@@ -31,41 +31,30 @@ namespace Application.Commands.Handlers
         {
             AuthResponse response = new AuthResponse();
             string? userId = null;
-            //ClaimsPrincipal claims = _tokenService.ValidateToken(request.AccessToken)!;
-            IEnumerable < Claim > claims = _tokenService.GetTokenClaims(request.AccessToken)!;
+            ClaimsPrincipal claims = _tokenService.ValidateToken(request.AccessToken)!;
             string? RefreshToken;
             DateTime? RefreshTokenExpiryTime;
-            string roleClaims = claims.First(u => u.Type.Equals(ClaimTypes.Role)).Value;
-            //if (claims.IsInRole(UserRoleEnumerations.Admin.ToString()))
-            if (roleClaims.Equals(UserRoleEnumerations.Admin.ToString()))
-            {
-                RefreshToken = KeyValueStore.Instance.Get<string>("Admin_RefreshToken");
-                RefreshTokenExpiryTime = KeyValueStore.Instance.Get<DateTime>("Admin_RefreshToken_Expiry");
-            }
-            else
-            {
-                userId = claims.FirstOrDefault(u => u.Type.Equals("id"))!.Value;
-                RefreshToken = await _unitOfWork.UserRepository.GetUserRefreshTokenByUserId(userId);
-                RefreshTokenExpiryTime = await _unitOfWork.UserRepository.GetUserRefreshTokenExpiryTimeByUserId(userId);
-            }
+            userId = claims.FindFirst("id")!.Value;
+            RefreshToken = await _unitOfWork.UserRepository.GetUserRefreshTokenByUserId(userId);
+            RefreshTokenExpiryTime = await _unitOfWork.UserRepository.GetUserRefreshTokenExpiryTimeByUserId(userId);
             if (RefreshTokenExpiryTime?.CompareTo(DateTimeUtilities.GetDateTimeVnNow()) < 0) throw new UnauthorizedAccessException("Timeout, please login again");
             else
             {
-                if (RefreshToken!.Equals(null)) throw new UnauthorizedAccessException("Token is null");
+                if (RefreshToken is null) throw new UnauthorizedAccessException("Token is null");
                 else
                 {
                     if (!RefreshToken.Equals(request.RefreshToken)) throw new Exception("Refresh token is currupted, please login again");
                     else
                     {
-
-                        UserRoleEnumerations role = roleClaims.Equals(UserRoleEnumerations.User.ToString())|| roleClaims.Equals(UserRoleEnumerations.Dependent.ToString()) ? UserRoleEnumerations.User : roleClaims.Equals(UserRoleEnumerations.Driver.ToString()) ? UserRoleEnumerations.Driver : roleClaims.Equals(UserRoleEnumerations.Driver.ToString())?UserRoleEnumerations.Dependent:UserRoleEnumerations.Admin;
-                        response.AccessToken = _tokenService.GenerateJWTToken(userId is not null ? new Guid(userId):null, claims.First(u=>u.Type.Equals("phone"))?.Value, claims.First(u=>u.Type.Equals("name"))?.Value, role);
-                        response.Role = roleClaims;
-                        if (await _unitOfWork.UserRepository.IsDependent(new Guid(userId!))) response.Role = UserRoleEnumerations.Dependent.ToString();
+                        UserRoleEnumerations role =
+                            claims.IsInRole(UserRoleEnumerations.User.ToString()) ? UserRoleEnumerations.User :
+                            claims.IsInRole(UserRoleEnumerations.Driver.ToString()) ? UserRoleEnumerations.Driver : UserRoleEnumerations.Dependent;
+                        response.Role = role.ToString();
                         response.RefreshToken = request.RefreshToken;
-                        response.Phone = claims.First(u => u.Type.Equals("phone"))?.Value;
-                        response.Name = claims.First(u => u.Type.Equals("name"))?.Value;
+                        response.Phone = claims.FindFirst("phone")!.Value;
+                        response.Name = claims.FindFirst("name")!.Value;
                         response.Id = new Guid(userId!);
+                        response.AccessToken = _tokenService.GenerateJWTToken(response.Id,response.Phone, response.Name, role);
                         var trip = await _unitOfWork.TripRepository.GetCurrentTripByUserId((Guid)response.Id);
                         response.CurrentTrip = trip?.Id;
                         response.DependentCurrentTrips = await _userService.GetCurrentDenpendentTrips(_unitOfWork, new Guid(userId!));

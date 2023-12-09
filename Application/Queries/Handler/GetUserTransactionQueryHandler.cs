@@ -33,7 +33,7 @@ namespace Application.Queries.Handler
             //get wallet transactions
             List<Wallettransaction> transactions = _unitOfWork.WallettransactionRepository.GetListByWalletId(w.Id).Result;
             //get transaction that is success or failed
-            transactions = transactions.Where(t => !t.Status.Equals(WalletTransactionStatus.PENDING)).ToList();
+            //transactions = transactions.Where(t => !t.Status.Equals(WalletTransactionStatus.PENDING)).ToList();
             return Task.FromResult(_mapper.Map<List<WalletTransactionDto>>(transactions));
         }
     }

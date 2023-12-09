@@ -22,11 +22,5 @@ namespace Api_Admin.Controllers
             var response = await _mediator.Send(command);
             return Ok(response);
         }
-        [HttpPost("refresh-token")]
-        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenCommand command)
-        {
-            var response = await _mediator.Send(command);
-            return Ok(response);
-        }
     }
 }

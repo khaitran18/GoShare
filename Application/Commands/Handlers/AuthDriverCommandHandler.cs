@@ -34,12 +34,6 @@ namespace Application.Commands.Handlers
             {
                 throw new NotFoundException("Phone number not found");
             }
-            else if (!user.Isverify)
-            {
-                throw new UnauthorizedAccessException("User is not verified");
-            }
-            else if (await _unitOfWork.UserRepository.IsBanned(user.Id, out string? reason))
-                throw new ForbiddenAccessException("User is banned: " + reason);
             else
             {
                 if (!PasswordHasher.Validate(user.Passcode!, request.Passcode))
