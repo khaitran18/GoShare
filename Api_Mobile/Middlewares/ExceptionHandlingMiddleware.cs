@@ -103,6 +103,17 @@ namespace Api_Mobile.Middlewares
                     };
                     await context.Response.WriteAsJsonAsync(responseBody);
                 }
+                else if (ex is SecurityTokenSignatureKeyNotFoundException)
+                {
+                    context.Response.StatusCode = 401;
+                    context.Response.ContentType = "application/json";
+                    var responseBody = new
+                    {
+                        Message = "Token is currupted",
+                        StackTrace = ex.StackTrace
+                    };
+                    await context.Response.WriteAsJsonAsync(responseBody);
+                }
                 else
                 {
                     context.Response.StatusCode = 500;

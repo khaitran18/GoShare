@@ -31,8 +31,8 @@ namespace Application.Commands.Handlers
             {
                 response.AccessToken = _tokenService.GenerateJWTToken(null,null,null,role:UserRoleEnumerations.Admin);
                 response.RefreshToken = _tokenService.GenerateRefreshToken();
-                KeyValueStore.Instance.Set("Admin_RefreshToken", response.RefreshToken);
-                KeyValueStore.Instance.Set("Admin_RefreshToken_Expiry", _tokenService.CreateRefreshTokenExpiryTime());
+                //KeyValueStore.Instance.Set("Admin_RefreshToken", response.RefreshToken);
+                //KeyValueStore.Instance.Set("Admin_RefreshToken_Expiry", _tokenService.CreateRefreshTokenExpiryTime());
             }
             else throw new BadRequestException("Wrong username or password");
             return await Task.FromResult(response);
