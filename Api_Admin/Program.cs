@@ -44,7 +44,7 @@ builder.Services.AddTransient<LoggingMiddleware>();
 builder.Services.AddTransient<GetUserClaimsMiddleware>();
 
 builder.Services.AddScoped<UserClaims>();
-
+ 
 // Add services to the container.
 builder.Services.AddControllers().AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
@@ -126,7 +126,7 @@ builder.Services.AddHangfireServer(options =>
 });
 
 // Firebase
-var credential = GoogleCredential.FromFile(Environment.CurrentDirectory! + "\\" + GoShareConfiguration.FirebaseCredentialFile);
+var credential = GoogleCredential.FromFile(AppDomain.CurrentDomain.BaseDirectory! + "\\" + GoShareConfiguration.FirebaseCredentialFile);
 
 if (FirebaseApp.DefaultInstance == null)
 {

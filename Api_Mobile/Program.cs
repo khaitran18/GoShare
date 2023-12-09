@@ -342,7 +342,7 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapHub<SignalRHub>("/goshareHub");
 });
-
+ 
 app.Run();
 
 public partial class Program
