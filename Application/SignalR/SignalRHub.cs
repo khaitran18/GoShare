@@ -126,22 +126,42 @@ namespace Application.SignalR
                 return;
             }
 
-            var groupName = SignalRUtilities.GetGroupNameForUser(trip.Passenger, trip);
-
-            // Check the trip status
-            if (trip.Status == TripStatus.GOING)
+            // Check the trip type
+            if (trip.Type == TripType.SELF_BOOK && trip.Status == TripStatus.GOING_TO_PICKUP)
+            {
+                // Only let user see driver location going to the pickup point
+                await Clients.Group(trip.BookerId.ToString())
+                    .SendAsync("UpdateDriverLocation", driverLocation);
+            }
+            else if (trip.Type == TripType.BOOK_FOR_DEP_NO_APP)
             {
                 // Only update driver location for guardian
-                if (trip.Passenger.GuardianId != null && trip.Passenger.GuardianId == trip.BookerId)
-                {
-                    await Clients.Group(trip.Passenger.GuardianId.ToString())
-                        .SendAsync("UpdateDriverLocation", driverLocation);
-                }
+                await Clients.Group(trip.BookerId.ToString())
+                    .SendAsync("UpdateDriverLocation", driverLocation);
             }
-            else if (trip.Status == TripStatus.GOING_TO_PICKUP)
+        }
+
+        public async Task SendDependentLocation(string dependentLocation, string tripId)
+        {
+            var trip = await _unitOfWork.TripRepository.GetByIdAsync(Guid.Parse(tripId));
+
+            if (trip == null)
             {
-                await Clients.Group(groupName)
-                        .SendAsync("UpdateDriverLocation", driverLocation);
+                return;
+            }
+
+            // Check the trip type
+            if (trip.Type == TripType.BOOK_FOR_DEP_WITH_APP)
+            {
+                // Update dependent location for driver
+                if (trip.Status == TripStatus.GOING_TO_PICKUP)
+                {
+                    await Clients.Group(trip.DriverId.ToString())
+                        .SendAsync("UpdateDependentLocation", dependentLocation);
+                }
+
+                await Clients.Group(trip.BookerId.ToString())
+                        .SendAsync("UpdateDependentLocation", dependentLocation);
             }
         }
     }

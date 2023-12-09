@@ -17,7 +17,7 @@ namespace Application.Common.Utilities.SignalR
                 return $"{user.Id}-{user.GuardianId}";
             }
 
-            // Driver, self-book dependent
+            // Driver
             return $"{user.Id}";
         }
     }
