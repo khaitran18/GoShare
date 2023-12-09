@@ -51,27 +51,29 @@ namespace Application.Commands.Handlers
                 UpdatedTime = DateTimeUtilities.GetDateTimeVnNow()
             };
 
-            if (request.UserId == null)
-            {
-                // Create location for self
-                plannedDestination.UserId = userId;
-            }
-            else
-            {
-                var dependent = await _unitOfWork.UserRepository.GetUserById(request.UserId.ToString()!);
-                if (dependent == null)
-                {
-                    throw new NotFoundException(nameof(User), request.UserId);
-                }
+            //if (request.UserId == null)
+            //{
+            //    // Create location for self
+            //    plannedDestination.UserId = userId;
+            //}
+            //else
+            //{
+            //    var dependent = await _unitOfWork.UserRepository.GetUserById(request.UserId.ToString()!);
+            //    if (dependent == null)
+            //    {
+            //        throw new NotFoundException(nameof(User), request.UserId);
+            //    }
 
-                // Check if dependent is of the user
-                if (dependent.GuardianId != userId)
-                {
-                    throw new BadRequestException("The user is not the guardian of the dependent.");
-                }
+            //    // Check if dependent is of the user
+            //    if (dependent.GuardianId != userId)
+            //    {
+            //        throw new BadRequestException("The user is not the guardian of the dependent.");
+            //    }
 
-                plannedDestination.UserId = (Guid)request.UserId;
-            }
+            //    plannedDestination.UserId = (Guid)request.UserId;
+            //}
+
+            plannedDestination.UserId = userId;
 
             // Check if a planned destination with the same coordinates already exists
             var existingPlannedDestination = await _unitOfWork.LocationRepository.GetByUserIdAndLatLongAndTypeAsync(plannedDestination.UserId, request.Latitude, request.Longitude, LocationType.PLANNED_DESTINATION);

@@ -40,7 +40,7 @@ namespace Application.Commands.Handlers
                 throw new NotFoundException(nameof(Location), request.Id);
             }
 
-            if (location.UserId != userId && (location.User.Guardian == null || location.User.GuardianId != userId))
+            if (location.UserId != userId/* && (location.User.Guardian == null || location.User.GuardianId != userId)*/)
             {
                 throw new BadRequestException("The user does not have permission to delete this location.");
             }

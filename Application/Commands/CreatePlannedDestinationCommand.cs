@@ -14,6 +14,6 @@ namespace Application.Commands
         public decimal Longitude { get; set; }
         public string? Address { get; set; }
         public string? Name { get; set; }
-        public Guid? UserId { get; set; }
+        //public Guid? UserId { get; set; }
     }
 }
