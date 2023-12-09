@@ -1,4 +1,4 @@
-﻿using Application.Commands;
+﻿using Application.UseCase.PaymentUC.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;

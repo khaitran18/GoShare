@@ -1,5 +1,5 @@
-﻿using Application.Commands;
-using Application.Common.Utilities;
+﻿using Application.Common.Utilities;
+using Application.UseCase.AuthUC.Commands;
 using FluentValidation;
 using System;
 using System.Collections.Generic;

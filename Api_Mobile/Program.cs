@@ -2,8 +2,6 @@ using Api_Mobile.Middlewares;
 using Application.Common.Dtos;
 using Application.Common.Mappers;
 using Application.Common.Validations;
-using Application.Queries;
-using Application.Queries.Handler;
 using AutoMapper;
 using Domain.Interfaces;
 using FirebaseAdmin;
@@ -17,8 +15,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using Application.Configuration;
 using Application.Services;
-using Application.Commands;
-using Application.Commands.Handlers;
 using Hangfire;
 using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -30,6 +26,31 @@ using Google.Cloud.Storage.V1;
 using Application.Common.Behaviours;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
+using Application.UseCase.TripUC.Handlers;
+using Application.UseCase.UserUC.Commands;
+using Application.UseCase.UserUC.Queries;
+using Application.UseCase.WalletUC.Queries;
+using Application.UseCase.ChatUC.Queries;
+using Application.UseCase.WalletUC.Handlers;
+using Application.UseCase.UserUC.Handlers;
+using Application.UseCase.TripUC.Commands;
+using Application.UseCase.PaymentUC.Commands;
+using Application.UseCase.WallettransactionUC.Queries;
+using Application.UseCase.TripUC.Queries;
+using Application.UseCase.PaymentUC.Handler;
+using Application.UseCase.DriverUC.Queries;
+using Application.UseCase.LocationUC.Queries;
+using Application.UseCase.WallettransactionUC.Handlers;
+using Application.UseCase.AuthUC.Commands;
+using Application.UseCase.AuthUC.Handlers;
+using Application.UseCase.AppfeedbackUC.Handlers;
+using Application.UseCase.AppfeedbackUC.Commands;
+using Application.UseCase.ChatUC.Handlers;
+using Application.UseCase.ChatUC.Commands;
+using Application.UseCase.DriverUC.Commands;
+using Application.UseCase.DriverUC.Handlers;
+using Application.UseCase.LocationUC.Commands;
+using Application.UseCase.LocationUC.Handlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -165,7 +186,6 @@ builder.Services.AddCors(options =>
 
 // Add Handler
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-builder.Services.AddScoped<IRequestHandler<TestQuery, TestDto>, TestQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateTripCommand, TripDto>, CreateTripHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateTripForDependentCommand, TripDto>, CreateTripForDependentHandler>();
 builder.Services.AddScoped<IRequestHandler<AuthCommand, AuthResponse>, AuthCommandHandler>();
@@ -216,7 +236,6 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.Get
 
 // Fluent Validation
 
-builder.Services.AddScoped<IValidator<TestQuery>, TestQueryValidator>();
 builder.Services.AddScoped<IValidator<CreateTripCommand>, CreateTripCommandValidator>();
 builder.Services.AddScoped<IValidator<AddCarCommand>, AddCarCommandValidator>();
 builder.Services.AddScoped<IValidator<AuthCommand>, AuthCommandValidator>();

@@ -1,5 +1,5 @@
-﻿using Application.Commands;
-using Application.Queries;
+﻿using Application.UseCase.ChatUC.Commands;
+using Application.UseCase.ChatUC.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

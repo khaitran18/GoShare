@@ -1,6 +1,6 @@
-﻿using Application.Commands;
-using Application.Common.Dtos;
+﻿using Application.Common.Dtos;
 using Application.Common.Validations;
+using Application.UseCase.TripUC.Commands;
 using Domain.Enumerations;
 using FluentAssertions;
 using Moq;

@@ -1,5 +1,6 @@
-﻿using Application.Commands;
-using Application.Queries;
+﻿using Application.UseCase.DriverUC.Commands;
+using Application.UseCase.DriverUC.Queries;
+using Application.UseCase.UserUC.Queries;
 using Domain.Enumerations;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

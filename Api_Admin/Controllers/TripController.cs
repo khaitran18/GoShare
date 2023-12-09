@@ -1,7 +1,6 @@
-﻿using Application.Commands;
+﻿using Application.UseCase.TripUC.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api_Admin.Controllers

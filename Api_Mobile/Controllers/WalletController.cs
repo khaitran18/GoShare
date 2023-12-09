@@ -1,4 +1,4 @@
-﻿using Application.Queries;
+﻿using Application.UseCase.WalletUC.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

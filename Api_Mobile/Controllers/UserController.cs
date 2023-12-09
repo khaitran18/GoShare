@@ -1,5 +1,5 @@
-﻿using Application.Commands;
-using Application.Queries;
+﻿using Application.UseCase.UserUC.Commands;
+using Application.UseCase.UserUC.Queries;
 using Domain.Enumerations;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

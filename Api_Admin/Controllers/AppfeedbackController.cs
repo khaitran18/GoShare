@@ -1,4 +1,4 @@
-﻿using Application.Queries;
+﻿using Application.UseCase.AppfeedbackUC.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;

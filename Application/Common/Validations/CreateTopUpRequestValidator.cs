@@ -1,4 +1,4 @@
-﻿using Application.Commands;
+﻿using Application.UseCase.PaymentUC.Commands;
 using FluentValidation;
 using System;
 using System.Collections.Generic;

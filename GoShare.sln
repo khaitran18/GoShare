@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7FCAE039-18A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{C4A85FF1-2077-452B-BEBA-34A1976AB2BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api_Mobile.Tests", "Api_Mobile.Tests\Api_Mobile.Tests.csproj", "{D9553A36-4657-4CC5-B190-7EB40F098782}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api_Mobile.Tests", "Api_Mobile.Tests\Api_Mobile.Tests.csproj", "{D9553A36-4657-4CC5-B190-7EB40F098782}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,6 +1,6 @@
-﻿using Application.Commands;
-using Application.Common.Dtos;
-using Application.Queries;
+﻿using Application.Common.Dtos;
+using Application.UseCase.TripUC.Commands;
+using Application.UseCase.TripUC.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;

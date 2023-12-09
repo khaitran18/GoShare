@@ -1,7 +1,6 @@
-﻿using Application.Commands;
-using Application.Common;
+﻿using Application.Common;
 using Application.Common.Dtos;
-using Application.Queries;
+using Application.UseCase.AppfeedbackUC.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

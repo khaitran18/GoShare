@@ -1,5 +1,5 @@
-﻿using Application.Commands;
-using Application.Configuration;
+﻿using Application.Configuration;
+using Application.UseCase.AuthUC.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

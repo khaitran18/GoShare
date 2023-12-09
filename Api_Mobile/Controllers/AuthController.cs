@@ -1,4 +1,4 @@
-﻿using Application.Commands;
+﻿using Application.UseCase.AuthUC.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

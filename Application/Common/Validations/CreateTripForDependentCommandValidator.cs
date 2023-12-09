@@ -1,4 +1,4 @@
-﻿using Application.Commands;
+﻿using Application.UseCase.TripUC.Commands;
 using Domain.Enumerations;
 using FluentValidation;
 using System;

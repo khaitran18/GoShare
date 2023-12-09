@@ -1,5 +1,5 @@
 ﻿using Application.Common.Dtos;
-using Application.Queries;
+using Application.UseCase.UserUC.Queries;
 using Domain.Enumerations;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
