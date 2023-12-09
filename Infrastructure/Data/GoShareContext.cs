@@ -408,6 +408,14 @@ namespace Infrastructure.Data
 
                 entity.Property(e => e.PassengerId).HasColumnName("passenger_id");
 
+                entity.Property(e => e.PassengerName)
+                    .HasMaxLength(50)
+                    .HasColumnName("passenger_name");
+
+                entity.Property(e => e.PassengerPhoneNumber)
+                    .HasMaxLength(15)
+                    .HasColumnName("passenger_phone_number");
+
                 entity.Property(e => e.BookerId).HasColumnName("booker_id");
 
                 entity.Property(e => e.CanceledBy).HasColumnName("canceled_by");
@@ -431,6 +439,8 @@ namespace Infrastructure.Data
                 entity.Property(e => e.Status).HasColumnName("status");
 
                 entity.Property(e => e.PaymentMethod).HasColumnName("payment_method");
+
+                entity.Property(e => e.Type).HasColumnName("type");
 
                 entity.Property(e => e.UpdatedTime)
                     .HasColumnType("timestamp without time zone")

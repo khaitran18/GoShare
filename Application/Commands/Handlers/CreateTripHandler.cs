@@ -50,6 +50,12 @@ namespace Application.Commands.Handlers
                 throw new NotFoundException(nameof(User), userId);
             }
 
+            // Prevent dependents from creating trip
+            if (passenger.GuardianId != null)
+            {
+                throw new BadRequestException("Dependents are not allowed to create trips. Please contact your guardian to book a trip on your behalf.");
+            }
+
             // Check if the passenger is already in a trip that hasn't completed
             var ongoingTrip = await _unitOfWork.TripRepository.GetOngoingTripByPassengerId(userId);
             if (ongoingTrip != null)
@@ -69,17 +75,17 @@ namespace Application.Commands.Handlers
 
             var now = DateTimeUtilities.GetDateTimeVnNow();
             var cancellationWindowMinutes = _settingService.GetSetting("TRIP_CANCELLATION_WINDOW");
-            var cancellationLimit = _settingService.GetSetting("TRIP_CANCELLATION_LIMIT");
-            var banDurationMinutes = _settingService.GetSetting("CANCELLATION_BAN_DURATION");
+            //var cancellationLimit = _settingService.GetSetting("TRIP_CANCELLATION_LIMIT");
 
-            var cancellationWindow = now.AddMinutes(-cancellationWindowMinutes);
+            //var cancellationWindow = now.AddMinutes(-cancellationWindowMinutes);
 
-            // Check if the user has cancelled too many trips recently
-            if (passenger.LastTripCancellationTime >= cancellationWindow && passenger.CanceledTripCount >= cancellationLimit)
+            if (passenger.CancellationBanUntil != null)
             {
+                // Check if the user has cancelled too many trips recently (being banned)
                 if (now < passenger.CancellationBanUntil)
                 {
-                    throw new BadRequestException($"You have exceeded the maximum number of cancellations allowed within {cancellationWindowMinutes} minutes. Please wait until {passenger.CancellationBanUntil} before creating a new trip.");
+                    throw new BadRequestException($"You have exceeded the maximum number of cancellations allowed within {cancellationWindowMinutes} minutes. " +
+                        $"Please wait until {passenger.CancellationBanUntil} before creating a new trip.");
                 }
                 else
                 {
@@ -178,9 +184,10 @@ namespace Application.Commands.Handlers
 
             var totalPrice = await _unitOfWork.CartypeRepository.CalculatePriceForCarType(request.CartypeId, distance);
 
+            // Check if user's wallet has enough balance to book trip
             if (request.PaymentMethod == PaymentMethod.WALLET)
             {
-                Guid walletOwnerId = passenger.GuardianId ?? passenger.Id;
+                Guid walletOwnerId = passenger.Id;
 
                 var walletOwnerWallet = await _unitOfWork.WalletRepository.GetByUserIdAsync(walletOwnerId);
                 if (walletOwnerWallet == null)
@@ -208,7 +215,10 @@ namespace Application.Commands.Handlers
                 Status = TripStatus.PENDING,
                 PaymentMethod = request.PaymentMethod,
                 BookerId = userId,
-                Note = request.Note
+                Note = request.Note,
+                PassengerName = passenger.Name,
+                PassengerPhoneNumber = passenger.Phone,
+                Type = TripType.SELF_BOOK
             };
 
             await _unitOfWork.TripRepository.AddAsync(trip);

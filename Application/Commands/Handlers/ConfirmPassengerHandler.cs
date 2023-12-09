@@ -80,19 +80,13 @@ namespace Application.Commands.Handlers
                 // Wallet transaction
                 if (trip.PaymentMethod == PaymentMethod.WALLET)
                 {
-                    var passenger = await _unitOfWork.UserRepository.GetUserById(trip.PassengerId.ToString());
-                    if (passenger == null)
-                    {
-                        throw new NotFoundException(nameof(User), trip.PassengerId);
-                    }
-
-                    Guid walletOwnerId = passenger.GuardianId ?? passenger.Id;
+                    Guid walletOwnerId = trip.BookerId;
                     var walletOwnerWallet = await _unitOfWork.WalletRepository.GetByUserIdAsync(walletOwnerId);
+                    // These validation shouldn't happen, but I place them here just in case
                     if (walletOwnerWallet == null)
                     {
                         throw new NotFoundException(nameof(Wallet), walletOwnerId);
                     }
-
                     if (walletOwnerWallet.Balance < trip.Price)
                     {
                         throw new BadRequestException("The wallet owner's wallet does not have enough balance.");

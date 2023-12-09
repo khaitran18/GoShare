@@ -82,18 +82,18 @@ namespace Application.Commands.Handlers
             // Prevent creating trip for dependents who are busy
             if (dependent.Status == UserStatus.BUSY)
             {
-                throw new BadRequestException("This dependent is busy.");
+                throw new BadRequestException("This dependent is already in a trip.");
             }
 
             var now = DateTimeUtilities.GetDateTimeVnNow();
             var cancellationWindowMinutes = _settingService.GetSetting("TRIP_CANCELLATION_WINDOW");
-            var cancellationLimit = _settingService.GetSetting("TRIP_CANCELLATION_LIMIT");
+            //var cancellationLimit = _settingService.GetSetting("TRIP_CANCELLATION_LIMIT");
 
-            var cancellationWindow = now.AddMinutes(-cancellationWindowMinutes);
+            //var cancellationWindow = now.AddMinutes(-cancellationWindowMinutes);
 
-            // Check if the user has cancelled too many trips recently (guardian)
-            if (guardian.LastTripCancellationTime >= cancellationWindow && guardian.CanceledTripCount >= cancellationLimit)
+            if (guardian.CancellationBanUntil != null)
             {
+                // Check if the guardian has cancelled too many trips recently (being blocked)
                 if (now < guardian.CancellationBanUntil)
                 {
                     throw new BadRequestException($"You have exceeded the maximum number of cancellations allowed within {cancellationWindowMinutes} minutes. " +
@@ -105,6 +105,7 @@ namespace Application.Commands.Handlers
                     guardian.CanceledTripCount = 0;
                     guardian.LastTripCancellationTime = null;
                     guardian.CancellationBanUntil = null;
+                    guardian.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
                     await _unitOfWork.UserRepository.UpdateAsync(guardian);
                 }
             }
@@ -208,11 +209,15 @@ namespace Application.Commands.Handlers
                 Status = TripStatus.PENDING,
                 PaymentMethod = request.PaymentMethod,
                 BookerId = userId,
-                Note = request.Note
+                Note = request.Note,
+                PassengerName = dependent.Name,
+                PassengerPhoneNumber = dependent.Phone,
+                Type = TripType.BOOK_FOR_DEP_WITH_APP
             };
 
             await _unitOfWork.TripRepository.AddAsync(trip);
 
+            // Set status of dependent to busy
             dependent.Status = UserStatus.BUSY;
             dependent.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
             await _unitOfWork.UserRepository.UpdateAsync(dependent);
@@ -221,7 +226,7 @@ namespace Application.Commands.Handlers
 
             tripDto = _mapper.Map<TripDto>(trip);
 
-            // Background task
+            // Background task find driver
             string jobId = BackgroundJob.Enqueue<BackgroundServices>(s => s.FindDriver(trip.Id, request.CartypeId));
 
             // Notify dependent using FCM and SignalR

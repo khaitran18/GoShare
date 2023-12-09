@@ -14,6 +14,8 @@ namespace Domain.DataModels
 
         public Guid Id { get; set; }
         public Guid PassengerId { get; set; }
+        public string PassengerName { get; set; } = null!;
+        public string? PassengerPhoneNumber { get; set; }
         public Guid? DriverId { get; set; }
         public Guid StartLocationId { get; set; }
         public Guid EndLocationId { get; set; }
@@ -30,6 +32,7 @@ namespace Domain.DataModels
         public Guid BookerId { get; set; }
         public string? Note { get; set; }
         public Guid? CanceledBy { get; set; }
+        public TripType Type { get; set; }
 
         public virtual User? Driver { get; set; }
         public virtual User Booker { get; set; } = null!;

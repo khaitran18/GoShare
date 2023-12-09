@@ -107,7 +107,6 @@ builder.Services.AddSingleton<ITokenService>(new TokenService(_key, _expirtyMinu
 builder.Services.AddSingleton<IDriverDocumentService, DriverDocumentService>();
 builder.Services.AddSingleton<IDriverService, DriverService>();
 
-
 //Add VnPayService
 builder.Services.AddSingleton<IPaymentService>(new PaymentService(GoShareConfiguration.VnpayConfig));
 

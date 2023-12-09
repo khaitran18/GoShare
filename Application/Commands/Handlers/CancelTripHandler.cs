@@ -46,99 +46,50 @@ namespace Application.Commands.Handlers
 
         public async Task<TripDto> Handle(CancelTripCommand request, CancellationToken cancellationToken)
         {
-            Guid userId = (Guid)_userClaims.id!;
-
-            var user = await _unitOfWork.UserRepository.GetUserById(userId.ToString());
-            if (user == null)
-            {
-                throw new NotFoundException(nameof(User), userId);
-            }
-
             var trip = await _unitOfWork.TripRepository.GetByIdAsync(request.TripId);
             if (trip == null)
             {
                 throw new NotFoundException(nameof(Trip), request.TripId);
             }
 
-            if (trip.PassengerId != userId && trip.BookerId != userId)
+            var booker = await _unitOfWork.UserRepository.GetUserById(trip.BookerId.ToString());
+            if (booker == null)
             {
-                throw new BadRequestException("User does not match for this trip.");
+                throw new NotFoundException(nameof(User), trip.BookerId);
             }
 
-            if (trip.Status != TripStatus.PENDING)
+            UserRoleEnumerations userRole = _userClaims.Role;
+            if (userRole == UserRoleEnumerations.Admin)
             {
-                throw new BadRequestException("The trip is invalid.");
+                if (trip.Status == TripStatus.PENDING || trip.Status == TripStatus.GOING_TO_PICKUP)
+                {
+                    throw new BadRequestException("You can only cancel going trip.");
+                }
+
+                trip.CanceledBy = null;
+            }
+            else
+            {
+                Guid userId = (Guid)_userClaims.id!;
+
+                if (trip.BookerId != userId)
+                {
+                    throw new BadRequestException("User is not booker of this trip. User can't do this function.");
+                }
+
+                if (trip.Status != TripStatus.PENDING && trip.Status != TripStatus.GOING_TO_PICKUP)
+                {
+                    throw new BadRequestException("You are not allowed to cancel trip at the moment.");
+                }
+
+                trip.CanceledBy = userId;
             }
 
             var now = DateTimeUtilities.GetDateTimeVnNow();
             var cancellationWindowMinutes = _settingService.GetSetting("TRIP_CANCELLATION_WINDOW");
             var cancellationLimit = _settingService.GetSetting("TRIP_CANCELLATION_LIMIT");
 
-            var cancellationWindow = now.AddMinutes(-cancellationWindowMinutes);
-
-            // Check if the last cancellation was long ago
-            if (user.CanceledTripCount > 1 && user.CanceledTripCount < cancellationLimit && user.LastTripCancellationTime < cancellationWindow)
-            {
-                user.CanceledTripCount = 0;
-                user.LastTripCancellationTime = null;
-                user.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
-                await _unitOfWork.UserRepository.UpdateAsync(user);
-            }
-
-            // Check if the user has cancelled too many trips recently (this is only for blocking dependent)
-            if (user.LastTripCancellationTime >= cancellationWindow && user.CanceledTripCount >= cancellationLimit)
-            {
-                if (now < user.CancellationBanUntil)
-                {
-                    throw new BadRequestException($"You have exceeded the maximum number of cancellations allowed within {cancellationWindowMinutes} minutes.");
-                }
-                else
-                {
-                    // If the ban duration has passed, reset
-                    user.CanceledTripCount = 0;
-                    user.LastTripCancellationTime = null;
-                    user.CancellationBanUntil = null;
-                    user.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
-                    await _unitOfWork.UserRepository.UpdateAsync(user);
-                }
-            }
-
-            trip.Status = TripStatus.CANCELED;
-            trip.CanceledBy = userId;
-            trip.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
-
-            await _unitOfWork.TripRepository.UpdateAsync(trip);
-
-            user.CanceledTripCount++;
-
-            // Cancel reach limit
-            var banDuration = _settingService.GetSetting("CANCELLATION_BAN_DURATION");
-
-            if (user.CanceledTripCount == 1)
-            {
-                user.LastTripCancellationTime = now;
-
-                // Scheduled job to reset cancellation count and time
-                _logger.LogInformation("Scheduling job to reset trip cancellation for userId: {userId}", user.Id);
-                var resetJobId = BackgroundJob.Schedule<BackgroundServices>(s => s.ResetCancellationCountAndTime(user.Id), TimeSpan.FromMinutes(cancellationWindowMinutes));
-                KeyValueStore.Instance.Set($"ResetCancellationTask_{user.Id}", resetJobId);
-            }
-
-            if (user.CanceledTripCount == cancellationLimit)
-            {
-                user.CancellationBanUntil = now.AddMinutes(banDuration);
-
-                // Cancel the reset job as the user has reached the cancellation limit
-                var resetJobId = KeyValueStore.Instance.Get<string>($"ResetCancellationTask_{user.Id}");
-                if (!string.IsNullOrEmpty(resetJobId))
-                {
-                    _logger.LogInformation("Cancelling reset job for userId: {userId} as cancellation limit has been reached", user.Id);
-                    BackgroundJob.Delete(resetJobId);
-                    KeyValueStore.Instance.Remove($"ResetCancellationTask_{user.Id}");
-                }
-            }
-
-            await _unitOfWork.UserRepository.UpdateAsync(user);
+            //var cancellationWindow = now.AddMinutes(-cancellationWindowMinutes);
 
             // Check if a driver was assigned to the trip
             if (trip.DriverId.HasValue)
@@ -146,27 +97,101 @@ namespace Application.Commands.Handlers
                 var driver = await _unitOfWork.UserRepository.GetUserById(trip.DriverId.Value.ToString());
                 if (driver != null && driver.Status == UserStatus.BUSY)
                 {
-                    // Reset the status of the driver to active
+                    // Reset the status of the driver to active, so he can continue receiving new request
                     driver.Status = UserStatus.ACTIVE;
                     driver.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
                     await _unitOfWork.UserRepository.UpdateAsync(driver);
-
-                    trip.DriverId = null;
-                    trip.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
-                    await _unitOfWork.TripRepository.UpdateAsync(trip);
                 }
             }
+
+            // Remove driver from pending trip
+            if (trip.Status == TripStatus.PENDING)
+            {
+                // Remove driver from the trip if he hasn't accepted the trip
+                if (trip.Status == TripStatus.PENDING)
+                {
+                    trip.DriverId = null;
+                }
+
+                // Cancel find driver task
+                _logger.LogInformation("Cancelling find driver task for tripId: {tripId}", trip.Id);
+                KeyValueStore.Instance.Set($"CancelFindDriverTask_{trip.Id}", "true");
+            }
+
+            // If trip is canceled after driver has accepted, and payment method is wallet, give money back to booker
+            if (trip.PaymentMethod == PaymentMethod.WALLET && trip.Status != TripStatus.PENDING)
+            {
+                Guid walletOwnerId = trip.BookerId;
+                var walletOwnerWallet = await _unitOfWork.WalletRepository.GetByUserIdAsync(walletOwnerId);
+                // This validation shouldn't happen, but I place them here just in case
+                if (walletOwnerWallet == null)
+                {
+                    throw new NotFoundException(nameof(Wallet), walletOwnerId);
+                }
+
+                walletOwnerWallet.Balance += trip.Price;
+                walletOwnerWallet.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
+                await _unitOfWork.WalletRepository.UpdateAsync(walletOwnerWallet);
+
+                // New transaction for giving back to user's wallet
+                var userTransaction = new Wallettransaction
+                {
+                    Id = Guid.NewGuid(),
+                    WalletId = walletOwnerWallet.Id,
+                    TripId = trip.Id,
+                    Amount = trip.Price,
+                    PaymentMethod = PaymentMethod.WALLET,
+                    Status = WalletTransactionStatus.SUCCESSFULL,
+                    Type = WalletTransactionType.PASSENGER_PAYMENT,
+                    CreateTime = DateTimeUtilities.GetDateTimeVnNow(),
+                    UpdatedTime = DateTimeUtilities.GetDateTimeVnNow()
+                };
+
+                await _unitOfWork.WallettransactionRepository.AddAsync(userTransaction);
+            }
+
+            trip.Status = TripStatus.CANCELED;
+            trip.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
+
+            await _unitOfWork.TripRepository.UpdateAsync(trip);
+
+            booker.CanceledTripCount++;
+
+            // Cancel reach limit
+            var banDuration = _settingService.GetSetting("CANCELLATION_BAN_DURATION");
+
+            if (booker.CanceledTripCount == 1)
+            {
+                booker.LastTripCancellationTime = now;
+
+                // Scheduled job to reset cancellation count and time
+                _logger.LogInformation("Scheduling job to reset trip cancellation for userId: {userId}", booker.Id);
+                var resetJobId = BackgroundJob.Schedule<BackgroundServices>(s => s.ResetCancellationCountAndTime(booker.Id), TimeSpan.FromMinutes(cancellationWindowMinutes));
+                KeyValueStore.Instance.Set($"ResetCancellationTask_{booker.Id}", resetJobId);
+            }
+
+            if (booker.CanceledTripCount == cancellationLimit)
+            {
+                booker.CancellationBanUntil = now.AddMinutes(banDuration);
+
+                // Cancel the reset job as the user has reached the cancellation limit
+                var resetJobId = KeyValueStore.Instance.Get<string>($"ResetCancellationTask_{booker.Id}");
+                if (!string.IsNullOrEmpty(resetJobId))
+                {
+                    _logger.LogInformation("Cancelling reset job for userId: {userId} as cancellation limit has been reached", booker.Id);
+                    BackgroundJob.Delete(resetJobId);
+                    KeyValueStore.Instance.Remove($"ResetCancellationTask_{booker.Id}");
+                }
+            }
+
+            await _unitOfWork.UserRepository.UpdateAsync(booker);
 
             // Change status of passenger back to inactive
             trip.Passenger.Status = UserStatus.INACTIVE;
             trip.Passenger.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
-            await _unitOfWork.UserRepository.UpdateAsync(user);
+            await _unitOfWork.UserRepository.UpdateAsync(trip.Passenger);
 
             await _unitOfWork.Save();
-
-            // Cancel find driver task
-            _logger.LogInformation("Cancelling find driver task for tripId: {tripId}", trip.Id);
-            KeyValueStore.Instance.Set($"CancelFindDriverTask_{trip.Id}", "true");
 
             // Notify passenger using FCM and SignalR
             await NotifyPassengerTripCanceled(trip);

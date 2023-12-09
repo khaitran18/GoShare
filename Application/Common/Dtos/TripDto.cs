@@ -11,6 +11,8 @@ namespace Application.Common.Dtos
     {
         public Guid Id { get; set; }
         public Guid PassengerId { get; set; }
+        public string PassengerName { get; set; } = null!;
+        public string? PassengerPhoneNumber { get; set; }
         public Guid? DriverId { get; set; }
         public Guid StartLocationId { get; set; }
         public Guid EndLocationId { get; set; }
@@ -26,6 +28,7 @@ namespace Application.Common.Dtos
         public PaymentMethod PaymentMethod { get; set; }
         public Guid BookerId { get; set; }
         public string? Note { get; set; }
+        public TripType Type { get; set; }
 
         public UserDto? Driver { get; set; }
         public UserDto? Passenger { get; set; }
@@ -39,6 +42,8 @@ namespace Application.Common.Dtos
     {
         public Guid Id { get; set; }
         public Guid PassengerId { get; set; }
+        public string PassengerName { get; set; } = null!;
+        public string? PassengerPhoneNumber { get; set; }
         public Guid? DriverId { get; set; }
         public Guid StartLocationId { get; set; }
         public Guid EndLocationId { get; set; }
@@ -54,6 +59,7 @@ namespace Application.Common.Dtos
         public PaymentMethod PaymentMethod { get; set; }
         public Guid BookerId { get; set; }
         public string? Note { get; set; }
+        public TripType Type { get; set; }
         public double? SystemCommission { get; set; }
 
         public UserDto? Driver { get; set; }

@@ -370,6 +370,7 @@ namespace Application.Services
             {
                 user.CanceledTripCount = 0;
                 user.LastTripCancellationTime = null;
+                user.CancellationBanUntil = null;
                 await _unitOfWork.UserRepository.UpdateAsync(user);
                 await _unitOfWork.Save();
             }

@@ -15,4 +15,11 @@ namespace Domain.Enumerations
         CANCELED = 4,
         TIMEDOUT = 5
     }
+
+    public enum TripType : short
+    {
+        SELF_BOOK = 0,
+        BOOK_FOR_DEP_WITH_APP = 1,
+        BOOK_FOR_DEP_NO_APP = 2
+    }
 }
