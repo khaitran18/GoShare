@@ -46,5 +46,13 @@ namespace Api_Mobile.Controllers
             var result = await _mediator.Send(command);
             return Ok(result);
         }
+
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetUserProfile()
+        {
+            var query = new GetUserQuery();
+            var result = await _mediator.Send(query);
+            return Ok(result);
+        }
     }
 }

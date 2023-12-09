@@ -153,6 +153,7 @@ builder.Services.AddScoped<IRequestHandler<GetUsersQuery, PaginatedResult<AdminU
 builder.Services.AddScoped<IRequestHandler<GetDriverQuery, PaginatedResult<AdminDriverResponse>>, GetDriverQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<GetFeedbackQuery, AppfeedbackDto>, GetFeedbackHandler>();
 builder.Services.AddScoped<IRequestHandler<CancelTripCommand, TripDto>, CancelTripHandler>();
+builder.Services.AddScoped<IRequestHandler<GetUserQuery, UserDto>, GetUserHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
 builder.Services.AddCors(options =>
