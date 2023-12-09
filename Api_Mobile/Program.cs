@@ -52,6 +52,7 @@ using Application.UseCase.DriverUC.Handlers;
 using Application.UseCase.LocationUC.Commands;
 using Application.UseCase.LocationUC.Handlers;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 //Add middlewares
