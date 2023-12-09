@@ -22,4 +22,10 @@ namespace Domain.Enumerations
         BOOK_FOR_DEP_WITH_APP = 1,
         BOOK_FOR_DEP_NO_APP = 2
     }
+
+    public enum TripImageType : short
+    {
+        PICK_UP = 0,
+        END_TRIP = 1
+    }
 }

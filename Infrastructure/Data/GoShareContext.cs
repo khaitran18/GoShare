@@ -37,6 +37,7 @@ namespace Infrastructure.Data
         public virtual DbSet<Wallet> Wallets { get; set; } = null!;
         public virtual DbSet<Wallettransaction> Wallettransactions { get; set; } = null!;
         public virtual DbSet<Setting> Settings { get; set; } = null!;
+        public virtual DbSet<Report> Reports { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -367,6 +368,41 @@ namespace Infrastructure.Data
                     .HasConstraintName("fk_rating_trip");
             });
 
+            modelBuilder.Entity<Report>(entity =>
+            {
+                entity.ToTable("reports");
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("id");
+
+                entity.Property(e => e.TripId).HasColumnName("trip_id");
+
+                entity.Property(e => e.Title)
+                    .HasColumnType("character varying")
+                    .HasColumnName("title");
+
+                entity.Property(e => e.Description)
+                    .HasColumnType("character varying")
+                    .HasColumnName("description");
+
+                entity.Property(e => e.Status).HasColumnName("status");
+
+                entity.Property(e => e.CreateTime)
+                    .HasColumnType("timestamp without time zone")
+                    .HasColumnName("create_time");
+
+                entity.Property(e => e.UpdatedTime)
+                    .HasColumnType("timestamp without time zone")
+                    .HasColumnName("updated_time");
+
+                entity.HasOne(d => d.Trip)
+                    .WithMany(p => p.Reports)
+                    .HasForeignKey(d => d.TripId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("fk_trip_report");
+            });
+
             modelBuilder.Entity<Setting>(entity =>
             {
                 entity.ToTable("settings");
@@ -488,6 +524,37 @@ namespace Infrastructure.Data
                     .HasForeignKey(d => d.CartypeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("fk_cartype_trip");
+            });
+
+            modelBuilder.Entity<TripImage>(entity =>
+            {
+                entity.ToTable("tripimages");
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("id");
+
+                entity.Property(e => e.TripId).HasColumnName("trip_id");
+
+                entity.Property(e => e.ImageUrl)
+                    .HasColumnType("character varying")
+                    .HasColumnName("image_url");
+
+                entity.Property(e => e.Type).HasColumnName("type");
+
+                entity.Property(e => e.CreateTime)
+                    .HasColumnType("timestamp without time zone")
+                    .HasColumnName("create_time");
+
+                entity.Property(e => e.UpdatedTime)
+                    .HasColumnType("timestamp without time zone")
+                    .HasColumnName("updated_time");
+
+                entity.HasOne(d => d.Trip)
+                    .WithMany(p => p.TripImages)
+                    .HasForeignKey(d => d.TripId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("fk_trip_tripimage");
             });
 
             modelBuilder.Entity<User>(entity =>
