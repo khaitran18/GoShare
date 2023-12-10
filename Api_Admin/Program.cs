@@ -165,6 +165,7 @@ builder.Services.AddScoped<IRequestHandler<CancelTripCommand, TripDto>, CancelTr
 builder.Services.AddScoped<IRequestHandler<GetUserQuery, UserDto>, GetUserHandler>();
 builder.Services.AddScoped<IRequestHandler<GetReportsQuery, PaginatedResult<ReportDto>>, GetReportsHandler>();
 builder.Services.AddScoped<IRequestHandler<UpdateReportStatusCommand, ReportDto>, UpdateReportStatusHandler>();
+builder.Services.AddScoped<IRequestHandler<GetReportQuery, ReportDto>, GetReportHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
 builder.Services.AddCors(options =>
@@ -190,6 +191,7 @@ var mapperConfig = new MapperConfiguration(cfg =>
     cfg.AddProfile<WallettransactionProfile>();
     cfg.AddProfile<RatingProfile>();
     cfg.AddProfile<ReportProfile>();
+    cfg.AddProfile<TripImageProfile>();
 });
 var mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);

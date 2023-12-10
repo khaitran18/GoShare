@@ -36,6 +36,7 @@ namespace Application.Common.Dtos
         public LocationDto EndLocation { get; set; } = null!;
         public LocationDto StartLocation { get; set; } = null!;
         public CartypeDto Cartype { get; set; } = null!;
+        public List<TripImageDto> TripImages { get; set; } = new List<TripImageDto>();
     }
 
     public class TripEndDto

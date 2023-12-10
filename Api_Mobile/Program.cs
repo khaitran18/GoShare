@@ -273,6 +273,7 @@ var mapperConfig = new MapperConfiguration(cfg =>
     cfg.AddProfile<WallettransactionProfile>();
     cfg.AddProfile<RatingProfile>();
     cfg.AddProfile<ReportProfile>();
+    cfg.AddProfile<TripImageProfile>();
 });
 var mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
