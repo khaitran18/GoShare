@@ -44,7 +44,7 @@ builder.Services.AddTransient<LoggingMiddleware>();
 builder.Services.AddTransient<GetUserClaimsMiddleware>();
 
 builder.Services.AddScoped<UserClaims>();
-
+ 
 // Add services to the container.
 builder.Services.AddControllers().AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);

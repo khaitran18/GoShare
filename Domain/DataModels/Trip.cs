@@ -10,6 +10,8 @@ namespace Domain.DataModels
         {
             Ratings = new HashSet<Rating>();
             Wallettransactions = new HashSet<Wallettransaction>();
+            Reports = new HashSet<Report>();
+            TripImages = new HashSet<TripImage>();
         }
 
         public Guid Id { get; set; }
@@ -43,5 +45,7 @@ namespace Domain.DataModels
         public virtual Cartype Cartype { get; set; } = null!;
         public virtual ICollection<Rating> Ratings { get; set; }
         public virtual ICollection<Wallettransaction> Wallettransactions { get; set; }
+        public virtual ICollection<Report> Reports { get; set; }
+        public virtual ICollection<TripImage> TripImages { get; set; }
     }
 }
