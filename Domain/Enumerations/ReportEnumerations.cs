@@ -8,7 +8,7 @@ namespace Domain.Enumerations
 {
     public enum ReportStatus : short
     {
-        IN_PROGRESS = 0,
+        PENDING = 0,
         COMPLETED = 1,
         REJECTED = 2
     }

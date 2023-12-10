@@ -185,6 +185,7 @@ var mapperConfig = new MapperConfiguration(cfg =>
     cfg.AddProfile<DriverdocumentProfile>();
     cfg.AddProfile<WallettransactionProfile>();
     cfg.AddProfile<RatingProfile>();
+    cfg.AddProfile<ReportProfile>();
 });
 var mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);

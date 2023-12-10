@@ -51,6 +51,8 @@ using Application.UseCase.DriverUC.Commands;
 using Application.UseCase.DriverUC.Handlers;
 using Application.UseCase.LocationUC.Commands;
 using Application.UseCase.LocationUC.Handlers;
+using Application.UseCase.ReportUC.Commands;
+using Application.UseCase.ReportUC.Handlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -228,6 +230,7 @@ builder.Services.AddScoped<IRequestHandler<DriverUpdateDocumentCommand, bool>, D
 builder.Services.AddScoped<IRequestHandler<GetDriverInformationQuery, DriverInformationResponse>, GetDriverInformationHandler>();
 builder.Services.AddScoped<IRequestHandler<DeletePlannedDestinationCommand, bool>, DeletePlannedDestinationHandler>();
 builder.Services.AddScoped<IRequestHandler<GetUserQuery, UserDto>, GetUserHandler>();
+builder.Services.AddScoped<IRequestHandler<CreateReportCommand, ReportDto>, CreateReportHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
@@ -251,6 +254,7 @@ builder.Services.AddScoped<IValidator<EndTripCommand>, EndtripCommandValidator>(
 builder.Services.AddScoped<IValidator<RegisterCommand>, RegisterCommandValidator>();
 builder.Services.AddScoped<IValidator<CreateDependentCommand>, CreateDependentCommandValidator>();
 builder.Services.AddScoped<IValidator<CreateFeedbackCommand>, CreateFeedbackCommandValidator>();
+builder.Services.AddScoped<IValidator<CreateReportCommand>, CreateReportCommandValidator>();
 
 // Add AutoMapper
 var mapperConfig = new MapperConfiguration(cfg =>
@@ -266,6 +270,7 @@ var mapperConfig = new MapperConfiguration(cfg =>
     cfg.AddProfile<DriverdocumentProfile>();
     cfg.AddProfile<WallettransactionProfile>();
     cfg.AddProfile<RatingProfile>();
+    cfg.AddProfile<ReportProfile>();
 });
 var mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);

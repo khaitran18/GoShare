@@ -110,38 +110,6 @@ namespace Application.UseCase.TripUC.Handlers
                 KeyValueStore.Instance.Set($"CancelFindDriverTask_{trip.Id}", "true");
             }
 
-            // If trip is canceled after driver has accepted, and payment method is wallet, give money back to booker
-            if (trip.PaymentMethod == PaymentMethod.WALLET && trip.Status != TripStatus.PENDING)
-            {
-                Guid walletOwnerId = trip.BookerId;
-                var walletOwnerWallet = await _unitOfWork.WalletRepository.GetByUserIdAsync(walletOwnerId);
-                // This validation shouldn't happen, but I place them here just in case
-                if (walletOwnerWallet == null)
-                {
-                    throw new NotFoundException(nameof(Wallet), walletOwnerId);
-                }
-
-                walletOwnerWallet.Balance += trip.Price;
-                walletOwnerWallet.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
-                await _unitOfWork.WalletRepository.UpdateAsync(walletOwnerWallet);
-
-                // New transaction for giving back to user's wallet
-                var userTransaction = new Wallettransaction
-                {
-                    Id = Guid.NewGuid(),
-                    WalletId = walletOwnerWallet.Id,
-                    TripId = trip.Id,
-                    Amount = trip.Price,
-                    PaymentMethod = PaymentMethod.WALLET,
-                    Status = WalletTransactionStatus.SUCCESSFULL,
-                    Type = WalletTransactionType.PASSENGER_PAYMENT,
-                    CreateTime = DateTimeUtilities.GetDateTimeVnNow(),
-                    UpdatedTime = DateTimeUtilities.GetDateTimeVnNow()
-                };
-
-                await _unitOfWork.WallettransactionRepository.AddAsync(userTransaction);
-            }
-
             trip.Status = TripStatus.CANCELED;
             trip.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
 
