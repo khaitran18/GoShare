@@ -126,8 +126,7 @@ builder.Services.AddHangfireServer(options =>
 });
 
 // Firebase
-var credential = GoogleCredential.FromFile(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\" + GoShareConfiguration.FirebaseCredentialFile);
-
+var credential = GoogleCredential.FromFile(Environment.CurrentDirectory! + "\\" + GoShareConfiguration.FirebaseCredentialFile);
 if (FirebaseApp.DefaultInstance == null)
 {
     lock (_mutex)
