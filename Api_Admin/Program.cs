@@ -12,6 +12,7 @@ using Application.UseCase.AuthUC.Handlers;
 using Application.UseCase.DriverUC.Commands;
 using Application.UseCase.DriverUC.Handlers;
 using Application.UseCase.DriverUC.Queries;
+using Application.UseCase.ReportUC.Commands;
 using Application.UseCase.ReportUC.Handlers;
 using Application.UseCase.ReportUC.Queries;
 using Application.UseCase.TripUC.Commands;
@@ -163,6 +164,7 @@ builder.Services.AddScoped<IRequestHandler<GetFeedbackQuery, AppfeedbackDto>, Ge
 builder.Services.AddScoped<IRequestHandler<CancelTripCommand, TripDto>, CancelTripHandler>();
 builder.Services.AddScoped<IRequestHandler<GetUserQuery, UserDto>, GetUserHandler>();
 builder.Services.AddScoped<IRequestHandler<GetReportsQuery, PaginatedResult<ReportDto>>, GetReportsHandler>();
+builder.Services.AddScoped<IRequestHandler<UpdateReportStatusCommand, ReportDto>, UpdateReportStatusHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
 builder.Services.AddCors(options =>

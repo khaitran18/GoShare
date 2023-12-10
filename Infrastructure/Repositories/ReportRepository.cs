@@ -24,6 +24,14 @@ namespace Infrastructure.Repositories
             return await _context.Reports.FirstOrDefaultAsync(r => r.TripId == tripId);
         }
 
+        public async Task<Report?> GetByIdAsync(Guid id)
+        {
+            return await _context.Reports
+                .Include(r => r.Trip)
+                    .ThenInclude(t => t.TripImages)
+                .FirstOrDefaultAsync(r => r.Id == id);
+        }
+
         public async Task<(List<Report>, int)> GetReports(ReportStatus? status, int page, int pageSize)
         {
             IQueryable<Report> query = _context.Reports

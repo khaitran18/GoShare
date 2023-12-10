@@ -11,6 +11,7 @@ namespace Domain.Interfaces
     public interface IReportRepository : IBaseRepository<Report>
     {
         Task<Report?> GetByTripIdAsync(Guid tripId);
+        Task<Report?> GetByIdAsync(Guid id);
         Task<(List<Report>, int)> GetReports(ReportStatus? status, int page, int pageSize);
     }
 }
