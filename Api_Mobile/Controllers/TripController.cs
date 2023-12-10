@@ -50,6 +50,13 @@ namespace Api_Mobile.Controllers
             return Ok(response);
         }
 
+        [HttpPost("phoneless")]
+        public async Task<IActionResult> CreateTripForDependentWithoutPhone([FromBody] CreateTripForDependentWithoutPhoneCommand command)
+        {
+            var response = await _mediator.Send(command);
+            return Ok(response);
+        }
+
         [HttpPost("fees")]
         public async Task<IActionResult> CalculateFeesForTrip([FromBody] CalculateFeesForTripCommand command)
         {
@@ -80,7 +87,5 @@ namespace Api_Mobile.Controllers
             var response = await _mediator.Send(query);
             return Ok(response);
         }
-
-
     }
 }

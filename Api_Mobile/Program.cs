@@ -54,6 +54,7 @@ using Application.UseCase.LocationUC.Handlers;
 using Application.UseCase.ReportUC.Commands;
 using Application.UseCase.ReportUC.Handlers;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 //Add middlewares
@@ -229,6 +230,7 @@ builder.Services.AddScoped<IRequestHandler<CreateFeedbackCommand, AppfeedbackDto
 builder.Services.AddScoped<IRequestHandler<DriverUpdateDocumentCommand, bool>, DriverUpdateDocumentCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<GetDriverInformationQuery, DriverInformationResponse>, GetDriverInformationHandler>();
 builder.Services.AddScoped<IRequestHandler<DeletePlannedDestinationCommand, bool>, DeletePlannedDestinationHandler>();
+builder.Services.AddScoped<IRequestHandler<CreateTripForDependentWithoutPhoneCommand, TripDto>, CreateTripForDependentWithoutPhoneCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<GetUserQuery, UserDto>, GetUserHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateReportCommand, ReportDto>, CreateReportHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
@@ -347,7 +349,7 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapHub<SignalRHub>("/goshareHub");
 });
-
+ 
 app.Run();
 
 public partial class Program

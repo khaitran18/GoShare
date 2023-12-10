@@ -30,7 +30,7 @@ namespace Application.Services
                     DependentTripInfo d = new DependentTripInfo();
                     d.Id = t.Id;
                     d.Name = dependent.Name;
-                    d.DependentId = t.PassengerId;
+                    d.DependentId = (Guid)t.PassengerId!;
                     result.Add(d);
                 }
             }

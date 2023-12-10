@@ -55,9 +55,6 @@ namespace Application.UseCase.AuthUC.Handlers
                     response.Id = user.Id;
                     response.Phone = user.Phone;
                     response.Name = user.Name;
-                    //if user is a dependent response with dependent role, but jwt token keep role as user
-                    //if (user.GuardianId is not null) 
-                    //    role = UserRoleEnumerations.Dependent;
                     response.Role = role.ToString();
                     //------------------------------------------------------------------------------------
 

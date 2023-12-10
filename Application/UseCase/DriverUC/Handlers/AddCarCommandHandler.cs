@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.UseCase.LocationUC.Commands
+namespace Application.UseCase.DriverUC.Handlers
 {
     public class AddCarCommandHandler : IRequestHandler<AddCarCommand, Guid>
     {
