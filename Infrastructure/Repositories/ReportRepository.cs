@@ -1,4 +1,5 @@
 ﻿using Domain.DataModels;
+using Domain.Enumerations;
 using Domain.Interfaces;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,31 @@ namespace Infrastructure.Repositories
         public async Task<Report?> GetByTripIdAsync(Guid tripId)
         {
             return await _context.Reports.FirstOrDefaultAsync(r => r.TripId == tripId);
+        }
+
+        public async Task<(List<Report>, int)> GetReports(ReportStatus? status, int page, int pageSize)
+        {
+            IQueryable<Report> query = _context.Reports
+                .Include(r => r.Trip)
+                .AsQueryable();
+
+            // Filter by status
+            if (status.HasValue)
+            {
+                query = query.Where(r => r.Status == status);
+            }
+
+            // Order by newest to oldest
+            query = query.OrderByDescending(r => r.CreateTime);
+
+            var totalCount = await query.CountAsync();
+
+            // Pagination
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+            var reports = await query.ToListAsync();
+
+            return (reports, totalCount);
         }
     }
 }
