@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Application.UseCase.WallettransactionUC.Handlers
 {
-    public class GetUserTransactionQueryHandler : IRequestHandler<GetUserTransactionQuery, List<WalletTransactionDto>>
+    public class GetUserTransactionQueryHandler : IRequestHandler<GetUserTransactionQuery, PaginatedResult<WalletTransactionDto>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserClaims _claims;
@@ -26,16 +26,76 @@ namespace Application.UseCase.WallettransactionUC.Handlers
             _mapper = mapper;
         }
 
-        public Task<List<WalletTransactionDto>> Handle(GetUserTransactionQuery request, CancellationToken cancellationToken)
+        public async Task<PaginatedResult<WalletTransactionDto>> Handle(GetUserTransactionQuery request, CancellationToken cancellationToken)
         {
             var response = new List<WalletTransactionDto>();
-            Wallet? w = _unitOfWork.WalletRepository.GetByUserIdAsync((Guid)_claims.id!).Result;
+            Wallet? w = await _unitOfWork.WalletRepository.GetByUserIdAsync((Guid)_claims.id!);
             if (w is null) throw new DirectoryNotFoundException("User wallet is not found! Please contact our support");
             //get wallet transactions
-            List<Wallettransaction> transactions = _unitOfWork.WallettransactionRepository.GetListByWalletId(w.Id).Result;
+            var transactions = _unitOfWork.WallettransactionRepository.GetListByWalletId(w.Id).Result.AsQueryable();
+
             //get transaction that is success or failed
             //transactions = transactions.Where(t => !t.Status.Equals(WalletTransactionStatus.PENDING)).ToList();
-            return Task.FromResult(_mapper.Map<List<WalletTransactionDto>>(transactions));
+
+            //Get transaction for driver
+            if (_claims.Role.Equals(UserRoleEnumerations.Driver))
+            {
+                transactions = transactions.Where(t => 
+                    t.Type.Equals(WalletTransactionType.TOPUP)
+                    || t.Type.Equals(WalletTransactionType.DRIVER_WAGE));
+            }
+            //Get transaction for user
+            else if (_claims.Role.Equals(UserRoleEnumerations.User))
+            {
+                transactions = transactions.Where(t =>
+                t.Type.Equals(WalletTransactionType.TOPUP)
+                || t.Type.Equals(WalletTransactionType.PASSENGER_PAYMENT)
+                || t.Type.Equals(WalletTransactionType.PASSENGER_REFUND));
+            }
+
+            // Sort by
+            if (!string.IsNullOrEmpty(request.SortBy))
+            {
+                switch (request.SortBy.ToLower())
+                {
+                    case "Topup":
+                        transactions = transactions.OrderBy(u => u.Type.Equals(WalletTransactionType.TOPUP));
+                        break;
+                    case "Wage":
+                        transactions = transactions.OrderBy(u => u.PaymentMethod.Equals(WalletTransactionType.DRIVER_WAGE));
+                        break;
+                    case "Payment":
+                        transactions = transactions.OrderBy(u => u.PaymentMethod.Equals(WalletTransactionType.PASSENGER_PAYMENT));
+                        break;
+                    case "Cash":
+                        transactions = transactions.OrderBy(u => u.PaymentMethod.Equals(PaymentMethod.CASH));
+                        break;
+                    case "Vnpay":
+                        transactions = transactions.OrderBy(u => u.PaymentMethod.Equals(PaymentMethod.VNPAY));
+                        break;
+                    case "Wallet":
+                        transactions = transactions.OrderBy(u => u.PaymentMethod.Equals(PaymentMethod.WALLET));
+                        break;
+                    default:
+                        transactions = transactions.OrderByDescending(u => u.CreateTime);
+                        break;
+                }
+            }
+
+            var totalCount = transactions.Count();
+
+            // Pagination
+            transactions = transactions.Skip((request.Page - 1) * request.PageSize).Take(request.PageSize);
+
+            var list = transactions.ToList();
+            response = _mapper.Map<List<WalletTransactionDto>>(transactions);
+            var paginatedResult = new PaginatedResult<WalletTransactionDto>(
+                response,
+                totalCount,
+                request.Page,
+                request.PageSize
+            );
+            return paginatedResult;
         }
     }
 }

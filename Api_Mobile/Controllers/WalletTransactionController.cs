@@ -16,9 +16,8 @@ namespace Api_Mobile.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetUserTransaction()
+        public async Task<IActionResult> GetUserTransaction([FromQuery] GetUserTransactionQuery query )
         {
-            GetUserTransactionQuery query = new GetUserTransactionQuery();
             var response = await _mediator.Send(query);
             return Ok(response);
         }
