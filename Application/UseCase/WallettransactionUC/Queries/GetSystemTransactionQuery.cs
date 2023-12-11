@@ -6,9 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.UseCase.WalletUC.Queries
+namespace Application.UseCase.WallettransactionUC.Queries
 {
-    public class AdminGetRevenueStatisticsQuery : IRequest<RevenueStatisticsDto>
+    public class GetSystemTransactionQuery : IRequest<List<WalletTransactionDto>>
     {
+
     }
 }

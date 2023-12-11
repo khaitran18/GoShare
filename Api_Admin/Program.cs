@@ -19,6 +19,8 @@ using Application.UseCase.TripUC.Commands;
 using Application.UseCase.TripUC.Handlers;
 using Application.UseCase.UserUC.Handlers;
 using Application.UseCase.UserUC.Queries;
+using Application.UseCase.WallettransactionUC.Handlers;
+using Application.UseCase.WallettransactionUC.Queries;
 using AutoMapper;
 using Domain.Interfaces;
 using FirebaseAdmin;
@@ -166,6 +168,7 @@ builder.Services.AddScoped<IRequestHandler<GetUserQuery, UserDto>, GetUserHandle
 builder.Services.AddScoped<IRequestHandler<GetReportsQuery, PaginatedResult<ReportDto>>, GetReportsHandler>();
 builder.Services.AddScoped<IRequestHandler<UpdateReportStatusCommand, ReportDto>, UpdateReportStatusHandler>();
 builder.Services.AddScoped<IRequestHandler<GetReportQuery, ReportDto>, GetReportHandler>();
+builder.Services.AddScoped<IRequestHandler<GetSystemTransactionQuery, List<WalletTransactionDto>>, GetSystemTransactionHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
 builder.Services.AddCors(options =>
