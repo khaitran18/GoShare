@@ -27,7 +27,7 @@ namespace Application.UseCase.TripUC.Handlers
         public async Task<List<TripDto>> Handle(GetTripHistoryQuery request, CancellationToken cancellationToken)
         {
             Guid userId = (Guid)_userClaims.id!;
-            var trips = await _unitOfWork.TripRepository.GetTripsByUserId(userId, request.SortBy);
+            var trips = await _unitOfWork.TripRepository.GetTripHistoryByUserId(userId);
 
             var tripDtos = _mapper.Map<List<TripDto>>(trips);
 
