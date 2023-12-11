@@ -12,10 +12,15 @@ using Application.UseCase.AuthUC.Handlers;
 using Application.UseCase.DriverUC.Commands;
 using Application.UseCase.DriverUC.Handlers;
 using Application.UseCase.DriverUC.Queries;
+using Application.UseCase.ReportUC.Commands;
+using Application.UseCase.ReportUC.Handlers;
+using Application.UseCase.ReportUC.Queries;
 using Application.UseCase.TripUC.Commands;
 using Application.UseCase.TripUC.Handlers;
 using Application.UseCase.UserUC.Handlers;
 using Application.UseCase.UserUC.Queries;
+using Application.UseCase.WallettransactionUC.Handlers;
+using Application.UseCase.WallettransactionUC.Queries;
 using AutoMapper;
 using Domain.Interfaces;
 using FirebaseAdmin;
@@ -160,6 +165,10 @@ builder.Services.AddScoped<IRequestHandler<GetDriverQuery, PaginatedResult<Admin
 builder.Services.AddScoped<IRequestHandler<GetFeedbackQuery, AppfeedbackDto>, GetFeedbackHandler>();
 builder.Services.AddScoped<IRequestHandler<CancelTripCommand, TripDto>, CancelTripHandler>();
 builder.Services.AddScoped<IRequestHandler<GetUserQuery, UserDto>, GetUserHandler>();
+builder.Services.AddScoped<IRequestHandler<GetReportsQuery, PaginatedResult<ReportDto>>, GetReportsHandler>();
+builder.Services.AddScoped<IRequestHandler<UpdateReportStatusCommand, ReportDto>, UpdateReportStatusHandler>();
+builder.Services.AddScoped<IRequestHandler<GetReportQuery, ReportDto>, GetReportHandler>();
+builder.Services.AddScoped<IRequestHandler<GetSystemTransactionQuery, List<WalletTransactionDto>>, GetSystemTransactionHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
 builder.Services.AddCors(options =>
@@ -184,6 +193,8 @@ var mapperConfig = new MapperConfiguration(cfg =>
     cfg.AddProfile<DriverdocumentProfile>();
     cfg.AddProfile<WallettransactionProfile>();
     cfg.AddProfile<RatingProfile>();
+    cfg.AddProfile<ReportProfile>();
+    cfg.AddProfile<TripImageProfile>();
 });
 var mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);

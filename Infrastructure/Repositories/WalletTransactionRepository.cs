@@ -31,11 +31,11 @@ namespace Infrastructure.Repositories
         public Task<List<Wallettransaction>> GetListByDay(Guid guid)
         {
             DateTime TodayTime = DateTimeUtilities.GetDateTimeVnNow().Date;
-            DateTime CurrentDatetime= DateTimeUtilities.GetDateTimeVnNow();
+            DateTime CurrentDatetime = DateTimeUtilities.GetDateTimeVnNow();
             var list = _context.Wallets
                 .Include(u => u.Wallettransactions)
                 .FirstOrDefault(u => u.UserId.Equals(guid))!
-                .Wallettransactions.Where(t => t.CreateTime.CompareTo(TodayTime) > 0 
+                .Wallettransactions.Where(t => t.CreateTime.CompareTo(TodayTime) > 0
                 && t.CreateTime.CompareTo(CurrentDatetime) < 0
                 && t.Status.Equals(WalletTransactionStatus.SUCCESSFULL))
                 .ToList();

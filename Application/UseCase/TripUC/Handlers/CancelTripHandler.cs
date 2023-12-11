@@ -110,38 +110,6 @@ namespace Application.UseCase.TripUC.Handlers
                 KeyValueStore.Instance.Set($"CancelFindDriverTask_{trip.Id}", "true");
             }
 
-            // If trip is canceled after driver has accepted, and payment method is wallet, give money back to booker
-            if (trip.PaymentMethod == PaymentMethod.WALLET && trip.Status != TripStatus.PENDING)
-            {
-                Guid walletOwnerId = trip.BookerId;
-                var walletOwnerWallet = await _unitOfWork.WalletRepository.GetByUserIdAsync(walletOwnerId);
-                // This validation shouldn't happen, but I place them here just in case
-                if (walletOwnerWallet == null)
-                {
-                    throw new NotFoundException(nameof(Wallet), walletOwnerId);
-                }
-
-                walletOwnerWallet.Balance += trip.Price;
-                walletOwnerWallet.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
-                await _unitOfWork.WalletRepository.UpdateAsync(walletOwnerWallet);
-
-                // New transaction for giving back to user's wallet
-                var userTransaction = new Wallettransaction
-                {
-                    Id = Guid.NewGuid(),
-                    WalletId = walletOwnerWallet.Id,
-                    TripId = trip.Id,
-                    Amount = trip.Price,
-                    PaymentMethod = PaymentMethod.WALLET,
-                    Status = WalletTransactionStatus.SUCCESSFULL,
-                    Type = WalletTransactionType.PASSENGER_PAYMENT,
-                    CreateTime = DateTimeUtilities.GetDateTimeVnNow(),
-                    UpdatedTime = DateTimeUtilities.GetDateTimeVnNow()
-                };
-
-                await _unitOfWork.WallettransactionRepository.AddAsync(userTransaction);
-            }
-
             trip.Status = TripStatus.CANCELED;
             trip.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
 
@@ -186,126 +154,119 @@ namespace Application.UseCase.TripUC.Handlers
             await _unitOfWork.Save();
 
             // Notify passenger using FCM and SignalR
-            await NotifyPassengerTripCanceled(trip);
+            await NotifyUsersTripCanceled(trip);
 
             return _mapper.Map<TripDto>(trip);
         }
 
-        private async Task NotifyPassengerTripCanceled(Trip trip)
+        private async Task NotifyUsersTripCanceled(Trip trip)
         {
             // Guardian book for dependent
-            if (trip.Passenger.GuardianId != null && trip.Passenger.GuardianId == trip.BookerId)
+            if (trip.Type == TripType.BOOK_FOR_DEP_WITH_APP && trip.CanceledBy != null)
             {
                 // Canceled by dependent
                 if (trip.CanceledBy == trip.PassengerId)
                 {
-                    if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
-                    {
-                        var result = await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
-                            "Chuyến đã bị hủy",
-                            $"Bạn đã hủy chuyến thành công",
-                            new Dictionary<string, string>
-                            {
-                                { "tripId", trip.Id.ToString() }
-                            });
-
-                        if (result == string.Empty)
-                        {
-                            trip.Passenger.DeviceToken = null;
-                            await _unitOfWork.UserRepository.UpdateAsync(trip.Passenger);
-                        }
-                    }
-
-                    if (!string.IsNullOrEmpty(trip.Passenger.Guardian!.DeviceToken))
-                    {
-                        var result = await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian.DeviceToken,
-                            "Chuyến đã bị hủy",
-                            $"Người thân {trip.Passenger.Name} đã hủy chuyến",
-                            new Dictionary<string, string>
-                            {
-                                { "tripId", trip.Id.ToString() }
-                            });
-
-                        if (result == string.Empty)
-                        {
-                            trip.Passenger.Guardian.DeviceToken = null;
-                            await _unitOfWork.UserRepository.UpdateAsync(trip.Passenger.Guardian);
-                        }
-                    }
+                    await NotifyUserWithFirebaseAsync(trip.Passenger.DeviceToken!,
+                        "Chuyến đã bị hủy", 
+                        "Bạn đã hủy chuyến thành công", 
+                        trip.Passenger);
+                    await NotifyUserWithFirebaseAsync(trip.Booker.DeviceToken!, 
+                        "Chuyến đã bị hủy", 
+                        $"Người thân {trip.Passenger.Name} đã hủy chuyến", 
+                        trip.Booker);
                 }
                 // Canceled by booker/guardian
                 else if (trip.CanceledBy == trip.BookerId)
                 {
-                    if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
-                    {
-                        var result = await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
-                            "Chuyến đã bị hủy",
-                            $"Người thân {trip.Passenger.Guardian!.Name} của bạn đã hủy chuyến",
-                            new Dictionary<string, string>
-                            {
-                                { "tripId", trip.Id.ToString() }
-                            });
-
-                        if (result == string.Empty)
-                        {
-                            trip.Passenger.DeviceToken = null;
-                            await _unitOfWork.UserRepository.UpdateAsync(trip.Passenger);
-                        }
-                    }
-
-                    if (!string.IsNullOrEmpty(trip.Passenger.Guardian!.DeviceToken))
-                    {
-                        var result = await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian.DeviceToken,
-                            "Chuyến đã bị hủy",
-                            $"Bạn đã hủy chuyến thành công",
-                            new Dictionary<string, string>
-                            {
-                                { "tripId", trip.Id.ToString() }
-                            });
-
-                        if (result == string.Empty)
-                        {
-                            trip.Passenger.Guardian.DeviceToken = null;
-                            await _unitOfWork.UserRepository.UpdateAsync(trip.Passenger.Guardian);
-                        }
-                    }
+                    await NotifyUserWithFirebaseAsync(trip.Passenger.DeviceToken!, 
+                        "Chuyến đã bị hủy", 
+                        $"Người thân {trip.Passenger.Guardian!.Name} của bạn đã hủy chuyến", 
+                        trip.Passenger);
+                    await NotifyUserWithFirebaseAsync(trip.Booker.DeviceToken!, 
+                        "Chuyến đã bị hủy", 
+                        "Bạn đã hủy chuyến thành công", 
+                        trip.Booker);
                 }
 
                 bool isSelfBooking = false;
                 bool isNotificationForGuardian = true;
+                bool isCanceledByAdmin = false;
                 await _hubContext.Clients.Group(trip.Passenger.GuardianId.ToString())
-                    .SendAsync("NotifyPassengerTripCanceled", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
+                    .SendAsync("NotifyPassengerTripCanceled", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian, isCanceledByAdmin);
 
                 isNotificationForGuardian = false;
                 await _hubContext.Clients.Group(trip.PassengerId.ToString())
-                    .SendAsync("NotifyPassengerTripCanceled", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
+                    .SendAsync("NotifyPassengerTripCanceled", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian, isCanceledByAdmin);
             }
-            else
+            else if (trip.CanceledBy == trip.PassengerId && trip.CanceledBy == trip.BookerId) // Self-book and book for dep no app
             {
-                if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
-                {
-                    var result = await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
+                await NotifyUserWithFirebaseAsync(trip.Booker.DeviceToken!,
                         "Chuyến đã bị hủy",
-                        $"Bạn đã hủy chuyến thành công",
-                        new Dictionary<string, string>
-                        {
-                            { "tripId", trip.Id.ToString() }
-                        });
-
-                    if (result == string.Empty)
-                    {
-                        trip.Passenger.DeviceToken = null;
-                        await _unitOfWork.UserRepository.UpdateAsync(trip.Passenger);
-                    }
-                }
+                        "Bạn đã hủy chuyến thành công",
+                        trip.Booker);
 
                 bool isSelfBooking = true;
                 bool isNotificationForGuardian = false;
-                await _hubContext.Clients.Group(trip.PassengerId.ToString())
-                    .SendAsync("NotifyPassengerTripCanceled", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
+                bool isCanceledByAdmin = false;
+                await _hubContext.Clients.Group(trip.BookerId.ToString())
+                    .SendAsync("NotifyPassengerTripCanceled", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian, isCanceledByAdmin);
+            }
+            else if (trip.CanceledBy == null) // Admin cancel
+            {
+                bool isSelfBooking = false;
+                bool isNotificationForGuardian = false;
+                bool isCanceledByAdmin = true;
+
+                await NotifyUserWithFirebaseAsync(trip.Driver!.DeviceToken!, 
+                    "Chuyến đã bị hủy", 
+                    "Chuyến đã bị quản trị viên hủy vì có vấn đề", 
+                    trip.Driver);
+
+                if (trip.Type == TripType.BOOK_FOR_DEP_WITH_APP)
+                {
+                    // Noti dep
+                    await NotifyUserWithFirebaseAsync(trip.Passenger.DeviceToken!, 
+                        "Chuyến đã bị hủy", 
+                        "Chuyến đã bị quản trị viên hủy vì có vấn đề", 
+                        trip.Passenger);
+
+                    await _hubContext.Clients.Group(trip.PassengerId.ToString())
+                        .SendAsync("NotifyPassengerTripCanceled", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian, isCanceledByAdmin);
+                }
+
+                // Noti booker
+                await NotifyUserWithFirebaseAsync(trip.Booker.DeviceToken!, 
+                    "Chuyến đã bị hủy", 
+                    "Chuyến đã bị quản trị viên hủy theo yêu cầu của bạn", 
+                    trip.Booker);
+
+                isNotificationForGuardian = true;
+                await _hubContext.Clients.Group(trip.DriverId.ToString())
+                        .SendAsync("NotifyPassengerTripCanceled", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian, isCanceledByAdmin);
+                await _hubContext.Clients.Group(trip.BookerId.ToString())
+                        .SendAsync("NotifyPassengerTripCanceled", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian, isCanceledByAdmin);
             }
 
             await _unitOfWork.Save();
+        }
+
+        private async Task NotifyUserWithFirebaseAsync(string deviceToken, string title, string content, User user)
+        {
+            if (!string.IsNullOrEmpty(deviceToken))
+            {
+                var result = await FirebaseUtilities.SendNotificationToDeviceAsync(deviceToken, title, content,
+                    new Dictionary<string, string>
+                    {
+                        { "tripId", user.Id.ToString() }
+                    });
+
+                if (result == string.Empty)
+                {
+                    user.DeviceToken = null;
+                    await _unitOfWork.UserRepository.UpdateAsync(user);
+                }
+            }
         }
     }
 }

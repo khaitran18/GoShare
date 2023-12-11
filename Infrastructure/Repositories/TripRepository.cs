@@ -49,9 +49,21 @@ namespace Infrastructure.Repositories
                                           t.Status != TripStatus.TIMEDOUT);
         }
 
-        public async Task<List<Trip>> GetTripsByUserId(Guid userId, string? sortBy)
+        public async Task<List<Trip>> GetTripHistoryByUserId(Guid userId)
         {
-            IQueryable<Trip> query = _context.Trips
+            var ongoingTrips = await _context.Trips
+                .Where(t => t.PassengerId == userId &&
+                            (t.Status == TripStatus.GOING_TO_PICKUP || t.Status == TripStatus.GOING))
+                .Include(t => t.StartLocation)
+                .Include(t => t.Driver)
+                .Include(t => t.EndLocation)
+                .Include(t => t.Driver!.Car)
+                .Include(t => t.Cartype)
+                .Include(t => t.Booker)
+                .OrderByDescending(t => t.CreateTime)
+                .ToListAsync();
+
+            var completedTrips = await _context.Trips
                 .Where(t => t.PassengerId == userId && t.Status == TripStatus.COMPLETED)
                 .Include(t => t.StartLocation)
                 .Include(t => t.Driver)
@@ -59,37 +71,12 @@ namespace Infrastructure.Repositories
                 .Include(t => t.Driver!.Car)
                 .Include(t => t.Cartype)
                 .Include(t => t.Booker)
-                .AsQueryable();
+                .OrderByDescending(t => t.CreateTime)
+                .ToListAsync();
 
-            // Sort by
-            if (!string.IsNullOrEmpty(sortBy))
-            {
-                switch (sortBy.ToLower())
-                {
-                    case "distance":
-                        query = query.OrderBy(t => t.Distance);
-                        break;
-                    case "distance_desc":
-                        query = query.OrderByDescending(t => t.Distance);
-                        break;
-                    case "price":
-                        query = query.OrderBy(t => t.Price);
-                        break;
-                    case "price_desc":
-                        query = query.OrderByDescending(t => t.Price);
-                        break;
-                    case "date":
-                        query = query.OrderBy(t => t.StartTime);
-                        break;
-                    case "date_desc":
-                        query = query.OrderByDescending(t => t.StartTime);
-                        break;
-                }
-            }
+            var combinedTrips = ongoingTrips.Concat(completedTrips).OrderByDescending(t => t.CreateTime).ToList();
 
-            var trips = await query.ToListAsync();
-
-            return trips;
+            return combinedTrips;
         }
     }
 }

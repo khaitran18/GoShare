@@ -14,6 +14,7 @@
         IWallettransactionRepository WallettransactionRepository { get; }
         ISettingRepository SettingRepository { get; }
         IRatingRepository RatingRepository { get; }
+        IReportRepository ReportRepository { get; }
 
         Task Save();
     }

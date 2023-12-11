@@ -87,6 +87,5 @@ namespace Api_Mobile.Controllers
             var response = await _mediator.Send(query);
             return Ok(response);
         }
-
     }
 }
