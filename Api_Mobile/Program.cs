@@ -233,6 +233,7 @@ builder.Services.AddScoped<IRequestHandler<DeletePlannedDestinationCommand, bool
 builder.Services.AddScoped<IRequestHandler<CreateTripForDependentWithoutPhoneCommand, TripDto>, CreateTripForDependentWithoutPhoneCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<GetUserQuery, UserDto>, GetUserHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateReportCommand, ReportDto>, CreateReportHandler>();
+builder.Services.AddScoped<IRequestHandler<GetDriverWalletStatisticQuery, List<WalletMonthStatistic>>, GetDriverWalletStatisticQueryHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
