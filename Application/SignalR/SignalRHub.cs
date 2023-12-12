@@ -127,13 +127,13 @@ namespace Application.SignalR
             }
 
             // Check the trip type
-            if (trip.Type == TripType.SELF_BOOK && trip.Status == TripStatus.GOING_TO_PICKUP)
+            if (trip.Type == TripType.SELF_BOOK || trip.Type == TripType.BOOK_FOR_DEP_NO_APP && trip.Status == TripStatus.GOING_TO_PICKUP)
             {
                 // Only let user see driver location going to the pickup point
                 await Clients.Group(trip.BookerId.ToString())
                     .SendAsync("UpdateDriverLocation", driverLocation);
             }
-            else if (trip.Type == TripType.BOOK_FOR_DEP_NO_APP)
+            else if (trip.Type == TripType.BOOK_FOR_DEP_WITH_APP)
             {
                 // Only update driver location for guardian
                 await Clients.Group(trip.BookerId.ToString())

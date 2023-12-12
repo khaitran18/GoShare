@@ -99,7 +99,7 @@ namespace Application.UseCase.DriverUC.Handlers
             return tripDto;
         }
 
-        private async Task NotifyPassengerAboutDriverOnTheWay(Domain.DataModels.Trip trip)
+        private async Task NotifyPassengerAboutDriverOnTheWay(Trip trip)
         {
 
             if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))

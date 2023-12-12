@@ -416,6 +416,25 @@ namespace Application.Services
 
             await _unitOfWork.Save();
         }
+
+        public async Task CheckDriverRating()
+        {
+            _logger.LogInformation("Scanning daily driver rating...");
+            var drivers = await _unitOfWork.UserRepository.GetDriversWarnedRating();
+            var warningDuration = _settingService.GetSetting("WARNING_DURATION");
+            foreach (var driver in drivers)
+            {
+                // If driver has been WARNED for more than the warning duration, suspend the driver
+                if (driver.WarnedTime != null && (DateTimeUtilities.GetDateTimeVnNow() - driver.WarnedTime.Value).TotalDays > warningDuration)
+                {
+                    driver.Status = UserStatus.SUSPENDED;
+                    driver.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
+                    await _unitOfWork.UserRepository.UpdateAsync(driver);
+                }
+            }
+
+            await _unitOfWork.Save();
+        }
         #endregion
     }
 }

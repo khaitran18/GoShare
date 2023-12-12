@@ -17,6 +17,7 @@ namespace Application.Services
         public void Start()
         {
             RecurringJob.AddOrUpdate<BackgroundServices>("CheckDriverDebts", service => service.CheckDriverDebts(), Cron.Daily(17, 0));
+            RecurringJob.AddOrUpdate<BackgroundServices>("CheckDriverRating", service => service.CheckDriverRating(), Cron.Daily(17, 5));
         }
     }
 }

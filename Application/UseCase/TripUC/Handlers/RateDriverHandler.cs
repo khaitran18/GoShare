@@ -96,24 +96,14 @@ namespace Application.UseCase.TripUC.Handlers
             var ratingThreshold = _settingService.GetSetting("RATING_THRESHOLD");
             var warningDuration = _settingService.GetSetting("WARNING_DURATION");
 
-            if (driver.AverageRating < ratingThreshold)
+            // Issue a warning 
+            if (driver.RatingStatus == RatingStatus.GOOD && driver.WarnedTime == null && driver.AverageRating < ratingThreshold)
             {
-                // If driver's rating status is GOOD, issue a warning
-                if (driver.RatingStatus == RatingStatus.GOOD)
-                {
-                    driver.RatingStatus = RatingStatus.WARNED;
-                    driver.WarnedTime = DateTimeUtilities.GetDateTimeVnNow();
-                    driver.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
-                }
-                // If driver has been WARNED for more than the warning duration, suspend the driver
-                else if (driver.RatingStatus == RatingStatus.WARNED && driver.WarnedTime.HasValue && (DateTime.Now - driver.WarnedTime.Value).TotalDays > warningDuration)
-                {
-                    driver.Status = UserStatus.SUSPENDED;
-                    driver.DisabledReason = "Tài khoản của bạn đã bị khóa vì đánh giá trung bình quá thấp.";
-                    driver.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
-                }
+                driver.RatingStatus = RatingStatus.WARNED;
+                driver.WarnedTime = DateTimeUtilities.GetDateTimeVnNow();
+                driver.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
             }
-            else if (driver.RatingStatus == RatingStatus.WARNED)
+            else if (driver.RatingStatus == RatingStatus.WARNED && driver.WarnedTime != null && driver.AverageRating >= ratingThreshold)
             {
                 // If driver's rating status is WARNED and their average rating is above the threshold, change their status back to GOOD
                 driver.RatingStatus = RatingStatus.GOOD;

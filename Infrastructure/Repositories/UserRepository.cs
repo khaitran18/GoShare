@@ -139,7 +139,14 @@ namespace Infrastructure.Repositories
         {
             return await _context.Users
                 .Include(u => u.Wallets)
-                .Where(u => u.Isdriver && u.Wallets.FirstOrDefault() != null && u.Wallets.FirstOrDefault()!.Balance < 0)
+                .Where(u => u.Isdriver && u.Wallets.FirstOrDefault() != null && u.Wallets.FirstOrDefault()!.DueDate != null)
+                .ToListAsync();
+        }
+
+        public async Task<List<User>> GetDriversWarnedRating()
+        {
+            return await _context.Users
+                .Where(u => u.Isdriver && u.RatingStatus == RatingStatus.WARNED && u.WarnedTime != null)
                 .ToListAsync();
         }
 

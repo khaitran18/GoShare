@@ -204,7 +204,7 @@ namespace Application.UseCase.DriverUC.Handlers
             }
 
             // Check if the driver’s wallet is above 0
-            if (driverWallet.DueDate != null && driverWallet.Balance > _settingService.GetSetting("BALANCE_THRESHOLD"))
+            else if (driverWallet.DueDate != null && driverWallet.Balance >= _settingService.GetSetting("BALANCE_THRESHOLD"))
             {
                 // Reset the debt deadline
                 driverWallet.DueDate = null;
