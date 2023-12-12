@@ -42,8 +42,12 @@ namespace Application.UseCase.TripUC.Handlers
                     //if driver is driver of the trip
                     if (!_claims.id.Equals(t.DriverId))
                     {
-                        //if user is passenger dependent
-                        if (!await _userService.CheckDependentStatus(_unitOfWork, t.PassengerId, (Guid)_claims.id!))
+                        ////if user is passenger dependent
+                        //if (!await _userService.CheckDependentStatus(_unitOfWork, t.PassengerId, (Guid)_claims.id!))
+                        //{
+                        //    throw new UnauthorizedAccessException();
+                        //}
+                        if (!_claims.id.Equals(t.PassengerId))
                         {
                             throw new UnauthorizedAccessException();
                         }
