@@ -225,7 +225,7 @@ builder.Services.AddScoped<IRequestHandler<CreatePlannedDestinationCommand, Loca
 builder.Services.AddScoped<IRequestHandler<DriverUpdateLocationCommand, LocationDto>, DriverUpdateLocationHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateDependentCommand, UserDto>, CreateDependentCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<GetWalletBalanceQuery, double>, GetWalletBalanceQueryHandler>();
-builder.Services.AddScoped<IRequestHandler<GetUserTransactionQuery, List<WalletTransactionDto>>, GetUserTransactionQueryHandler>();
+builder.Services.AddScoped<IRequestHandler<GetUserTransactionQuery, PaginatedResult<WalletTransactionDto>>, GetUserTransactionQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<GetTripHistoryQuery, List<TripDto>>, GetTripHistoryHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateFeedbackCommand, AppfeedbackDto>, CreateFeedbackHandler>();
 builder.Services.AddScoped<IRequestHandler<DriverUpdateDocumentCommand, bool>, DriverUpdateDocumentCommandHandler>();
@@ -234,6 +234,7 @@ builder.Services.AddScoped<IRequestHandler<DeletePlannedDestinationCommand, bool
 builder.Services.AddScoped<IRequestHandler<CreateTripForDependentWithoutPhoneCommand, TripDto>, CreateTripForDependentWithoutPhoneCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<GetUserQuery, UserDto>, GetUserHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateReportCommand, ReportDto>, CreateReportHandler>();
+builder.Services.AddScoped<IRequestHandler<GetDriverWalletStatisticQuery, List<WalletMonthStatistic>>, GetDriverWalletStatisticQueryHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));

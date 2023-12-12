@@ -80,5 +80,12 @@ namespace Api_Mobile.Controllers
             var response = await _mediator.Send(command);
             return Ok(response);
         }
+        [HttpGet("statistic")]
+        public async Task<IActionResult> GetStatistic()
+        {
+            GetDriverWalletStatisticQuery query = new GetDriverWalletStatisticQuery();
+            var response = await _mediator.Send(query);
+            return Ok(response);
+        }
     }
 }

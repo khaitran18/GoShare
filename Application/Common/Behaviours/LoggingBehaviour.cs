@@ -21,6 +21,7 @@ namespace Application.Common.Behaviours
         {
             //Request
             _logger.LogInformation($"Handling {typeof(TRequest).Name}");
+            _logger.LogInformation("----------------------------------------------------");
             Type requestType = request!.GetType();
             IList<PropertyInfo> props = new List<PropertyInfo>(requestType.GetProperties());
             foreach (PropertyInfo prop in props)
@@ -30,6 +31,7 @@ namespace Application.Common.Behaviours
             }
             var response = await next();
             //Response
+            _logger.LogInformation("----------------------------------------------------");
             _logger.LogInformation($"Handled {typeof(TResponse).Name}");
             return response;
         }
