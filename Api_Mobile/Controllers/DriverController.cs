@@ -52,7 +52,7 @@ namespace Api_Mobile.Controllers
         }
 
         [HttpPost("confirm-pickup/{id}")]
-        public async Task<IActionResult> ConfirmPickupPassenger([FromBody] ConfirmPickupPassengerCommand command, [FromRoute] Guid id)
+        public async Task<IActionResult> ConfirmPickupPassenger([FromForm] ConfirmPickupPassengerCommand command, [FromRoute] Guid id)
         {
             command.TripId = id;
             var response = await _mediator.Send(command);
@@ -60,7 +60,7 @@ namespace Api_Mobile.Controllers
         }
 
         [HttpPost("end-trip/{id}")]
-        public async Task<IActionResult> EndTrip([FromBody] EndTripCommand command, [FromRoute] Guid id)
+        public async Task<IActionResult> EndTrip([FromForm] EndTripCommand command, [FromRoute] Guid id)
         {
             command.TripId = id;
             var response = await _mediator.Send(command);
