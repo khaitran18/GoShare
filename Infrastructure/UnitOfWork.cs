@@ -21,6 +21,7 @@ namespace Infrastructure
         private ISettingRepository _settingRepository = null!;
         private IRatingRepository _ratingRepository = null!;
         private IReportRepository _reportRepository = null!;
+        private ITripImageRepository _tripImageRepository = null!;
         public UnitOfWork(GoShareContext context)
         {
             _context = context;
@@ -39,6 +40,7 @@ namespace Infrastructure
         public ISettingRepository SettingRepository => _settingRepository ??= new SettingRepository(_context);
         public IRatingRepository RatingRepository => _ratingRepository ??= new RatingRepository(_context);
         public IReportRepository ReportRepository => _reportRepository ??= new ReportRepository(_context);
+        public ITripImageRepository TripImageRepository => _tripImageRepository ??= new TripImageRepository(_context);
 
         public void Dispose()
         {

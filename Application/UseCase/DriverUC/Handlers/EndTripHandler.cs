@@ -27,14 +27,16 @@ namespace Application.UseCase.DriverUC.Handlers
         private readonly IMapper _mapper;
         private readonly ISettingService _settingService;
         private readonly IHubContext<SignalRHub> _hubContext;
+        private readonly IFirebaseStorage _firebaseStorage;
 
-        public EndTripHandler(IUnitOfWork unitOfWork, UserClaims userClaims, IMapper mapper, ISettingService settingService, IHubContext<SignalRHub> hubContext)
+        public EndTripHandler(IUnitOfWork unitOfWork, UserClaims userClaims, IMapper mapper, ISettingService settingService, IHubContext<SignalRHub> hubContext, IFirebaseStorage firebaseStorage)
         {
             _unitOfWork = unitOfWork;
             _userClaims = userClaims;
             _mapper = mapper;
             _settingService = settingService;
             _hubContext = hubContext;
+            _firebaseStorage = firebaseStorage;
         }
 
         public async Task<TripEndDto> Handle(EndTripCommand request, CancellationToken cancellationToken)
@@ -87,6 +89,31 @@ namespace Application.UseCase.DriverUC.Handlers
             if (distance > _settingService.GetSetting("NEAR_DESTINATION_DISTANCE")) //km
             {
                 throw new BadRequestException("The driver is not near the drop-off location.");
+            }
+
+            // If the trip is book for dep no app, upload the image
+            if (trip.Type == TripType.BOOK_FOR_DEP_NO_APP)
+            {
+                if (request.Image == null)
+                {
+                    throw new BadRequestException("Image is required as proof of end trip. Please upload an image.");
+                }
+
+                string path = trip.Id.ToString();
+                string filename = trip.Id.ToString() + "_end";
+                string url = await _firebaseStorage.UploadFileAsync(request.Image, path, filename);
+
+                var tripImage = new TripImage
+                {
+                    Id = Guid.NewGuid(),
+                    TripId = trip.Id,
+                    ImageUrl = url,
+                    Type = TripImageType.END_TRIP,
+                    CreateTime = DateTimeUtilities.GetDateTimeVnNow(),
+                    UpdatedTime = DateTimeUtilities.GetDateTimeVnNow()
+                };
+
+                await _unitOfWork.TripImageRepository.AddAsync(tripImage);
             }
 
             trip.Status = TripStatus.COMPLETED;
@@ -224,82 +251,57 @@ namespace Application.UseCase.DriverUC.Handlers
 
         private async Task NotifyPassengerTripHasEnded(Trip trip)
         {
-            if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
-            {
-                var result = await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
+            await NotifyUserWithFirebaseAsync(trip.Passenger!.DeviceToken!,
                     "Hoàn thành chuyến",
-                    $"Chuyến đi của bạn đã kết thúc. Bạn đã đến nơi an toàn.",
-                    new Dictionary<string, string>
-                    {
-                        { "tripId", trip.Id.ToString() }
-                    });
+                    "Chuyến đi của bạn đã kết thúc. Bạn đã đến nơi an toàn.",
+                    trip.Passenger);
 
-                if (result == string.Empty)
-                {
-                    trip.Passenger.DeviceToken = null;
-                    await _unitOfWork.UserRepository.UpdateAsync(trip.Passenger);
-                }
+            // Noti booker about image
+            if (trip.Type == TripType.BOOK_FOR_DEP_NO_APP)
+            {
+                await NotifyUserWithFirebaseAsync(trip.Booker!.DeviceToken!,
+                    "Chuyến có ảnh mới",
+                    $"Tài xế vừa gửi ảnh người thân {trip.PassengerName} của bạn tại điểm đến.",
+                    trip.Booker);
             }
 
-            if (trip.Passenger.GuardianId != null)
+            if (trip.Type == TripType.BOOK_FOR_DEP_WITH_APP)
             {
-                if (!string.IsNullOrEmpty(trip.Passenger.Guardian!.DeviceToken))
+                string message;
+                if (trip.StartLocation.Address == null && trip.EndLocation.Address != null)
                 {
-                    string message;
-                    if (trip.StartLocation.Address == null && trip.EndLocation.Address != null)
-                    {
-                        message = $"Người thân {trip.Passenger.Name} vừa hoàn thành một chuyến đi đến {trip.EndLocation.Address}.";
-                    }
-                    else if (trip.StartLocation.Address != null && trip.EndLocation.Address == null)
-                    {
-                        message = $"Người thân {trip.Passenger.Name} vừa hoàn thành một chuyến đi từ {trip.StartLocation.Address}.";
-                    }
-                    else if (trip.StartLocation.Address == null && trip.EndLocation.Address == null)
-                    {
-                        message = $"Người thân {trip.Passenger.Name} vừa hoàn thành một chuyến đi.";
-                    }
-                    else
-                    {
-                        message = $"Người thân {trip.Passenger.Name} vừa hoàn thành chuyến đi từ {trip.StartLocation.Address} đến {trip.EndLocation.Address}.";
-                    }
-
-                    var result = await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian.DeviceToken,
-                        "Một chuyến đi đã hoàn thành",
-                        message,
-                        new Dictionary<string, string>
-                        {
-                            { "tripId", trip.Id.ToString() }
-                        });
-
-                    if (result == string.Empty)
-                    {
-                        trip.Passenger.Guardian.DeviceToken = null;
-                        await _unitOfWork.UserRepository.UpdateAsync(trip.Passenger.Guardian);
-                    }
+                    message = $"Người thân {trip.Passenger.Name} vừa hoàn thành một chuyến đi đến {trip.EndLocation.Address}.";
                 }
+                else if (trip.StartLocation.Address != null && trip.EndLocation.Address == null)
+                {
+                    message = $"Người thân {trip.Passenger.Name} vừa hoàn thành một chuyến đi từ {trip.StartLocation.Address}.";
+                }
+                else if (trip.StartLocation.Address == null && trip.EndLocation.Address == null)
+                {
+                    message = $"Người thân {trip.Passenger.Name} vừa hoàn thành một chuyến đi.";
+                }
+                else
+                {
+                    message = $"Người thân {trip.Passenger.Name} vừa hoàn thành chuyến đi từ {trip.StartLocation.Address} đến {trip.EndLocation.Address}.";
+                }
+
+                await NotifyUserWithFirebaseAsync(trip.Booker!.DeviceToken!,
+                    "Một chuyến đi đã hoàn thành",
+                    message,
+                    trip.Booker);
 
                 bool isSelfBooking = false;
                 bool isNotificationForGuardian;
 
-                if (trip.Passenger.GuardianId == trip.BookerId)
-                {
-                    isNotificationForGuardian = true;
-                    await _hubContext.Clients.Group(trip.Passenger.GuardianId.ToString())
-                        .SendAsync("NotifyPassengerTripEnded", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
+                isNotificationForGuardian = true;
+                await _hubContext.Clients.Group(trip.Passenger.GuardianId.ToString())
+                    .SendAsync("NotifyPassengerTripEnded", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
 
-                    isNotificationForGuardian = false;
-                    await _hubContext.Clients.Group(trip.PassengerId.ToString())
-                        .SendAsync("NotifyPassengerTripEnded", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
-                }
-                else
-                {
-                    isSelfBooking = true;
-                    isNotificationForGuardian = false;
-                    await _hubContext.Clients.Group(trip.PassengerId.ToString())
-                        .SendAsync("NotifyPassengerTripEnded", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
-                }
+                isNotificationForGuardian = false;
+                await _hubContext.Clients.Group(trip.PassengerId.ToString())
+                    .SendAsync("NotifyPassengerTripEnded", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
             }
-            else
+            else // Selfbook and book for dep no app
             {
                 bool isSelfBooking = true;
                 bool isNotificationForGuardian = false;
@@ -308,6 +310,24 @@ namespace Application.UseCase.DriverUC.Handlers
             }
 
             await _unitOfWork.Save();
+        }
+
+        private async Task NotifyUserWithFirebaseAsync(string deviceToken, string title, string content, User user)
+        {
+            if (!string.IsNullOrEmpty(deviceToken))
+            {
+                var result = await FirebaseUtilities.SendNotificationToDeviceAsync(deviceToken, title, content,
+                    new Dictionary<string, string>
+                    {
+                        { "tripId", user.Id.ToString() }
+                    });
+
+                if (result == string.Empty)
+                {
+                    user.DeviceToken = null;
+                    await _unitOfWork.UserRepository.UpdateAsync(user);
+                }
+            }
         }
     }
 }

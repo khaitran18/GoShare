@@ -53,9 +53,9 @@ namespace Application.UseCase.TripUC.Handlers
             UserRoleEnumerations userRole = _userClaims.Role;
             if (userRole == UserRoleEnumerations.Admin)
             {
-                if (trip.Status == TripStatus.PENDING || trip.Status == TripStatus.GOING_TO_PICKUP)
+                if (trip.Status == TripStatus.PENDING)
                 {
-                    throw new BadRequestException("You can only cancel going trip.");
+                    throw new BadRequestException("You cannot cancel pending trip.");
                 }
 
                 trip.CanceledBy = null;
@@ -69,9 +69,9 @@ namespace Application.UseCase.TripUC.Handlers
                     throw new BadRequestException("User is not booker of this trip. User can't do this function.");
                 }
 
-                if (trip.Status != TripStatus.PENDING && trip.Status != TripStatus.GOING_TO_PICKUP)
+                if (trip.Status != TripStatus.PENDING)
                 {
-                    throw new BadRequestException("You are not allowed to cancel trip at the moment.");
+                    throw new BadRequestException("You are not allowed to cancel trip at the moment. Please contact administrator.");
                 }
 
                 trip.CanceledBy = userId;
@@ -100,10 +100,7 @@ namespace Application.UseCase.TripUC.Handlers
             if (trip.Status == TripStatus.PENDING)
             {
                 // Remove driver from the trip if he hasn't accepted the trip
-                if (trip.Status == TripStatus.PENDING)
-                {
-                    trip.DriverId = null;
-                }
+                trip.DriverId = null;
 
                 // Cancel find driver task
                 _logger.LogInformation("Cancelling find driver task for tripId: {tripId}", trip.Id);
@@ -164,20 +161,8 @@ namespace Application.UseCase.TripUC.Handlers
             // Guardian book for dependent
             if (trip.Type == TripType.BOOK_FOR_DEP_WITH_APP && trip.CanceledBy != null)
             {
-                // Canceled by dependent
-                if (trip.CanceledBy == trip.PassengerId)
-                {
-                    await NotifyUserWithFirebaseAsync(trip.Passenger.DeviceToken!,
-                        "Chuyến đã bị hủy", 
-                        "Bạn đã hủy chuyến thành công", 
-                        trip.Passenger);
-                    await NotifyUserWithFirebaseAsync(trip.Booker.DeviceToken!, 
-                        "Chuyến đã bị hủy", 
-                        $"Người thân {trip.Passenger.Name} đã hủy chuyến", 
-                        trip.Booker);
-                }
                 // Canceled by booker/guardian
-                else if (trip.CanceledBy == trip.BookerId)
+                if (trip.CanceledBy == trip.BookerId)
                 {
                     await NotifyUserWithFirebaseAsync(trip.Passenger.DeviceToken!, 
                         "Chuyến đã bị hủy", 

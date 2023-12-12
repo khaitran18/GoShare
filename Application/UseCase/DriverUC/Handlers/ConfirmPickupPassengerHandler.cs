@@ -21,14 +21,16 @@ namespace Application.UseCase.DriverUC.Handlers
         private readonly ISettingService _settingService;
         private readonly UserClaims _userClaims;
         private readonly IHubContext<SignalRHub> _hubContext;
+        private readonly IFirebaseStorage _firebaseStorage;
 
-        public ConfirmPickupPassengerHandler(IUnitOfWork unitOfWork, IMapper mapper, ISettingService settingService, UserClaims userClaims, IHubContext<SignalRHub> hubContext)
+        public ConfirmPickupPassengerHandler(IUnitOfWork unitOfWork, IMapper mapper, ISettingService settingService, UserClaims userClaims, IHubContext<SignalRHub> hubContext, IFirebaseStorage firebaseStorage)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _settingService = settingService;
             _userClaims = userClaims;
             _hubContext = hubContext;
+            _firebaseStorage = firebaseStorage;
         }
 
         public async Task<TripDto> Handle(ConfirmPickupPassengerCommand request, CancellationToken cancellationToken)
@@ -83,6 +85,31 @@ namespace Application.UseCase.DriverUC.Handlers
                 throw new BadRequestException("The driver is not near the pickup location.");
             }
 
+            // If the trip is book for dep no app, upload the image
+            if (trip.Type == TripType.BOOK_FOR_DEP_NO_APP)
+            {
+                if (request.Image == null)
+                {
+                    throw new BadRequestException("Image is required as proof of pickup. Please upload an image.");
+                }
+
+                string path = trip.Id.ToString();
+                string filename = trip.Id.ToString() + "_pickup";
+                string url = await _firebaseStorage.UploadFileAsync(request.Image, path, filename);
+
+                var tripImage = new TripImage
+                {
+                    Id = Guid.NewGuid(),
+                    TripId = trip.Id,
+                    ImageUrl = url,
+                    Type = TripImageType.PICK_UP,
+                    CreateTime = DateTimeUtilities.GetDateTimeVnNow(),
+                    UpdatedTime = DateTimeUtilities.GetDateTimeVnNow()
+                };
+
+                await _unitOfWork.TripImageRepository.AddAsync(tripImage);
+            }
+
             trip.Status = TripStatus.GOING;
             trip.PickupTime = DateTimeUtilities.GetDateTimeVnNow();
             trip.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
@@ -101,43 +128,26 @@ namespace Application.UseCase.DriverUC.Handlers
 
         private async Task NotifyPassengerAboutDriverOnTheWay(Trip trip)
         {
-
-            if (!string.IsNullOrEmpty(trip.Passenger.DeviceToken))
-            {
-                var result = await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.DeviceToken,
+            await NotifyUserWithFirebaseAsync(trip.Passenger!.DeviceToken!,
                     "Tài xế đã tới",
                     $"Tài xế {trip.Driver!.Name} đã đến địa điểm đón của bạn",
-                    new Dictionary<string, string>
-                    {
-                        { "tripId", trip.Id.ToString() }
-                    });
-
-                if (result == string.Empty)
-                {
-                    trip.Passenger.DeviceToken = null;
-                    await _unitOfWork.UserRepository.UpdateAsync(trip.Passenger);
-                }
+                    trip.Passenger);
+            
+            // Noti booker about image
+            if (trip.Type == TripType.BOOK_FOR_DEP_NO_APP)
+            {
+                await NotifyUserWithFirebaseAsync(trip.Booker!.DeviceToken!,
+                    "Chuyến có ảnh mới",
+                    $"Tài xế vừa gửi ảnh người thân {trip.PassengerName} của bạn tại điểm đón.",
+                    trip.Booker);
             }
 
-
-            if (trip.Passenger.GuardianId != null && trip.Passenger.GuardianId == trip.BookerId)
+            if (trip.Type == TripType.BOOK_FOR_DEP_WITH_APP)
             {
-                if (!string.IsNullOrEmpty(trip.Passenger.Guardian!.DeviceToken))
-                {
-                    var result = await FirebaseUtilities.SendNotificationToDeviceAsync(trip.Passenger.Guardian.DeviceToken,
-                        "Tài xế đã tới",
-                        $"Tài xế {trip.Driver!.Name} đã đến địa điểm đón người thân của bạn",
-                        new Dictionary<string, string>
-                        {
-                            { "tripId", trip.Id.ToString() }
-                        });
-
-                    if (result == string.Empty)
-                    {
-                        trip.Passenger.Guardian.DeviceToken = null;
-                        await _unitOfWork.UserRepository.UpdateAsync(trip.Passenger.Guardian);
-                    }
-                }
+                await NotifyUserWithFirebaseAsync(trip.Booker!.DeviceToken!,
+                    "Tài xế đã tới",
+                    $"Tài xế {trip.Driver!.Name} đã đến địa điểm đón người thân của bạn",
+                    trip.Booker);
 
                 bool isSelfBooking = false;
                 bool isNotificationForGuardian = true;
@@ -148,7 +158,7 @@ namespace Application.UseCase.DriverUC.Handlers
                 await _hubContext.Clients.Group(trip.PassengerId.ToString())
                     .SendAsync("NotifyPassengerDriverPickup", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
             }
-            else
+            else // selfbook and book for dep no app
             {
                 bool isSelfBooking = true;
                 bool isNotificationForGuardian = false;
@@ -157,6 +167,24 @@ namespace Application.UseCase.DriverUC.Handlers
             }
 
             await _unitOfWork.Save();
+        }
+
+        private async Task NotifyUserWithFirebaseAsync(string deviceToken, string title, string content, User user)
+        {
+            if (!string.IsNullOrEmpty(deviceToken))
+            {
+                var result = await FirebaseUtilities.SendNotificationToDeviceAsync(deviceToken, title, content,
+                    new Dictionary<string, string>
+                    {
+                        { "tripId", user.Id.ToString() }
+                    });
+
+                if (result == string.Empty)
+                {
+                    user.DeviceToken = null;
+                    await _unitOfWork.UserRepository.UpdateAsync(user);
+                }
+            }
         }
     }
 }

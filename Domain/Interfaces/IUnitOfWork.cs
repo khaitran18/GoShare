@@ -15,6 +15,7 @@
         ISettingRepository SettingRepository { get; }
         IRatingRepository RatingRepository { get; }
         IReportRepository ReportRepository { get; }
+        ITripImageRepository TripImageRepository { get; }
 
         Task Save();
     }
