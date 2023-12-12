@@ -54,7 +54,6 @@ using Application.UseCase.LocationUC.Handlers;
 using Application.UseCase.ReportUC.Commands;
 using Application.UseCase.ReportUC.Handlers;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 //Add middlewares
@@ -72,6 +71,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 //Add class
 builder.Services.AddScoped<UserClaims>();
+builder.Services.AddScoped<BackgroundServices>();
 
 // Logging
 builder.Services.AddLogging(loggingBuilder =>
@@ -139,6 +139,7 @@ builder.Services.AddDbContext<GoShareContext>(options => options.UseNpgsql(GoSha
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddSingleton<ISettingService, SettingService>();
 builder.Services.AddSingleton<IUserService, UserService>();
+builder.Services.AddSingleton<ICronJobService, CronJobService>();
 // Hangfire
 builder.Services.AddHangfire(config => config
     .UsePostgreSqlStorage(c => c.UseNpgsqlConnection(GoShareConfiguration.ConnectionString("GoShareAzure")))
@@ -334,8 +335,6 @@ app.UseMiddleware<CheckUserVerificationMiddleware>();
 
 app.UseCors("CorsPolicy");
 
-app.UseHangfireDashboard("/hangfire");
-
 app.UseHttpsRedirection();
 
 app.UseRouting();
@@ -343,6 +342,12 @@ app.UseRouting();
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+app.UseHangfireDashboard("/hangfire");
+
+// Start the Cron job
+var cronJobService = app.Services.GetRequiredService<ICronJobService>();
+cronJobService.Start();
 
 app.MapControllers();
 

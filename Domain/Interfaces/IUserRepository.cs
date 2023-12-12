@@ -20,5 +20,6 @@ namespace Domain.Interfaces
         Task<(List<User>, int)> GetUsersAsync(int page, int pageSize, string? sortBy);
         Task<bool> IsDependent(Guid UserId);
         Task<bool> IsBanned(Guid userId, out string? reason);
+        Task<List<User>> GetDriversWithDebt();
     }
 }

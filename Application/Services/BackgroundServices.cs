@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 
 namespace Application.Services
 {
-    public class BackgroundServices
+    public partial class BackgroundServices
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<BackgroundServices> _logger;
@@ -397,5 +397,25 @@ namespace Application.Services
             }
             else _logger.LogWarning("Transaction: {TransactionId} is not found", TransactionId);
         }
+
+        #region Cron Job
+        public async Task CheckDriverDebts()
+        {
+            _logger.LogInformation("Scanning daily driver debt...");
+            var drivers = await _unitOfWork.UserRepository.GetDriversWithDebt();
+            foreach (var driver in drivers)
+            {
+                var driverWallet = await _unitOfWork.WalletRepository.GetByUserIdAsync(driver.Id);
+
+                if (driverWallet!.DueDate != null && DateTimeUtilities.GetDateTimeVnNow() > driverWallet.DueDate)
+                {
+                    driver.Status = UserStatus.SUSPENDED;
+                    await _unitOfWork.UserRepository.UpdateAsync(driver);
+                }
+            }
+
+            await _unitOfWork.Save();
+        }
+        #endregion
     }
 }

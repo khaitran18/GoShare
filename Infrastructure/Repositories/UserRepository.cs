@@ -135,6 +135,14 @@ namespace Infrastructure.Repositories
             return (list, totalCount);
         }
 
+        public async Task<List<User>> GetDriversWithDebt()
+        {
+            return await _context.Users
+                .Include(u => u.Wallets)
+                .Where(u => u.Isdriver && u.Wallets.FirstOrDefault() != null && u.Wallets.FirstOrDefault()!.Balance < 0)
+                .ToListAsync();
+        }
+
         public async Task<User?> GetUserById(string id)
         {
 

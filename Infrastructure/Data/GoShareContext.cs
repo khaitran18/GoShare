@@ -687,6 +687,10 @@ namespace Infrastructure.Data
                     .HasColumnType("timestamp without time zone")
                     .HasColumnName("create_time");
 
+                entity.Property(e => e.DueDate)
+                    .HasColumnType("timestamp without time zone")
+                    .HasColumnName("due_date");
+
                 entity.Property(e => e.Type).HasColumnName("type");
 
                 entity.Property(e => e.UpdatedTime)

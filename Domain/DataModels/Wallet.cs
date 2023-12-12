@@ -15,6 +15,7 @@ namespace Domain.DataModels
         public Guid? UserId { get; set; }
         public double Balance { get; set; }
         public WalletStatus Type { get; set; }
+        public DateTime? DueDate { get; set; }
         public DateTime CreateTime { get; set; }
         public DateTime UpdatedTime { get; set; }
 

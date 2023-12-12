@@ -15,6 +15,7 @@ namespace Domain.Enumerations
         METERS = 4,
         KILOMETERS = 5,
         TIMES = 6,
-        DEFAULT = 7
+        DEFAULT = 7,
+        VND = 8
     }
 }

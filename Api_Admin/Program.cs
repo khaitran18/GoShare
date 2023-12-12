@@ -252,6 +252,8 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
+app.UseHangfireDashboard("/hangfire");
+
 app.MapControllers();
 
 app.UseEndpoints(endpoints =>

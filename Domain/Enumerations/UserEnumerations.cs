@@ -13,6 +13,6 @@ namespace Domain.Enumerations
         INACTIVE = 2,
         BANNED = 3,
         REJECTED = 4,
-        WARNED = 5
+        SUSPENDED = 5
     }
 }

@@ -105,10 +105,10 @@ namespace Application.UseCase.TripUC.Handlers
                     driver.WarnedTime = DateTimeUtilities.GetDateTimeVnNow();
                     driver.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
                 }
-                // If driver has been WARNED for more than the warning duration, ban the driver
+                // If driver has been WARNED for more than the warning duration, suspend the driver
                 else if (driver.RatingStatus == RatingStatus.WARNED && driver.WarnedTime.HasValue && (DateTime.Now - driver.WarnedTime.Value).TotalDays > warningDuration)
                 {
-                    driver.Status = UserStatus.BANNED;
+                    driver.Status = UserStatus.SUSPENDED;
                     driver.DisabledReason = "Tài khoản của bạn đã bị khóa vì đánh giá trung bình quá thấp.";
                     driver.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
                 }

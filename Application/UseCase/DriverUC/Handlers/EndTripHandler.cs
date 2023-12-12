@@ -194,6 +194,23 @@ namespace Application.UseCase.DriverUC.Handlers
                 await _unitOfWork.WalletRepository.UpdateAsync(systemWallet);
             }
 
+            // Check driver wallet after it has been updated
+            if (driverWallet.DueDate == null && driverWallet.Balance < _settingService.GetSetting("MINIMUM_BALANCE_LIMIT"))
+            {
+                // Set the deadline for the driver to top up the wallet
+                var debtPaymentPeriod = _settingService.GetSetting("DEBT_REPAYMENT_PERIOD");
+                driverWallet.DueDate = DateTimeUtilities.GetDateTimeVnNow().AddDays(debtPaymentPeriod);
+                await _unitOfWork.WalletRepository.UpdateAsync(driverWallet);
+            }
+
+            // Check if the driver’s wallet is above 0
+            if (driverWallet.DueDate != null && driverWallet.Balance > _settingService.GetSetting("BALANCE_THRESHOLD"))
+            {
+                // Reset the debt deadline
+                driverWallet.DueDate = null;
+                await _unitOfWork.WalletRepository.UpdateAsync(driverWallet);
+            }
+
             await _unitOfWork.Save();
 
             tripDto = _mapper.Map<TripEndDto>(trip);

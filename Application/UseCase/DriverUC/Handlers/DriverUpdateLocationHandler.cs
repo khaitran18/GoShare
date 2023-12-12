@@ -55,6 +55,7 @@ namespace Application.UseCase.DriverUC.Handlers
                     Type = LocationType.CURRENT_LOCATION,
                     Latitude = request.Latitude,
                     Longtitude = request.Longitude,
+                    Address = null,
                     CreateTime = DateTimeUtilities.GetDateTimeVnNow(),
                     UpdatedTime = DateTimeUtilities.GetDateTimeVnNow()
                 };

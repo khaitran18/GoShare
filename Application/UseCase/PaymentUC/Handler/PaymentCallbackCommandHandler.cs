@@ -21,12 +21,14 @@ namespace Application.UseCase.PaymentUC.Handler
         private readonly IPaymentService _paymentService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserClaims _userClaims;
+        private readonly ISettingService _settingService;
 
-        public PaymentCallbackCommandHandler(IPaymentService paymentService, IUnitOfWork unitOfWork, UserClaims userClaims)
+        public PaymentCallbackCommandHandler(IPaymentService paymentService, IUnitOfWork unitOfWork, UserClaims userClaims, ISettingService settingService)
         {
             _paymentService = paymentService;
             _unitOfWork = unitOfWork;
             _userClaims = userClaims;
+            _settingService = settingService;
         }
 
         public async Task<bool> Handle(PaymentCallbackCommand request, CancellationToken cancellationToken)
@@ -47,6 +49,15 @@ namespace Application.UseCase.PaymentUC.Handler
                     //TOPUP TRANSACTION DESTINATION WALLET
                     Wallet wallet = _unitOfWork.WalletRepository.GetById(transaction.WalletId);
                     wallet.Balance += transaction.Amount;
+                    var user = await _unitOfWork.UserRepository.GetUserById(wallet.UserId.ToString()!);
+
+                    // Check if the driver’s wallet is above 0
+                    if (user!.Isdriver && wallet.DueDate != null && wallet.Balance > _settingService.GetSetting("BALANCE_THRESHOLD"))
+                    {
+                        // Reset the debt deadline
+                        wallet.DueDate = null;
+                    }
+
                     wallet.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
                     await _unitOfWork.WalletRepository.UpdateAsync(wallet);
                 }
