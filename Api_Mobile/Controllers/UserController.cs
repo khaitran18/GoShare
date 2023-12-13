@@ -11,7 +11,7 @@ namespace Api_Mobile.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "User,Driver")]
+    [Authorize(Roles = "User,Driver, Dependent")]
     public class UserController : ControllerBase
     {
         private readonly IMediator _mediator;
