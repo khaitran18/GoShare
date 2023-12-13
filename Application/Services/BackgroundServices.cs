@@ -407,7 +407,7 @@ namespace Application.Services
             {
                 var driverWallet = await _unitOfWork.WalletRepository.GetByUserIdAsync(driver.Id);
 
-                if (driverWallet!.DueDate != null && DateTimeUtilities.GetDateTimeVnNow() > driverWallet.DueDate)
+                if (driver.Status != UserStatus.BANNED && driverWallet!.DueDate != null && DateTimeUtilities.GetDateTimeVnNow() > driverWallet.DueDate)
                 {
                     driver.Status = UserStatus.SUSPENDED;
                     await _unitOfWork.UserRepository.UpdateAsync(driver);
@@ -425,7 +425,7 @@ namespace Application.Services
             foreach (var driver in drivers)
             {
                 // If driver has been WARNED for more than the warning duration, suspend the driver
-                if (driver.WarnedTime != null && (DateTimeUtilities.GetDateTimeVnNow() - driver.WarnedTime.Value).TotalDays > warningDuration)
+                if (driver.Status != UserStatus.BANNED && driver.WarnedTime != null && (DateTimeUtilities.GetDateTimeVnNow() - driver.WarnedTime.Value).TotalDays > warningDuration)
                 {
                     driver.Status = UserStatus.SUSPENDED;
                     driver.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();

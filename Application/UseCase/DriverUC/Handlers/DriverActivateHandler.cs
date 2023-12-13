@@ -35,6 +35,12 @@ namespace Application.UseCase.DriverUC.Handlers
                 throw new NotFoundException(nameof(User), userId);
             }
 
+            // Check if the user is suspended
+            if (user.Status == UserStatus.SUSPENDED)
+            {
+                throw new BadRequestException("You cannot activate while your account is suspended.");
+            }
+
             if (user.Status == UserStatus.BUSY)
             {
                 throw new BadRequestException("You cannot do this function while you are in a trip.");

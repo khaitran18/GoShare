@@ -124,7 +124,7 @@ namespace Application.UseCase.DriverUC.Handlers
 
             // Set status of driver back to active
             var driver = await _unitOfWork.UserRepository.GetUserById(driverId.ToString());
-            if (driver != null)
+            if (driver != null && driver.Status != UserStatus.SUSPENDED) // Check suspended to prevent re-activate driver
             {
                 driver.Status = UserStatus.ACTIVE;
                 driver.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
