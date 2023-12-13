@@ -10,7 +10,7 @@ namespace Api_Mobile.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "User, Driver")]
+    [Authorize(Roles = "User, Driver, Dependent")]
     public class TripController : ControllerBase
     {
         private readonly IMediator _mediator;
