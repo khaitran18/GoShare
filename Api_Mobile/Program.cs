@@ -235,6 +235,7 @@ builder.Services.AddScoped<IRequestHandler<CreateTripForDependentWithoutPhoneCom
 builder.Services.AddScoped<IRequestHandler<GetUserQuery, UserDto>, GetUserHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateReportCommand, ReportDto>, CreateReportHandler>();
 builder.Services.AddScoped<IRequestHandler<GetDriverWalletStatisticQuery, List<WalletMonthStatistic>>, GetDriverWalletStatisticQueryHandler>();
+builder.Services.AddScoped<IRequestHandler<UpdateUserProfileCommand, UserDto>, UpdateUserProfileHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
@@ -259,6 +260,7 @@ builder.Services.AddScoped<IValidator<RegisterCommand>, RegisterCommandValidator
 builder.Services.AddScoped<IValidator<CreateDependentCommand>, CreateDependentCommandValidator>();
 builder.Services.AddScoped<IValidator<CreateFeedbackCommand>, CreateFeedbackCommandValidator>();
 builder.Services.AddScoped<IValidator<CreateReportCommand>, CreateReportCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdateUserProfileCommand>, UpdateUserProfileCommandValidator>();
 
 // Add AutoMapper
 var mapperConfig = new MapperConfiguration(cfg =>
