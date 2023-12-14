@@ -25,6 +25,8 @@ using Application.UseCase.UserUC.Handlers;
 using Application.UseCase.UserUC.Queries;
 using Application.UseCase.WallettransactionUC.Handlers;
 using Application.UseCase.WallettransactionUC.Queries;
+using Application.UseCase.WalletUC.Commands;
+using Application.UseCase.WalletUC.Handlers;
 using AutoMapper;
 using Domain.Interfaces;
 using FirebaseAdmin;
@@ -187,11 +189,13 @@ builder.Services.AddScoped<IRequestHandler<GetReportQuery, ReportDto>, GetReport
 builder.Services.AddScoped<IRequestHandler<GetSystemTransactionQuery, List<WalletTransactionDto>>, GetSystemTransactionHandler>();
 builder.Services.AddScoped<IRequestHandler<BanUserCommand, UserDto>, BanUserHandler>();
 builder.Services.AddScoped<IRequestHandler<GetTripsQuery, PaginatedResult<TripDto>>, GetTripsHandler>();
+builder.Services.AddScoped<IRequestHandler<UpdateWalletBalanceCommand, double>, UpdateWalletBalanceHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 
 // Validator
 builder.Services.AddScoped<IValidator<BanUserCommand>, BanUserCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdateWalletBalanceCommand>, UpdateWalletBalanceCommandValidator>();
 
 var mapperConfig = new MapperConfiguration(cfg =>
 {
