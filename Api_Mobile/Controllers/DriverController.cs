@@ -80,6 +80,7 @@ namespace Api_Mobile.Controllers
             var response = await _mediator.Send(command);
             return Ok(response);
         }
+
         [HttpGet("statistic")]
         public async Task<IActionResult> GetStatistic()
         {

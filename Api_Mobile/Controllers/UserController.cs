@@ -55,19 +55,18 @@ namespace Api_Mobile.Controllers
             return Ok(result);
         }
 
-        //[HttpPut("profile")]
-        //public async Task<IActionResult> UpdateUserProfile([FromForm] UpdateUserProfileCommand command)
-        //{
-        //    var response = await _mediator.Send(command);
-        //    return Ok(response);
-        //}
-
         [HttpGet("driver-register-code")]
         public async Task<IActionResult> GetDriverRegisterCode()
         {
             var query = new GetDriverRegisterCodeQuery();
             var result = await _mediator.Send(query);
             return Ok(result);
+        }
+        [HttpPut("profile")]
+        public async Task<IActionResult> UpdateUserProfile([FromForm] UpdateUserProfileCommand command)
+        {
+            var response = await _mediator.Send(command);
+            return Ok(response);
         }
     }
 }

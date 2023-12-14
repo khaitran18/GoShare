@@ -1,6 +1,8 @@
 using Api_Admin.Middlewares;
+using Application.Common.Behaviours;
 using Application.Common.Dtos;
 using Application.Common.Mappers;
+using Application.Common.Validations;
 using Application.Configuration;
 using Application.Services;
 using Application.Services.Interfaces;
@@ -17,6 +19,7 @@ using Application.UseCase.ReportUC.Handlers;
 using Application.UseCase.ReportUC.Queries;
 using Application.UseCase.TripUC.Commands;
 using Application.UseCase.TripUC.Handlers;
+using Application.UseCase.UserUC.Commands;
 using Application.UseCase.UserUC.Handlers;
 using Application.UseCase.UserUC.Queries;
 using Application.UseCase.WallettransactionUC.Handlers;
@@ -24,6 +27,7 @@ using Application.UseCase.WallettransactionUC.Queries;
 using AutoMapper;
 using Domain.Interfaces;
 using FirebaseAdmin;
+using FluentValidation;
 using Google.Apis.Auth.OAuth2;
 using Hangfire;
 using Hangfire.PostgreSql;
@@ -153,6 +157,17 @@ builder.Services.AddSignalR(hubOptions =>
     hubOptions.EnableDetailedErrors = true;
 });
 
+// Cors
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", builder =>
+    {
+        builder.AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 //Add handler
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<IRequestHandler<VerifyDriverCommand, bool>, VerifyDriverCommandHandler>();
@@ -169,17 +184,12 @@ builder.Services.AddScoped<IRequestHandler<GetReportsQuery, PaginatedResult<Repo
 builder.Services.AddScoped<IRequestHandler<UpdateReportStatusCommand, ReportDto>, UpdateReportStatusHandler>();
 builder.Services.AddScoped<IRequestHandler<GetReportQuery, ReportDto>, GetReportHandler>();
 builder.Services.AddScoped<IRequestHandler<GetSystemTransactionQuery, List<WalletTransactionDto>>, GetSystemTransactionHandler>();
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+builder.Services.AddScoped<IRequestHandler<BanUserCommand, UserDto>, BanUserHandler>();
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
+    .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("CorsPolicy", builder =>
-    {
-        builder.AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
+// Validator
+builder.Services.AddScoped<IValidator<BanUserCommand>, BanUserCommandValidator>();
 
 var mapperConfig = new MapperConfiguration(cfg =>
 {
@@ -256,12 +266,12 @@ app.UseHangfireDashboard("/hangfire");
 
 app.MapControllers();
 
+app.UseCors("CorsPolicy");
+
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapHub<SignalRHub>("/goshareHub");
 });
-
-app.UseCors("CorsPolicy");
 
 app.Run();
 
