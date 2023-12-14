@@ -190,6 +190,7 @@ builder.Services.AddScoped<IRequestHandler<GetSystemTransactionQuery, List<Walle
 builder.Services.AddScoped<IRequestHandler<BanUserCommand, UserDto>, BanUserHandler>();
 builder.Services.AddScoped<IRequestHandler<GetTripsQuery, PaginatedResult<TripDto>>, GetTripsHandler>();
 builder.Services.AddScoped<IRequestHandler<UpdateWalletBalanceCommand, double>, UpdateWalletBalanceHandler>();
+builder.Services.AddScoped<IRequestHandler<UnbanUserCommand, UserDto>, UnbanUserHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 

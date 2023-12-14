@@ -65,5 +65,13 @@ namespace Api_Admin.Controllers
             var response = await _mediator.Send(command);
             return Ok(response);
         }
+
+        [HttpPut("unban/{id}")]
+        public async Task<IActionResult> UnbanUser([FromRoute] Guid id)
+        {
+            var command = new UnbanUserCommand { UserId = id };
+            var response = await _mediator.Send(command);
+            return Ok(response);
+        }
     }
 }
