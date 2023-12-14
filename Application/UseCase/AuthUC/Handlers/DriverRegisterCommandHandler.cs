@@ -29,10 +29,11 @@ namespace Application.UseCase.AuthUC.Handlers
 
         public async Task<bool> Handle(DriverRegisterCommand request, CancellationToken cancellationToken)
         {
-            var u = await _unitOfWork.UserRepository.GetUserByPhone(request.Phone);
+            //var u = await _unitOfWork.UserRepository.GetUserByPhone(request.Phone);
+            User? u = await _unitOfWork.UserRepository.GetUserByOtp(request.Otp);
             Guid id;
             if (u is not null) id = u.Id;
-            else throw new NotFoundException("User's phone is not found");
+            else throw new NotFoundException("User is not found");
             if (await _unitOfWork.UserRepository.IsDependent(id)) throw new UnauthorizedAccessException("Dependent cannot register to be a driver");
             if (await _driverDocumentService.ValidDocuments(request.List))
             {

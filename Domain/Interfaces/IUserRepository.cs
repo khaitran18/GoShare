@@ -22,5 +22,6 @@ namespace Domain.Interfaces
         Task<bool> IsBanned(Guid userId, out string? reason);
         Task<List<User>> GetDriversWithDebt();
         Task<List<User>> GetDriversWarnedRating();
+        Task<User?> GetUserByOtp(string otp);
     }
 }

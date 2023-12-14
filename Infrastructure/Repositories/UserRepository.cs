@@ -291,5 +291,10 @@ namespace Infrastructure.Repositories
             else throw new NotFoundException("User not found");
             return true;
         }
+
+        public Task<User?> GetUserByOtp(string otp)
+        {
+            return _context.Users.FirstOrDefaultAsync(u => u.Otp == otp);
+        }
     }
 }

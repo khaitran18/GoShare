@@ -12,7 +12,7 @@ namespace Application.UseCase.AuthUC.Commands
 {
     public record DriverRegisterCommand : IRequest<bool>
     {
-        public string Phone { get; set; } = null!;
+        public string Otp { get; set; } = null!;
         public CarDto Car { get; set; } = null!;
         public short Capacity { get; set; }
         public List<PictureUploadDto> List { get; set; } = null!;
