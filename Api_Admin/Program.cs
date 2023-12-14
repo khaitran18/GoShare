@@ -19,6 +19,7 @@ using Application.UseCase.ReportUC.Handlers;
 using Application.UseCase.ReportUC.Queries;
 using Application.UseCase.TripUC.Commands;
 using Application.UseCase.TripUC.Handlers;
+using Application.UseCase.TripUC.Queries;
 using Application.UseCase.UserUC.Commands;
 using Application.UseCase.UserUC.Handlers;
 using Application.UseCase.UserUC.Queries;
@@ -185,6 +186,7 @@ builder.Services.AddScoped<IRequestHandler<UpdateReportStatusCommand, ReportDto>
 builder.Services.AddScoped<IRequestHandler<GetReportQuery, ReportDto>, GetReportHandler>();
 builder.Services.AddScoped<IRequestHandler<GetSystemTransactionQuery, List<WalletTransactionDto>>, GetSystemTransactionHandler>();
 builder.Services.AddScoped<IRequestHandler<BanUserCommand, UserDto>, BanUserHandler>();
+builder.Services.AddScoped<IRequestHandler<GetTripsQuery, PaginatedResult<TripDto>>, GetTripsHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 

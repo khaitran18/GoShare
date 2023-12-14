@@ -1,4 +1,5 @@
 ﻿using Application.UseCase.TripUC.Commands;
+using Application.UseCase.TripUC.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +24,13 @@ namespace Api_Admin.Controllers
             var command = new CancelTripCommand();
             command.TripId = id;
             var response = await _mediator.Send(command);
+            return Ok(response);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetTrips([FromQuery] GetTripsQuery query)
+        {
+            var response = await _mediator.Send(query);
             return Ok(response);
         }
     }

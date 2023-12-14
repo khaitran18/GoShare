@@ -52,10 +52,15 @@ namespace Application.UseCase.PaymentUC.Handler
                     var user = await _unitOfWork.UserRepository.GetUserById(wallet.UserId.ToString()!);
 
                     // Check if the driver’s wallet is above 0
-                    if (user!.Isdriver && wallet.DueDate != null && wallet.Balance > _settingService.GetSetting("BALANCE_THRESHOLD"))
+                    if (wallet.DueDate != null && wallet.Balance > _settingService.GetSetting("BALANCE_THRESHOLD"))
                     {
                         // Reset the debt deadline
                         wallet.DueDate = null;
+                        if (user!.Status == UserStatus.SUSPENDED)
+                        {
+                            // Un-ban user
+                            user.Status = UserStatus.INACTIVE;
+                        }
                     }
 
                     wallet.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();

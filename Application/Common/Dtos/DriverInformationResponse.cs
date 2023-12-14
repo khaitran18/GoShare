@@ -12,5 +12,6 @@ namespace Application.Common.Dtos
         public double Rating { get; set; }
         public double DailyIncome { get; set; }
         public DateTime? DueDate { get; set; }
+        public DateTime? WarnedTime { get; set; }
     }
 }

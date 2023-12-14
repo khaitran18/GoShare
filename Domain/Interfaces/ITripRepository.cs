@@ -1,4 +1,5 @@
 ﻿using Domain.DataModels;
+using Domain.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,5 +14,6 @@ namespace Domain.Interfaces
         Task<Trip?> GetOngoingTripByPassengerId(Guid passengerId);
         Task<List<Trip>> GetTripHistoryByUserId(Guid userId);
         Task<Trip?> GetCurrentTripByUserId(Guid id);
+        Task<(List<Trip>, int)> GetTrips(TripStatus? status, PaymentMethod? paymentMethod, TripType? type, string? sortBy, int page, int pageSize);
     }
 }

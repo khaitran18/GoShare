@@ -78,5 +78,92 @@ namespace Infrastructure.Repositories
 
             return combinedTrips;
         }
+
+        public async Task<(List<Trip>, int)> GetTrips(TripStatus? status, PaymentMethod? paymentMethod, TripType? type, string? sortBy, int page, int pageSize)
+        {
+            IQueryable<Trip> query = _context.Trips
+                .Include(t => t.StartLocation)
+                .Include(t => t.EndLocation)
+                .Include(t => t.Driver)
+                    .ThenInclude(d => d!.Car)
+                .Include(t => t.Cartype)
+                .Include(t => t.Passenger)
+                    .ThenInclude(p => p.Guardian)
+                .Include(t => t.Booker)
+                .AsQueryable();
+
+            // Filter by status, payment method, and type
+            if (status.HasValue)
+            {
+                query = query.Where(t => t.Status == status);
+            }
+            if (paymentMethod.HasValue)
+            {
+                query = query.Where(t => t.PaymentMethod == paymentMethod);
+            }
+            if (type.HasValue)
+            {
+                query = query.Where(t => t.Type == type);
+            }
+
+            // Pre-order by CreateTime
+            query = query.OrderByDescending(t => t.CreateTime);
+
+            // Sort by the specified field
+            switch (sortBy)
+            {
+                case "passengerName":
+                    query = query.OrderBy(t => t.Passenger.Name);
+                    break;
+                case "passengerName_desc":
+                    query = query.OrderByDescending(t => t.Passenger.Name);
+                    break;
+                case "startTime":
+                    query = query.OrderBy(t => t.StartTime);
+                    break;
+                case "startTime_desc":
+                    query = query.OrderByDescending(t => t.StartTime);
+                    break;
+                case "endTime":
+                    query = query.OrderBy(t => t.EndTime);
+                    break;
+                case "endTime_desc":
+                    query = query.OrderByDescending(t => t.EndTime);
+                    break;
+                case "pickupTime":
+                    query = query.OrderBy(t => t.PickupTime);
+                    break;
+                case "pickupTime_desc":
+                    query = query.OrderByDescending(t => t.PickupTime);
+                    break;
+                case "distance":
+                    query = query.OrderBy(t => t.Distance);
+                    break;
+                case "distance_desc":
+                    query = query.OrderByDescending(t => t.Distance);
+                    break;
+                case "price":
+                    query = query.OrderBy(t => t.Price);
+                    break;
+                case "price_desc":
+                    query = query.OrderByDescending(t => t.Price);
+                    break;
+                case "updatedTime":
+                    query = query.OrderBy(t => t.UpdatedTime);
+                    break;
+                case "updatedTime_desc":
+                    query = query.OrderByDescending(t => t.UpdatedTime);
+                    break;
+            }
+
+            var totalCount = await query.CountAsync();
+
+            // Pagination
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+            var trips = await query.ToListAsync();
+
+            return (trips, totalCount);
+        }
     }
 }
