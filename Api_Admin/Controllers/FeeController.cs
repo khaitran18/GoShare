@@ -1,4 +1,5 @@
-﻿using Application.UseCase.FeeUC.Queries;
+﻿using Application.UseCase.FeeUC.Command;
+using Application.UseCase.FeeUC.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -23,6 +24,20 @@ namespace Api_Admin.Controllers
         {
             GetFeeAndPoliciesQuery query = new GetFeeAndPoliciesQuery();
             var response = await _mediator.Send(query);
+            return Ok(response);
+        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateFee([FromRoute]Guid id ,[FromBody]UpdateFeeCommand command)
+        {
+            command.Guid = id;
+            var response = await _mediator.Send(command);
+            return Ok(response);
+        }
+        [HttpPut("policy/{id}")]
+        public async Task<IActionResult> UpdateFeePolicy([FromRoute] Guid id, [FromBody] UpdateFeePolicyCommand command)
+        {
+            command.Guid = id;
+            var response = await _mediator.Send(command);
             return Ok(response);
         }
     }

@@ -14,6 +14,7 @@ using Application.UseCase.AuthUC.Handlers;
 using Application.UseCase.DriverUC.Commands;
 using Application.UseCase.DriverUC.Handlers;
 using Application.UseCase.DriverUC.Queries;
+using Application.UseCase.FeeUC.Command;
 using Application.UseCase.FeeUC.Handler;
 using Application.UseCase.FeeUC.Queries;
 using Application.UseCase.ReportUC.Commands;
@@ -190,6 +191,8 @@ builder.Services.AddScoped<IRequestHandler<GetSystemTransactionQuery, List<Walle
 builder.Services.AddScoped<IRequestHandler<BanUserCommand, UserDto>, BanUserHandler>();
 builder.Services.AddScoped<IRequestHandler<GetTripsQuery, PaginatedResult<TripDto>>, GetTripsHandler>();
 builder.Services.AddScoped<IRequestHandler<GetFeeAndPoliciesQuery, List<FeeDto>>, GetFeeAndPoliciesQueryHandler>();
+builder.Services.AddScoped<IRequestHandler<UpdateFeeCommand, bool>, UpdateFeeCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<UpdateFeePolicyCommand, bool>, UpdateFeePolicyCommandHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 

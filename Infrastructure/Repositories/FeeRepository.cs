@@ -20,7 +20,14 @@ namespace Infrastructure.Repositories
 
         public Task<List<Fee>> GetAllWithPoliciesAsync()
         {
-            return _context.Fees.Include(f => f.Feepolicies).ToListAsync();
+            return _context.Fees
+            .Include(f => f.Feepolicies)
+            .SelectMany(f => f.Feepolicies, (f, p) => new { Fee = f, Policy = p })
+            .OrderBy(fp => fp.Fee.CarType)
+            .ThenBy(fp => fp.Policy.MinDistance)
+            .Select(fp => fp.Fee)
+            .Distinct()
+            .ToListAsync();
         }
     }
 }

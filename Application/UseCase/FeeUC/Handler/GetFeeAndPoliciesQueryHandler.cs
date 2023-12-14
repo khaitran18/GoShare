@@ -33,7 +33,7 @@ namespace Application.UseCase.FeeUC.Handler
                 dto.policies = feepolicies;
                 response.Add(dto);
             }
-            return response;
+            return response.OrderBy(u=>u.CarType).ToList();
         }
     }
 }
