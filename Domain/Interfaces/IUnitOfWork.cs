@@ -16,6 +16,7 @@
         IRatingRepository RatingRepository { get; }
         IReportRepository ReportRepository { get; }
         ITripImageRepository TripImageRepository { get; }
+        IFeeRepository FeeRepository { get; }
 
         Task Save();
     }

@@ -6,14 +6,13 @@ using System.Threading.Tasks;
 
 namespace Application.Common.Dtos
 {
-    public class FeeDto
+    public class FeepolicyDto
     {
         public Guid Id { get; set; }
-        public int CarType { get; set; }
-        public double BasePrice { get; set; }
-        public double BaseDistance { get; set; }
+        public double MinDistance { get; set; }
+        public double? MaxDistance { get; set; }
+        public double PricePerKm { get; set; }
         public DateTime CreateTime { get; set; }
         public DateTime UpdateTime { get; set; }
-        public List<FeepolicyDto> policies { get; set; } = null!;
     }
 }
