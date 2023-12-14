@@ -55,6 +55,7 @@ namespace Api_Mobile.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "User")]
         [HttpGet("driver-register-code")]
         public async Task<IActionResult> GetDriverRegisterCode()
         {

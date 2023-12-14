@@ -25,11 +25,11 @@ namespace Api_Mobile.Middlewares
                     throw new ForbiddenAccessException("User is not verified");
                 if (await _unitOfWork.UserRepository.IsBanned(UserId, out string? reason))
                     throw new ForbiddenAccessException("User is banned: " + reason);
-                if (_userClaims.Role.Equals(UserRoleEnumerations.Driver))
-                {
-                    if (!await _unitOfWork.CarRepository.IsValidByDate(UserId))
-                        throw new ForbiddenAccessException("User's car is invalid");
-                }
+                //if (_userClaims.Role.Equals(UserRoleEnumerations.Driver))
+                //{
+                //    if (!await _unitOfWork.CarRepository.IsValidByDate(UserId))
+                //        throw new ForbiddenAccessException("User's car is invalid");
+                //}
             }
             await next(context);
         }

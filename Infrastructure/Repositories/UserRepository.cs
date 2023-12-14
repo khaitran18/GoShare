@@ -294,7 +294,7 @@ namespace Infrastructure.Repositories
 
         public Task<User?> GetUserByOtp(string otp)
         {
-            return _context.Users.FirstOrDefaultAsync(u => u.Otp == otp);
+            return _context.Users.FirstOrDefaultAsync(u => u.Otp!.Equals(otp));
         }
     }
 }
