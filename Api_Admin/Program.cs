@@ -157,6 +157,17 @@ builder.Services.AddSignalR(hubOptions =>
     hubOptions.EnableDetailedErrors = true;
 });
 
+// Cors
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", builder =>
+    {
+        builder.AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 //Add handler
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<IRequestHandler<VerifyDriverCommand, bool>, VerifyDriverCommandHandler>();
@@ -175,21 +186,10 @@ builder.Services.AddScoped<IRequestHandler<GetReportQuery, ReportDto>, GetReport
 builder.Services.AddScoped<IRequestHandler<GetSystemTransactionQuery, List<WalletTransactionDto>>, GetSystemTransactionHandler>();
 builder.Services.AddScoped<IRequestHandler<BanUserCommand, UserDto>, BanUserHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
-    .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 
 // Validator
 builder.Services.AddScoped<IValidator<BanUserCommand>, BanUserCommandValidator>();
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("CorsPolicy", builder =>
-    {
-        builder.AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
 
 var mapperConfig = new MapperConfiguration(cfg =>
 {
@@ -266,12 +266,12 @@ app.UseHangfireDashboard("/hangfire");
 
 app.MapControllers();
 
+app.UseCors("CorsPolicy");
+
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapHub<SignalRHub>("/goshareHub");
 });
-
-app.UseCors("CorsPolicy");
 
 app.Run();
 
