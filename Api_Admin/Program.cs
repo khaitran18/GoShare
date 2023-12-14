@@ -14,6 +14,8 @@ using Application.UseCase.AuthUC.Handlers;
 using Application.UseCase.DriverUC.Commands;
 using Application.UseCase.DriverUC.Handlers;
 using Application.UseCase.DriverUC.Queries;
+using Application.UseCase.FeeUC.Handler;
+using Application.UseCase.FeeUC.Queries;
 using Application.UseCase.ReportUC.Commands;
 using Application.UseCase.ReportUC.Handlers;
 using Application.UseCase.ReportUC.Queries;
@@ -187,6 +189,7 @@ builder.Services.AddScoped<IRequestHandler<GetReportQuery, ReportDto>, GetReport
 builder.Services.AddScoped<IRequestHandler<GetSystemTransactionQuery, List<WalletTransactionDto>>, GetSystemTransactionHandler>();
 builder.Services.AddScoped<IRequestHandler<BanUserCommand, UserDto>, BanUserHandler>();
 builder.Services.AddScoped<IRequestHandler<GetTripsQuery, PaginatedResult<TripDto>>, GetTripsHandler>();
+builder.Services.AddScoped<IRequestHandler<GetFeeAndPoliciesQuery, List<FeeDto>>, GetFeeAndPoliciesQueryHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 
@@ -207,6 +210,7 @@ var mapperConfig = new MapperConfiguration(cfg =>
     cfg.AddProfile<RatingProfile>();
     cfg.AddProfile<ReportProfile>();
     cfg.AddProfile<TripImageProfile>();
+    cfg.AddProfile<FeeProfile>();
 });
 var mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
