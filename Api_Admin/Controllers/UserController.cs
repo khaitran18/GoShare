@@ -1,5 +1,6 @@
 ﻿using Application.UseCase.DriverUC.Commands;
 using Application.UseCase.DriverUC.Queries;
+using Application.UseCase.UserUC.Commands;
 using Application.UseCase.UserUC.Queries;
 using Domain.Enumerations;
 using MediatR;
@@ -54,6 +55,14 @@ namespace Api_Admin.Controllers
         public async Task<IActionResult> GetUser([FromRoute] GetUserQuery query)
         {
             var response = await _mediator.Send(query);
+            return Ok(response);
+        }
+
+        [HttpPut("ban/{id}")]
+        public async Task<IActionResult> BanUser([FromRoute] Guid id, [FromBody] BanUserCommand command)
+        {
+            command.UserId = id;
+            var response = await _mediator.Send(command);
             return Ok(response);
         }
     }

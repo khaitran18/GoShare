@@ -29,6 +29,14 @@ namespace Application.UseCase.DriverUC.Handlers
             var response = new DriverInformationResponse();
             response.DailyIncome = await _driverService.GetDriverDailyIncome(_unitOfWork, (Guid)_claims.id!);
             (response.Rating, response.RatingNum) = await _driverService.GetDriverRating(_unitOfWork, (Guid)_claims.id!);
+            
+            // Get the Wallet information
+            var wallet = await _unitOfWork.WalletRepository.GetByUserIdAsync((Guid)_claims.id!);
+            if (wallet != null && wallet.DueDate != null)
+            {
+                response.DueDate = wallet.DueDate;
+            }
+
             return response;
         }
     }
