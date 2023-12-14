@@ -11,7 +11,7 @@ namespace Api_Mobile.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "User,Driver, Dependent")]
+    [Authorize(Roles = "User,Driver,Dependent")]
     public class UserController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -55,6 +55,14 @@ namespace Api_Mobile.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "User")]
+        [HttpGet("driver-register-code")]
+        public async Task<IActionResult> GetDriverRegisterCode()
+        {
+            var query = new GetDriverRegisterCodeQuery();
+            var result = await _mediator.Send(query);
+            return Ok(result);
+        }
         [HttpPut("profile")]
         public async Task<IActionResult> UpdateUserProfile([FromForm] UpdateUserProfileCommand command)
         {

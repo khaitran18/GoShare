@@ -235,6 +235,8 @@ builder.Services.AddScoped<IRequestHandler<CreateTripForDependentWithoutPhoneCom
 builder.Services.AddScoped<IRequestHandler<GetUserQuery, UserDto>, GetUserHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateReportCommand, ReportDto>, CreateReportHandler>();
 builder.Services.AddScoped<IRequestHandler<GetDriverWalletStatisticQuery, List<WalletMonthStatistic>>, GetDriverWalletStatisticQueryHandler>();
+//builder.Services.AddScoped<IRequestHandler<UpdateUserProfileCommand, UserDto>, UpdateUserProfileHandler>();
+builder.Services.AddScoped<IRequestHandler<GetDriverRegisterCodeQuery, string?>, GetDriverRegisterCodeQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<UpdateUserProfileCommand, UserDto>, UpdateUserProfileHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>))

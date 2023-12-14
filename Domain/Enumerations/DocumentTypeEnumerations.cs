@@ -8,9 +8,10 @@ namespace Domain.Enumerations
 {
     public enum DocumentTypeEnumerations
     {
+        Id,
         DriverLicense,
         VehicleRegistration,
-        CarPicture,
-        RegistrationCertificate
+        RegistrationCertificate,
+        DriverPicture,
     }
 }

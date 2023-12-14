@@ -14,10 +14,11 @@ namespace Application.Services
     {
         public async Task<bool> ValidDocuments(List<PictureUploadDto> list)
         {
-            int numOfDriverLicense = 1;
-            int numOfVehicleRegistration = 1;
+            int numOfId = 2;
+            int numOfDriverLicense = 2;
+            int numOfVehicleRegistration = 2;
             int numOfRegistrationCertificate = 1;
-            int numOfCarPicture = 1;
+            int numOfDriverPicture = 1;
             foreach (string type in Enum.GetNames(typeof(DocumentTypeEnumerations)))
             {
                 int dem = 0;
@@ -26,10 +27,11 @@ namespace Application.Services
                     string pictureType = pictureUploadDto.type.ToString();
                     if (pictureType.Equals(type)) dem++;
                 }
-                if (type.Equals(DocumentTypeEnumerations.DriverLicense.ToString())) if (dem != numOfDriverLicense) throw new BadRequestException("Driver license not found");
-                if (type.Equals(DocumentTypeEnumerations.VehicleRegistration.ToString())) if (dem != numOfVehicleRegistration) throw new BadRequestException("Vehicle Registration not found");
-                if (type.Equals(DocumentTypeEnumerations.RegistrationCertificate.ToString())) if (dem != numOfRegistrationCertificate) throw new BadRequestException("Registratoin Certificate not found");
-                if (type.Equals(DocumentTypeEnumerations.CarPicture.ToString())) if (dem != numOfCarPicture) throw new BadRequestException("Not enough Car Picture");
+                if (type.Equals(DocumentTypeEnumerations.Id.ToString())) if (dem != numOfId) throw new BadRequestException("Bạn cần phải có "+numOfId+" hình căn cước");
+                if (type.Equals(DocumentTypeEnumerations.DriverLicense.ToString())) if (dem != numOfDriverLicense) throw new BadRequestException("Bạn cần phải có "+numOfDriverLicense+" hình bằng lái");
+                if (type.Equals(DocumentTypeEnumerations.VehicleRegistration.ToString())) if (dem != numOfVehicleRegistration) throw new BadRequestException("Bạn cần phải có "+numOfDriverLicense+" hình cà vẹt xe");
+                if (type.Equals(DocumentTypeEnumerations.RegistrationCertificate.ToString())) if (dem != numOfRegistrationCertificate) throw new BadRequestException("Bạn cần phải có "+numOfRegistrationCertificate+" hình giấy đăng kiểm");
+                if (type.Equals(DocumentTypeEnumerations.DriverPicture.ToString())) if (dem != numOfDriverPicture) throw new BadRequestException("Bạn cần phải có "+numOfDriverPicture+" hình bản thân");
             }
             return await Task.FromResult(true);
         }
