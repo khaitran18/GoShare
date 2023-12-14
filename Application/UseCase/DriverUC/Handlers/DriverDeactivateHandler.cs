@@ -38,7 +38,8 @@ namespace Application.UseCase.DriverUC.Handlers
             // Check if the user is suspended
             if (user.Status == UserStatus.SUSPENDED)
             {
-                throw new BadRequestException("You cannot de-activate while your account is suspended.");
+                throw new BadRequestException("Bạn đã bị khóa tạm thời và không thể thực hiện hành động này. " +
+                    "Vui lòng kiếm tra lại tài khoản của bạn.");
             }
 
             if (user.Status == UserStatus.BUSY)
