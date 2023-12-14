@@ -49,6 +49,13 @@ namespace Infrastructure.Repositories
                                           t.Status != TripStatus.TIMEDOUT);
         }
 
+        public async Task<List<Trip>> GetPastCompletedTripsByPassengerIdAsync(Guid passengerId)
+        {
+            return await _context.Trips
+                .Where(t => t.PassengerId == passengerId && t.Status == TripStatus.COMPLETED)
+                .ToListAsync();
+        }
+
         public async Task<List<Trip>> GetTripHistoryByUserId(Guid userId)
         {
             var ongoingTrips = await _context.Trips

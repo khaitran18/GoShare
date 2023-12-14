@@ -25,12 +25,34 @@ namespace Application.UseCase.LocationUC.Handlers
             _mapper = mapper;
         }
 
-        public Task<List<LocationDto>> Handle(GetLocationQuery request, CancellationToken cancellationToken)
+        public async Task<List<LocationDto>> Handle(GetLocationQuery request, CancellationToken cancellationToken)
         {
-            List<LocationDto> response = new List<LocationDto>();
-            List<Location> list = _unitOfWork.LocationRepository.GetListByUserIdAndTypeAsync((Guid)_claims.id!, Domain.Enumerations.LocationType.PLANNED_DESTINATION).Result;
-            response = _mapper.Map<List<LocationDto>>(list);
-            return Task.FromResult(response);
+            List<Location> list = await _unitOfWork.LocationRepository.GetListByUserIdAndTypeAsync((Guid)_claims.id!, Domain.Enumerations.LocationType.PLANNED_DESTINATION);
+
+            // Get the list of past completed trips
+            List<Trip> pastTrips = await _unitOfWork.TripRepository.GetPastCompletedTripsByPassengerIdAsync((Guid)_claims.id!);
+
+            // Group the past trips by end location and count the frequency
+            var locationFrequencies = pastTrips.GroupBy(t => t.EndLocationId)
+                                               .ToDictionary(g => g.Key, g => g.Count());
+
+            // Sort the planned destinations by frequency, then by CreateTime
+            list.Sort((a, b) =>
+            {
+                int frequencyComparison = locationFrequencies.GetValueOrDefault(b.Id, 0).CompareTo(locationFrequencies.GetValueOrDefault(a.Id, 0));
+                if (frequencyComparison != 0)
+                {
+                    return frequencyComparison;
+                }
+                else
+                {
+                    // If frequencies are equal, sort by CreateTime (most recent first)
+                    return b.CreateTime.CompareTo(a.CreateTime);
+                }
+            });
+
+            List<LocationDto> response = _mapper.Map<List<LocationDto>>(list);
+            return response;
         }
     }
 }

@@ -15,5 +15,6 @@ namespace Domain.Interfaces
         Task<List<Trip>> GetTripHistoryByUserId(Guid userId);
         Task<Trip?> GetCurrentTripByUserId(Guid id);
         Task<(List<Trip>, int)> GetTrips(TripStatus? status, PaymentMethod? paymentMethod, TripType? type, string? sortBy, int page, int pageSize);
+        Task<List<Trip>> GetPastCompletedTripsByPassengerIdAsync(Guid passengerId);
     }
 }
