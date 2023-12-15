@@ -63,10 +63,11 @@ namespace Infrastructure.Repositories
                             (t.Status == TripStatus.GOING_TO_PICKUP || t.Status == TripStatus.GOING))
                 .Include(t => t.StartLocation)
                 .Include(t => t.Driver)
+                    .ThenInclude(t => t!.Car)
                 .Include(t => t.EndLocation)
-                .Include(t => t.Driver!.Car)
                 .Include(t => t.Cartype)
                 .Include(t => t.Booker)
+                .Include(t => t.TripImages)
                 .OrderByDescending(t => t.CreateTime)
                 .ToListAsync();
 
@@ -74,10 +75,11 @@ namespace Infrastructure.Repositories
                 .Where(t => t.PassengerId == userId && t.Status == TripStatus.COMPLETED)
                 .Include(t => t.StartLocation)
                 .Include(t => t.Driver)
+                    .ThenInclude(t => t!.Car)
                 .Include(t => t.EndLocation)
-                .Include(t => t.Driver!.Car)
                 .Include(t => t.Cartype)
                 .Include(t => t.Booker)
+                .Include(t => t.TripImages)
                 .OrderByDescending(t => t.CreateTime)
                 .ToListAsync();
 
