@@ -35,6 +35,7 @@ using Domain.Interfaces;
 using FirebaseAdmin;
 using FluentValidation;
 using Google.Apis.Auth.OAuth2;
+using Google.Cloud.Storage.V1;
 using Hangfire;
 using Hangfire.PostgreSql;
 using Infrastructure;
@@ -126,6 +127,7 @@ builder.Services.AddDbContext<GoShareContext>(options => options.UseNpgsql(GoSha
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddSingleton<IUserService, UserService>();
 builder.Services.AddSingleton<ISettingService, SettingService>();
+builder.Services.AddSingleton<IDriverDocumentService, DriverDocumentService>();
 
 //Add Admin Account
 builder.Services.AddSingleton<Admin>(GoShareConfiguration.admin);
@@ -156,6 +158,9 @@ if (FirebaseApp.DefaultInstance == null)
         }
     }
 }
+
+StorageClient _storageClient = StorageClient.Create(credential);
+builder.Services.AddSingleton<IFirebaseStorage>(new FirebaseStorage(GoShareConfiguration.firebaseBucket, _storageClient));
 
 //SignalR
 builder.Services.AddSignalR(hubOptions =>
@@ -197,6 +202,7 @@ builder.Services.AddScoped<IRequestHandler<UnbanUserCommand, UserDto>, UnbanUser
 builder.Services.AddScoped<IRequestHandler<GetFeeAndPoliciesQuery, List<FeeDto>>, GetFeeAndPoliciesQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<UpdateFeeCommand, bool>, UpdateFeeCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<UpdateFeePolicyCommand, bool>, UpdateFeePolicyCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<DriverUpdateDocumentCommand, bool>, DriverUpdateDocumentCommandHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 
