@@ -74,12 +74,12 @@ namespace Api_Mobile.Controllers
             return Ok(response);
         }
 
-        [HttpPut("documents")]
-        public async Task<IActionResult> UpdateDriverProfile([FromForm] DriverUpdateDocumentCommand command)
-        {
-            var response = await _mediator.Send(command);
-            return Ok(response);
-        }
+        //[HttpPut("documents")]
+        //public async Task<IActionResult> UpdateDriverProfile([FromForm] DriverUpdateDocumentCommand command)
+        //{
+        //    var response = await _mediator.Send(command);
+        //    return Ok(response);
+        //}
 
         [HttpGet("statistic")]
         public async Task<IActionResult> GetStatistic()

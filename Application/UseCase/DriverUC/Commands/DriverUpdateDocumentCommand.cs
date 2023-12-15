@@ -10,6 +10,7 @@ namespace Application.UseCase.DriverUC.Commands
 {
     public class DriverUpdateDocumentCommand : IRequest<bool>
     {
+        public Guid id { get; set; }
         public List<PictureUploadDto> List { get; set; } = null!;
     }
 }
