@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.DataModels
+namespace Application.Common.Dtos
 {
-    public partial class Setting
+    public class SettingDto
     {
         public Guid Id { get; set; }
         public string Key { get; set; } = null!;

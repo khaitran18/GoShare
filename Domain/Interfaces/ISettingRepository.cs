@@ -9,6 +9,6 @@ namespace Domain.Interfaces
 {
     public interface ISettingRepository : IBaseRepository<Setting>
     {
-
+        Task<Setting?> GetSettingById(Guid id);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Domain.DataModels;
 using Domain.Interfaces;
 using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,11 @@ namespace Infrastructure.Repositories
         public SettingRepository(GoShareContext context) : base(context)
         {
             _context = context;
+        }
+
+        public async Task<Setting?> GetSettingById(Guid id)
+        {
+            return await _context.Settings.FirstOrDefaultAsync(s => s.Id == id);
         }
     }
 }

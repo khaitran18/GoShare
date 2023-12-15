@@ -411,6 +411,10 @@ namespace Infrastructure.Data
                     .ValueGeneratedNever()
                     .HasColumnName("id");
 
+                entity.Property(e => e.Description)
+                    .HasColumnType("character varying")
+                    .HasColumnName("description");
+
                 entity.Property(e => e.Key)
                     .HasMaxLength(100)
                     .HasColumnName("key");

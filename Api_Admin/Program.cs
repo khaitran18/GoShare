@@ -20,6 +20,9 @@ using Application.UseCase.FeeUC.Queries;
 using Application.UseCase.ReportUC.Commands;
 using Application.UseCase.ReportUC.Handlers;
 using Application.UseCase.ReportUC.Queries;
+using Application.UseCase.SettingUC.Commands;
+using Application.UseCase.SettingUC.Handlers;
+using Application.UseCase.SettingUC.Queries;
 using Application.UseCase.TripUC.Commands;
 using Application.UseCase.TripUC.Handlers;
 using Application.UseCase.TripUC.Queries;
@@ -203,12 +206,15 @@ builder.Services.AddScoped<IRequestHandler<GetFeeAndPoliciesQuery, List<FeeDto>>
 builder.Services.AddScoped<IRequestHandler<UpdateFeeCommand, bool>, UpdateFeeCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<UpdateFeePolicyCommand, bool>, UpdateFeePolicyCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<DriverUpdateDocumentCommand, bool>, DriverUpdateDocumentCommandHandler>();
+builder.Services.AddScoped<IRequestHandler<GetSettingsQuery, List<SettingDto>>, GetSettingsHandler>();
+builder.Services.AddScoped<IRequestHandler<UpdateSettingCommand, SettingDto>, UpdateSettingHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 
 // Validator
 builder.Services.AddScoped<IValidator<BanUserCommand>, BanUserCommandValidator>();
 builder.Services.AddScoped<IValidator<UpdateWalletBalanceCommand>, UpdateWalletBalanceCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdateSettingCommand>, UpdateSettingCommandValidator>();
 
 var mapperConfig = new MapperConfiguration(cfg =>
 {
@@ -225,6 +231,7 @@ var mapperConfig = new MapperConfiguration(cfg =>
     cfg.AddProfile<ReportProfile>();
     cfg.AddProfile<TripImageProfile>();
     cfg.AddProfile<FeeProfile>();
+    cfg.AddProfile<SettingProfile>();
 });
 var mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
