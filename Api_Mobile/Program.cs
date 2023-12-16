@@ -226,7 +226,6 @@ builder.Services.AddScoped<IRequestHandler<DriverUpdateLocationCommand, Location
 builder.Services.AddScoped<IRequestHandler<CreateDependentCommand, UserDto>, CreateDependentCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<GetWalletBalanceQuery, double>, GetWalletBalanceQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<GetUserTransactionQuery, PaginatedResult<WalletTransactionDto>>, GetUserTransactionQueryHandler>();
-builder.Services.AddScoped<IRequestHandler<GetTripHistoryQuery, List<TripDto>>, GetTripHistoryHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateFeedbackCommand, AppfeedbackDto>, CreateFeedbackHandler>();
 builder.Services.AddScoped<IRequestHandler<DriverUpdateDocumentCommand, bool>, DriverUpdateDocumentCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<GetDriverInformationQuery, DriverInformationResponse>, GetDriverInformationHandler>();

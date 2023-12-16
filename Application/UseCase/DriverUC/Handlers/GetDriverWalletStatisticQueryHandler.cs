@@ -44,9 +44,10 @@ namespace Application.UseCase.DriverUC.Handlers
                 var monthTransactions = transactions.Where(u => u.CreateTime.Month == t.Month && u.Status.Equals(WalletTransactionStatus.SUCCESSFULL));
                 WalletMonthStatistic stat = new WalletMonthStatistic();
                 stat.Month = t.Month;
-                stat.MonthTotal = monthTransactions.Sum(u => u.Amount);
+                stat.MonthTotal = monthTransactions.Sum(u => Math.Abs(u.Amount));
                 stat.WeekAverage = stat.MonthTotal / numOfWeekInMonth;
-                if (response.Count != 0 && response.Last().MonthTotal != 0) stat.CompareToLastMonth = monthTransactions.Sum(u => u.Amount) / response.Last().MonthTotal;
+                if (response.Count != 0 && response.Last().MonthTotal != 0) 
+                    stat.CompareToLastMonth = monthTransactions.Sum(u => Math.Abs(u.Amount)) / response.Last().MonthTotal;
                 if (i != numberOfMonth) response.Add(stat);
             }
             return response;
