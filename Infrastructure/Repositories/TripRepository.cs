@@ -25,10 +25,12 @@ namespace Infrastructure.Repositories
                 .Include(t => t.StartLocation)
                 .Include(t => t.EndLocation)
                 .Include(t => t.Driver)
+                    .ThenInclude(d => d!.Car)
                 .Include(t => t.Cartype)
                 .Include(t => t.Passenger)
                     .ThenInclude(p => p.Guardian)
                 .Include(t => t.Booker)
+                .Include(t => t.TripImages)
                 .FirstOrDefaultAsync(t => t.Id == id);
         }
 
