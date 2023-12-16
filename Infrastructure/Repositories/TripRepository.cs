@@ -90,6 +90,23 @@ namespace Infrastructure.Repositories
             return combinedTrips;
         }
 
+        public async Task<List<Trip>> GetTripHistoryByDriverId(Guid driverId)
+        {
+            var completedTrips = await _context.Trips
+                .Where(t => t.DriverId == driverId && t.Status == TripStatus.COMPLETED)
+                .Include(t => t.StartLocation)
+                .Include(t => t.Driver)
+                    .ThenInclude(t => t!.Car)
+                .Include(t => t.EndLocation)
+                .Include(t => t.Cartype)
+                .Include(t => t.Booker)
+                .Include(t => t.TripImages)
+                .OrderByDescending(t => t.CreateTime)
+                .ToListAsync();
+
+            return completedTrips;
+        }
+
         public async Task<(List<Trip>, int)> GetTrips(TripStatus? status, PaymentMethod? paymentMethod, TripType? type, string? sortBy, int page, int pageSize)
         {
             IQueryable<Trip> query = _context.Trips

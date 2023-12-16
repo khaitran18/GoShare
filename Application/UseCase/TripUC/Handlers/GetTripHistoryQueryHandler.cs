@@ -1,6 +1,8 @@
 ﻿using Application.Common.Dtos;
 using Application.UseCase.TripUC.Queries;
 using AutoMapper;
+using Domain.DataModels;
+using Domain.Enumerations;
 using Domain.Interfaces;
 using MediatR;
 
@@ -22,7 +24,17 @@ namespace Application.UseCase.TripUC.Handlers
         public async Task<List<TripDto>> Handle(GetTripHistoryQuery request, CancellationToken cancellationToken)
         {
             Guid userId = (Guid)_userClaims.id!;
-            var trips = await _unitOfWork.TripRepository.GetTripHistoryByUserId(userId);
+            var userRole = _userClaims.Role;
+            var trips = new List<Trip>();
+
+            if (userRole == UserRoleEnumerations.Driver)
+            {
+                trips = await _unitOfWork.TripRepository.GetTripHistoryByDriverId(userId);
+            }
+            else if (userRole == UserRoleEnumerations.User)
+            {
+                trips = await _unitOfWork.TripRepository.GetTripHistoryByUserId(userId);
+            }
 
             var tripDtos = _mapper.Map<List<TripDto>>(trips);
 
