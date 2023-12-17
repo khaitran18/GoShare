@@ -31,7 +31,7 @@ namespace Api_Mobile.Controllers
             PaymentCallbackCommand command = new PaymentCallbackCommand();
             command.collection = Request.Query;
             await _mediator.Send(command);
-            return Ok();
+            return Content("<html>< body >< h1 style = 'color: blue; font-size: 24px; font-family: Arial, sans-serif;'> Thanh toán thành công, vui lòng quay lại trang trước để cập nhật số dư </ h1 ></ body ></ html > ", "text/html");
         }
     }
 }
