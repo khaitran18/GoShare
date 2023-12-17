@@ -58,23 +58,23 @@ namespace Application.UseCase.WallettransactionUC.Handlers
             {
                 switch (request.SortBy.ToLower())
                 {
-                    case "Topup":
-                        transactions = transactions.OrderBy(u => u.Type.Equals(WalletTransactionType.TOPUP));
+                    case "topup":
+                        transactions = transactions.OrderByDescending(u => u.Type.Equals(WalletTransactionType.TOPUP));
                         break;
-                    case "Wage":
-                        transactions = transactions.OrderBy(u => u.PaymentMethod.Equals(WalletTransactionType.DRIVER_WAGE));
+                    case "wage":
+                        transactions = transactions.OrderByDescending(u => u.Type.Equals(WalletTransactionType.DRIVER_WAGE));
                         break;
-                    case "Payment":
-                        transactions = transactions.OrderBy(u => u.PaymentMethod.Equals(WalletTransactionType.PASSENGER_PAYMENT));
+                    case "payment":
+                        transactions = transactions.OrderByDescending(u => u.Type.Equals(WalletTransactionType.PASSENGER_PAYMENT));
                         break;
-                    case "Cash":
-                        transactions = transactions.OrderBy(u => u.PaymentMethod.Equals(PaymentMethod.CASH));
+                    case "cash":
+                        transactions = transactions.OrderByDescending(u => u.PaymentMethod.Equals(PaymentMethod.CASH));
                         break;
-                    case "Vnpay":
-                        transactions = transactions.OrderBy(u => u.PaymentMethod.Equals(PaymentMethod.VNPAY));
+                    case "vnpay":
+                        transactions = transactions.OrderByDescending(u => u.PaymentMethod.Equals(PaymentMethod.VNPAY));
                         break;
-                    case "Wallet":
-                        transactions = transactions.OrderBy(u => u.PaymentMethod.Equals(PaymentMethod.WALLET));
+                    case "wallet":
+                        transactions = transactions.OrderByDescending(u => u.PaymentMethod.Equals(PaymentMethod.WALLET));
                         break;
                     default:
                         transactions = transactions.OrderByDescending(u => u.CreateTime);
