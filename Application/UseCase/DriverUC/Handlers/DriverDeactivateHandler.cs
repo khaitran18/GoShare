@@ -38,8 +38,15 @@ namespace Application.UseCase.DriverUC.Handlers
             // Check if the user is suspended
             if (user.Status == UserStatus.SUSPENDED)
             {
-                throw new BadRequestException("Bạn đã bị khóa tạm thời và không thể thực hiện hành động này. " +
-                    "Vui lòng kiếm tra lại tài khoản của bạn.");
+                if (user.DisabledReason != null)
+                {
+                    throw new BadRequestException(user.DisabledReason);
+                }
+                else
+                {
+                    throw new BadRequestException("Tài khoản của bạn đã bị khóa tạm thời và không thể thực hiện hành động này. " +
+                        "Vui lòng kiểm tra lại tài khoản của bạn.");
+                }
             }
 
             if (user.Status == UserStatus.BUSY)

@@ -410,6 +410,9 @@ namespace Application.Services
                 if (driver.Status != UserStatus.BANNED && driverWallet!.DueDate != null && DateTimeUtilities.GetDateTimeVnNow() > driverWallet.DueDate)
                 {
                     driver.Status = UserStatus.SUSPENDED;
+                    driver.DisabledReason = "Bạn đã bị khóa tạm thời vì đã không nạp tiền vào ví đúng hạn. " +
+                                            "Xin vui lòng nạp tiền vào ví hoặc liên hệ với bộ phận hỗ trợ để được hỗ trợ.";
+                    driver.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
                     await _unitOfWork.UserRepository.UpdateAsync(driver);
                 }
             }
@@ -428,6 +431,8 @@ namespace Application.Services
                 if (driver.Status != UserStatus.BANNED && driver.WarnedTime != null && (DateTimeUtilities.GetDateTimeVnNow() - driver.WarnedTime.Value).TotalDays > warningDuration)
                 {
                     driver.Status = UserStatus.SUSPENDED;
+                    driver.DisabledReason = "Bạn đã bị khóa tạm thời do nhận được nhiều đánh giá tiêu cực trong thời gian dài. " +
+                                            "Xin vui lòng liên hệ với bộ phận hỗ trợ để được hỗ trợ.";
                     driver.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
                     await _unitOfWork.UserRepository.UpdateAsync(driver);
                 }
