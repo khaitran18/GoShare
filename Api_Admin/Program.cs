@@ -208,6 +208,7 @@ builder.Services.AddScoped<IRequestHandler<UpdateFeePolicyCommand, bool>, Update
 builder.Services.AddScoped<IRequestHandler<DriverUpdateDocumentCommand, bool>, DriverUpdateDocumentCommandHandler>();
 builder.Services.AddScoped<IRequestHandler<GetSettingsQuery, List<SettingDto>>, GetSettingsHandler>();
 builder.Services.AddScoped<IRequestHandler<UpdateSettingCommand, SettingDto>, UpdateSettingHandler>();
+builder.Services.AddScoped<IRequestHandler<GetUserTransactionQuery, PaginatedResult<WalletTransactionDto>>, GetUserTransactionQueryHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 

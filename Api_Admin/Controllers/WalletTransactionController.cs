@@ -26,5 +26,13 @@ namespace Api_Admin.Controllers
             var response = await _mediator.Send(query);
             return Ok(response);
         }
+
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetUserTransaction([FromRoute] Guid userId, [FromQuery] GetUserTransactionQuery query)
+        {
+            query.UserId = userId;
+            var response = await _mediator.Send(query);
+            return Ok(response);
+        }
     }
 }

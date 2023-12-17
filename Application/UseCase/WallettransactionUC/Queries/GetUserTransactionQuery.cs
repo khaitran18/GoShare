@@ -10,6 +10,7 @@ namespace Application.UseCase.WallettransactionUC.Queries
 {
     public record GetUserTransactionQuery : IRequest<PaginatedResult<WalletTransactionDto>>
     {
+        public Guid? UserId { get; set; }
         public string? SortBy { get; set; }
         public int Page { get; set; } = 1;
         public int PageSize { get; set; } = 10;

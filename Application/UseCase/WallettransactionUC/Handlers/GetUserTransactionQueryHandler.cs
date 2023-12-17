@@ -29,7 +29,19 @@ namespace Application.UseCase.WallettransactionUC.Handlers
         public async Task<PaginatedResult<WalletTransactionDto>> Handle(GetUserTransactionQuery request, CancellationToken cancellationToken)
         {
             var response = new List<WalletTransactionDto>();
-            Wallet? w = await _unitOfWork.WalletRepository.GetByUserIdAsync((Guid)_claims.id!);
+
+            Wallet? w;
+            if (request.UserId.HasValue)
+            {
+                // Admin is querying
+                w = await _unitOfWork.WalletRepository.GetByUserIdAsync(request.UserId.Value);
+            }
+            else
+            {
+                // User is querying their own transactions
+                w = await _unitOfWork.WalletRepository.GetByUserIdAsync((Guid)_claims.id!);
+            }
+
             if (w is null) throw new DirectoryNotFoundException("User wallet is not found! Please contact our support");
             //get wallet transactions
             var transactions = _unitOfWork.WallettransactionRepository.GetListByWalletId(w.Id).Result.AsQueryable();
@@ -40,7 +52,7 @@ namespace Application.UseCase.WallettransactionUC.Handlers
             //Get transaction for driver
             if (_claims.Role.Equals(UserRoleEnumerations.Driver))
             {
-                transactions = transactions.Where(t => 
+                transactions = transactions.Where(t =>
                     t.Type.Equals(WalletTransactionType.TOPUP)
                     || t.Type.Equals(WalletTransactionType.DRIVER_WAGE));
             }
