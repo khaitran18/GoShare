@@ -11,19 +11,18 @@ namespace Application.Common.Behaviours
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
             var validationFailures = _validators
-                .Select(validator => validator.Validate(request))
-                .SelectMany(validationResult => validationResult.Errors)
-                .Where(validationFailure => validationFailure != null)
-                .ToList();
+            .Select(validator => validator.Validate(request))
+            .SelectMany(validationResult => validationResult.Errors)
+            .Where(validationFailure => validationFailure != null)
+            .ToList();
 
             if (validationFailures.Any())
             {
-                // Get the first validation error message
-                var firstValidationError = validationFailures.First().ToString();
-
-                throw new Exceptions.BadRequestException(firstValidationError);
+                //var error = string.Join("\r\n", validationFailures);
+                throw new Exceptions.ValidationException(validationFailures);
+                //Exceptions.ValidationException exception = new Exceptions.ValidationException();
+                //return (TResponse)Activator.CreateInstance(typeof(TResponse), true, error, exception);
             }
-
             return await next();
         }
     }

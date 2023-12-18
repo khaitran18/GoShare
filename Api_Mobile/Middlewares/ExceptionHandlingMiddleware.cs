@@ -53,9 +53,10 @@ namespace Api_Mobile.Middlewares
                 {
                     context.Response.StatusCode = 400;
                     context.Response.ContentType = "application/json";
+                    var firstErrorMessage = valid.Errors.Values.SelectMany(list => list).FirstOrDefault();
                     var responseBody = new
                     {
-                        Message = valid.Errors.Values.ToArray(),
+                        Message = firstErrorMessage,
                         StackTrace = ex.StackTrace
                     };
                     await context.Response.WriteAsJsonAsync(responseBody);
