@@ -34,6 +34,7 @@ namespace Domain.Enumerations
         PASSENGER_PAYMENT = 3,
         DRIVER_DEPOSIT = 4,
         PASSENGER_REFUND = 5,
+        ADMIN_MODIFICATION = 6
     }
     public enum TopupMethod : short
     {

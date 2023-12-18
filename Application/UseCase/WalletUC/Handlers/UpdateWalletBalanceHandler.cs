@@ -3,6 +3,7 @@ using Application.Common.Utilities;
 using Application.UseCase.WalletUC.Commands;
 using AutoMapper;
 using Domain.DataModels;
+using Domain.Enumerations;
 using Domain.Interfaces;
 using MediatR;
 using System;
@@ -34,12 +35,27 @@ namespace Application.UseCase.WalletUC.Handlers
 
             if (request.Balance.HasValue)
             {
+                var oldBalance = wallet.Balance;
                 wallet.Balance = request.Balance.Value;
                 wallet.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
-            }
 
-            await _unitOfWork.WalletRepository.UpdateAsync(wallet);
-            await _unitOfWork.Save();
+                // Create a new wallet transaction
+                var transaction = new Wallettransaction
+                {
+                    Id = Guid.NewGuid(),
+                    WalletId = wallet.Id,
+                    Amount = request.Balance.Value - oldBalance,
+                    PaymentMethod = PaymentMethod.WALLET,
+                    Status = WalletTransactionStatus.SUCCESSFULL,
+                    Type = WalletTransactionType.ADMIN_MODIFICATION,
+                    CreateTime = DateTimeUtilities.GetDateTimeVnNow(),
+                    UpdatedTime = DateTimeUtilities.GetDateTimeVnNow()
+                };
+
+                await _unitOfWork.WallettransactionRepository.AddAsync(transaction);
+                await _unitOfWork.WalletRepository.UpdateAsync(wallet);
+                await _unitOfWork.Save();
+            }
 
             return wallet.Balance;
         }
