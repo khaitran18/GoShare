@@ -21,6 +21,8 @@ namespace Application.Common.Dtos
         public DateTime UpdatedTime { get; set; }
         public short? Gender { get; set; }
         public DateTime Birth { get; set; }
+        public double Balance { get; set; }
+        public CarDto? Car { get; set; }
         public UserDto? Guardian { get; set; }
     }
 }

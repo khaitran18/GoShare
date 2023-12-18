@@ -199,7 +199,10 @@ namespace Infrastructure.Repositories
 
         public async Task<(List<User>, int)> GetUsersAsync(int page, int pageSize, string? sortBy)
         {
-            IQueryable<User> query = _context.Users.Include(u=>u.Guardian);
+            IQueryable<User> query = _context.Users
+                .Include(u => u.Car)
+                .Include(u => u.Wallets)
+                .Include(u=>u.Guardian);
 
             // Sort by
             if (!string.IsNullOrEmpty(sortBy))

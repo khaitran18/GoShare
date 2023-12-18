@@ -16,7 +16,8 @@ namespace Application.Common.Mappers
             CreateMap<UserDto, User>().ReverseMap();
 
             CreateMap<User, AdminUserResponse>()
-                .ForMember(des=>des.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+                .ForMember(des => des.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+                .ForMember(des => des.Balance, opt => opt.MapFrom(src => src.Wallets.FirstOrDefault()!.Balance))
                 .ReverseMap();
 
             CreateMap<User, AdminDriverResponse>()
