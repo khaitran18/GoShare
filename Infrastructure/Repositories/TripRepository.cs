@@ -58,7 +58,7 @@ namespace Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<List<Trip>> GetTripHistoryByUserId(Guid userId)
+        public async Task<List<Trip>> GetTripHistoryByPassengerId(Guid userId)
         {
             var ongoingTrips = await _context.Trips
                 .Where(t => t.PassengerId == userId &&
@@ -75,6 +75,38 @@ namespace Infrastructure.Repositories
 
             var completedTrips = await _context.Trips
                 .Where(t => t.PassengerId == userId && t.Status == TripStatus.COMPLETED)
+                .Include(t => t.StartLocation)
+                .Include(t => t.Driver)
+                    .ThenInclude(t => t!.Car)
+                .Include(t => t.EndLocation)
+                .Include(t => t.Cartype)
+                .Include(t => t.Booker)
+                .Include(t => t.TripImages)
+                .OrderByDescending(t => t.CreateTime)
+                .ToListAsync();
+
+            var combinedTrips = ongoingTrips.Concat(completedTrips).OrderByDescending(t => t.CreateTime).ToList();
+
+            return combinedTrips;
+        }
+
+        public async Task<List<Trip>> GetTripHistoryByBookerId(Guid userId)
+        {
+            var ongoingTrips = await _context.Trips
+                .Where(t => t.BookerId == userId &&
+                            (t.Status == TripStatus.GOING_TO_PICKUP || t.Status == TripStatus.GOING))
+                .Include(t => t.StartLocation)
+                .Include(t => t.Driver)
+                    .ThenInclude(t => t!.Car)
+                .Include(t => t.EndLocation)
+                .Include(t => t.Cartype)
+                .Include(t => t.Booker)
+                .Include(t => t.TripImages)
+                .OrderByDescending(t => t.CreateTime)
+                .ToListAsync();
+
+            var completedTrips = await _context.Trips
+                .Where(t => t.BookerId == userId && t.Status == TripStatus.COMPLETED)
                 .Include(t => t.StartLocation)
                 .Include(t => t.Driver)
                     .ThenInclude(t => t!.Car)

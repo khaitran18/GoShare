@@ -31,9 +31,13 @@ namespace Application.UseCase.TripUC.Handlers
             {
                 trips = await _unitOfWork.TripRepository.GetTripHistoryByDriverId(userId);
             }
+            else if (userRole == UserRoleEnumerations.Dependent)
+            {
+                trips = await _unitOfWork.TripRepository.GetTripHistoryByPassengerId(userId);
+            }
             else if (userRole == UserRoleEnumerations.User)
             {
-                trips = await _unitOfWork.TripRepository.GetTripHistoryByUserId(userId);
+                trips = await _unitOfWork.TripRepository.GetTripHistoryByBookerId(userId);
             }
 
             var tripDtos = _mapper.Map<List<TripDto>>(trips);
