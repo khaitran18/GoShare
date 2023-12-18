@@ -154,18 +154,21 @@ namespace Infrastructure.Repositories
         {
 
             var user = await _context.Users
+                .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Id.Equals(new Guid(id)));
 
             if (user != null && user.Isdriver)
             {
                 user = await _context.Users
                     .Include(u => u.Car)
+                    .AsNoTracking()
                     .FirstOrDefaultAsync(u => u.Id.Equals(new Guid(id)));
             }
             if (user != null && user.GuardianId != null)
             {
                 user = await _context.Users
                     .Include(u => u.Guardian)
+                    .AsNoTracking()
                     .FirstOrDefaultAsync(u => u.Id.Equals(new Guid(id)));
             }
 
