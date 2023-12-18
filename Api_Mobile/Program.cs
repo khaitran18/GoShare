@@ -238,6 +238,7 @@ builder.Services.AddScoped<IRequestHandler<GetTripHistoryQuery, List<TripDto>>, 
 //builder.Services.AddScoped<IRequestHandler<UpdateUserProfileCommand, UserDto>, UpdateUserProfileHandler>();
 builder.Services.AddScoped<IRequestHandler<GetDriverRegisterCodeQuery, string?>, GetDriverRegisterCodeQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<UpdateUserProfileCommand, UserDto>, UpdateUserProfileHandler>();
+builder.Services.AddScoped<IRequestHandler<GetGuardianInformationQuery, UserDto>, GetGuardianInformationQueryHandler>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>))
     .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));

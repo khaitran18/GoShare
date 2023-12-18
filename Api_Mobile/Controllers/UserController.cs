@@ -69,5 +69,13 @@ namespace Api_Mobile.Controllers
             var response = await _mediator.Send(command);
             return Ok(response);
         }
+        [Authorize(Roles = "Dependent")]
+        [HttpGet("guardian-info")]
+        public async Task<IActionResult> GetGuardianInformation()
+        {
+            var query = new GetGuardianInformationQuery();
+            var result = await _mediator.Send(query);
+            return Ok(result);
+        }
     }
 }
