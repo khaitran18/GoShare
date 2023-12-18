@@ -26,7 +26,10 @@ namespace Api_Mobile.Middlewares
                     userClaims!.id = _tokenService.GetGuid(token);
                     userClaims.name = principal.FindFirst("name")?.Value.ToString();
                     userClaims.phone = principal.FindFirst("phone")?.Value.ToString();
-                    userClaims.Role = principal.IsInRole(UserRoleEnumerations.User.ToString()) ? UserRoleEnumerations.User : principal.IsInRole(UserRoleEnumerations.Driver.ToString()) ? UserRoleEnumerations.Driver : UserRoleEnumerations.Admin;
+                    userClaims.Role = 
+                        principal.IsInRole(UserRoleEnumerations.User.ToString()) ? UserRoleEnumerations.User : principal.IsInRole(UserRoleEnumerations.Driver.ToString()) ? UserRoleEnumerations.Driver :
+                        principal.IsInRole(UserRoleEnumerations.Dependent.ToString()) ? UserRoleEnumerations.Dependent
+                         : UserRoleEnumerations.Admin;
                     userClaims.UserIp = UserUltilities.GetIpAddress(context);
                     await next(context);
                 }
