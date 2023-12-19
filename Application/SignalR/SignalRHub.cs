@@ -157,11 +157,11 @@ namespace Application.SignalR
                 if (trip.Status == TripStatus.GOING_TO_PICKUP)
                 {
                     await Clients.Group(trip.DriverId.ToString())
-                        .SendAsync("UpdateDependentLocation", dependentLocation);
+                        .SendAsync("UpdateDependentLocation", dependentLocation, tripId);
                 }
 
                 await Clients.Group(trip.BookerId.ToString())
-                        .SendAsync("UpdateDependentLocation", dependentLocation);
+                        .SendAsync("UpdateDependentLocation", dependentLocation, tripId);
             }
         }
     }
