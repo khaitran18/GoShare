@@ -38,17 +38,20 @@ namespace Infrastructure.Repositories
             return Task.FromResult(car.VerifiedTo > DateTime.Now ? true : false);
         }
 
-        public async Task<bool> VerifyCar(Guid id, DateTime verifiedTo)
+        public Task<bool> VerifyCar(Guid id, DateTime verifiedTo)
         {
-            Car? car = _context.Cars.FirstOrDefault(c => c.UserId.CompareTo(id) == 0);
-            if (car is not null)
-            {
-                car.Status = (short)CarStatusEnumerations.Verified;
-                car.VerifiedTo = verifiedTo;
-                await _context.SaveChangesAsync();
-            }
-            else throw new NotFoundException("User's car is not found");
-            return true;
+            //Car? car = _context.Cars.FirstOrDefault(c => c.UserId.CompareTo(id) == 0);
+            //if (car is not null)
+            //{
+            //    car.Status = (short)CarStatusEnumerations.Verified;
+            //    car.VerifiedTo = verifiedTo;
+            //    await _context.SaveChangesAsync();
+            //}
+            //else throw new NotFoundException("User's car is not found");
+            Car car = _context.Cars.FirstOrDefault(c => c.Id.CompareTo(id) == 0)!;
+            car.Status = (short)CarStatusEnumerations.Verified;
+            car.VerifiedTo = verifiedTo;
+            return Task.FromResult(true);
         }
     }
 }
