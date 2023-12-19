@@ -299,5 +299,13 @@ namespace Infrastructure.Repositories
         {
             return _context.Users.FirstOrDefaultAsync(u => u.Otp!.Equals(otp));
         }
+
+        public Task<bool> VerifyDriver(Guid id, string avtUrl)
+        {
+            User u = _context.Users.FirstOrDefault(u => u.Id.Equals(id))!;
+            u.Isdriver = true;
+            u.AvatarUrl = avtUrl;
+            return Task.FromResult(true);
+        }
     }
 }

@@ -23,5 +23,6 @@ namespace Domain.Interfaces
         Task<List<User>> GetDriversWithDebt();
         Task<List<User>> GetDriversWarnedRating();
         Task<User?> GetUserByOtp(string otp);
+        Task<bool> VerifyDriver(Guid id, string avtUrl);
     }
 }
