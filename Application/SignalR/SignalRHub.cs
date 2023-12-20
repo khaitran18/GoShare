@@ -131,13 +131,13 @@ namespace Application.SignalR
             {
                 // Only let user see driver location going to the pickup point
                 await Clients.Group(trip.BookerId.ToString())
-                    .SendAsync("UpdateDriverLocation", driverLocation);
+                    .SendAsync("UpdateDriverLocation", driverLocation, tripId);
             }
             else if (trip.Type == TripType.BOOK_FOR_DEP_WITH_APP)
             {
                 // Only update driver location for guardian
                 await Clients.Group(trip.BookerId.ToString())
-                    .SendAsync("UpdateDriverLocation", driverLocation);
+                    .SendAsync("UpdateDriverLocation", driverLocation, tripId);
             }
         }
 
@@ -157,11 +157,11 @@ namespace Application.SignalR
                 if (trip.Status == TripStatus.GOING_TO_PICKUP)
                 {
                     await Clients.Group(trip.DriverId.ToString())
-                        .SendAsync("UpdateDependentLocation", dependentLocation);
+                        .SendAsync("UpdateDependentLocation", dependentLocation, tripId);
                 }
 
                 await Clients.Group(trip.BookerId.ToString())
-                        .SendAsync("UpdateDependentLocation", dependentLocation);
+                        .SendAsync("UpdateDependentLocation", dependentLocation, tripId);
             }
         }
     }
