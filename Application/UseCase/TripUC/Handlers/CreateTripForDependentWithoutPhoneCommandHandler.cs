@@ -64,14 +64,14 @@ namespace Application.UseCase.TripUC.Handlers
             //}
 
             // Prevent users who are busy from creating new trip
-            if (booker.Status == UserStatus.BUSY)
-            {
-                if (booker.Isdriver)
-                {
-                    throw new BadRequestException("You are not allow to create trip at the moment.");
-                }
-                throw new BadRequestException("You cannot create more trip.");
-            }
+            //if (booker.Status == UserStatus.BUSY)
+            //{
+            //    if (booker.Isdriver)
+            //    {
+            //        throw new BadRequestException("You are not allow to create trip at the moment.");
+            //    }
+            //    throw new BadRequestException("You cannot create more trip.");
+            //}
 
             var now = DateTimeUtilities.GetDateTimeVnNow();
             var cancellationWindowMinutes = _settingService.GetSetting("TRIP_CANCELLATION_WINDOW");
