@@ -152,7 +152,7 @@ namespace Application.Services
                 }
 
                 // No available drivers found within the current radius, increase it
-                if (radius < maxRadius && (drivers.All(d => driversToExclude.Any(e => e.Id == d.Id)) || !drivers.Any()))
+                if (radius < maxRadius && !drivers.Any(d => driversToExclude.Any(e => e.Id == d.Id)))
                 {
                     _logger.LogInformation("No drivers found within {radius} km for tripId: {tripId}. Increasing search radius...", radius, trip.Id);
                     radius++;
