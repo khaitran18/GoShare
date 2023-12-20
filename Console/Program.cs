@@ -26,14 +26,15 @@ partial class Program
     {
         IUnitOfWork _unitOfWork;
         GoShareContext _context;
-        IMediator _mediator;
-        (_unitOfWork,_context,_mediator) = Configure();
-        ConfirmPickupPassengerCommand command = new ConfirmPickupPassengerCommand();
-        command.TripId = new Guid("342e3435-66e5-4d65-a6a1-bb8381201362");
-        command.DriverLongitude = (decimal)10.8441264;
-        command.DriverLatitude = (decimal)106.7988646;
-        command.Image = null;
-        await _mediator.Send(command);
+
+        (_unitOfWork,_context) = Configure();
+        await SendSMSUsingTwilio("+84919651361");
+        //ConfirmPickupPassengerCommand command = new ConfirmPickupPassengerCommand();
+        //command.TripId = new Guid("342e3435-66e5-4d65-a6a1-bb8381201362");
+        //command.DriverLongitude = (decimal)10.8441264;
+        //command.DriverLatitude = (decimal)106.7988646;
+        //command.Image = null;
+        //await _mediator.Send(command);
         //string phone = "+919191919191";
         //User u = _context.Users.FirstOrDefault(u=>u.Phone.Equals(phone))!;
         //string PasscodeResetToken = OtpUtils.Generate();
@@ -46,10 +47,22 @@ partial class Program
     }
 
 
-    private static async Task SendSMSUsingTwilio(string phone)
+    private static async Task SendOtpUsingTwilio(string phone)
     {
         ITwilioVerification _service = new TwilioVerification(GoShareConfiguration.TwilioAccount);
         var response = await _service.StartVerificationAsync(phone, "sms");
+        foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(response))
+        {
+            string name = descriptor.Name;
+            object? value = descriptor.GetValue(response);
+            Console.WriteLine("{0}={1}", name, value);
+        }
+    }
+
+    private static async Task SendSMSUsingTwilio(string phone)
+    {
+        ITwilioVerification _service = new TwilioVerification(GoShareConfiguration.TwilioAccount);
+        var response = await _service.SendSMS(phone, "Bây giờ là " + DateTimeUtilities.GetDateTimeVnNow().ToString() + " theo giờ Việt Nam");
         foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(response))
         {
             string name = descriptor.Name;
@@ -161,7 +174,7 @@ partial class Program
 
     }
 
-    private static (IUnitOfWork, GoShareContext,IMediator) Configure()
+    private static (IUnitOfWork, GoShareContext) Configure()
     {
         var builder = new ConfigurationBuilder()
         .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
@@ -198,10 +211,8 @@ partial class Program
         var _unitOfWork = serviceProvider.GetService<IUnitOfWork>();
         var _context = serviceProvider.GetService<GoShareContext>();
         var _mediator = serviceProvider.GetService<IMediator>();
-        // Load settings
-        var settingService = serviceProvider.GetRequiredService<ISettingService>();
-        settingService.LoadSettings().Wait();
-        return (_unitOfWork!, _context!,_mediator!);
+
+        return (_unitOfWork!, _context!);
     }
 
 }
