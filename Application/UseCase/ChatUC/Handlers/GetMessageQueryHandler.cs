@@ -35,7 +35,7 @@ namespace Application.UseCase.ChatUC.Handlers
             List<ChatDto> response = new List<ChatDto>();
             Guid userId = (Guid)_claims.id!;
             var t = await _unitOfWork.TripRepository.GetByIdAsync(request.TripId);
-            if (t is null) throw new BadRequestException("Trip doesn't exist");
+            if (t is null) throw new BadRequestException("Chuyến đi không tồn tại");
             else
             {
                 if (t.Booker.Id.CompareTo(userId) == 0
@@ -47,7 +47,7 @@ namespace Application.UseCase.ChatUC.Handlers
                     //            await _hubContext.Clients.Group(_claims.id.ToString()).SendAsync("GetMessages", response);
                     return response;
                 }
-                else throw new BadRequestException("User cant send message to this trip");
+                else throw new BadRequestException("Bạn không thể xem tin nhắn của chuyến đi này");
             }
         }
     }

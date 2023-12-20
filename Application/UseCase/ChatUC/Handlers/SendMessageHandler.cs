@@ -31,20 +31,33 @@ namespace Application.UseCase.ChatUC.Handlers
         public async Task<Task> Handle(SendMessageCommand request, CancellationToken cancellationToken)
         {
             var t = await _unitOfWork.TripRepository.GetByIdAsync(request.TripId);
-            if (t is null) throw new BadRequestException("Trip for chat is not found");
+            if (t is null) throw new BadRequestException("Chuyến đi không tồn tại");
             else
             {
-                await _unitOfWork.ChatRepository.AddAsync(new Chat
+                var userId = (Guid)_claims.id!;
+                if (t.Booker.Id.CompareTo(userId) == 0
+                    || t.Passenger.Id.CompareTo(userId) == 0
+                    || t.Driver?.Id.CompareTo(userId) == 0)
                 {
-                    Id = Guid.NewGuid(),
-                    Content = request.Content,
-                    Receiver = request.Receiver,
-                    Sender = (Guid)_claims.id!,
-                    TripId = t.Id,
-                    Time = DateTimeUtilities.GetDateTimeVnNow()
-                });
-                await _unitOfWork.Save();
-                return _hubContext.Clients.Group(request.Receiver.ToString()).SendAsync("ReceiveSMSMessages", request.Content);
+                    if (t.Booker.Id.CompareTo(request.Receiver) == 0
+                    || t.Passenger.Id.CompareTo(request.Receiver) == 0
+                    || t.Driver?.Id.CompareTo(request.Receiver) == 0)
+                    {
+                        await _unitOfWork.ChatRepository.AddAsync(new Chat
+                        {
+                            Id = Guid.NewGuid(),
+                            Content = request.Content,
+                            Receiver = request.Receiver,
+                            Sender = userId,
+                            TripId = t.Id,
+                            Time = DateTimeUtilities.GetDateTimeVnNow()
+                        });
+                        await _unitOfWork.Save();
+                        return _hubContext.Clients.Group(request.Receiver.ToString()).SendAsync("ReceiveSMSMessages", request.Content);
+                    }
+                    else throw new BadRequestException("Bạn không thể gửi tin nhắn cho người dùng này");
+                }
+                else throw new BadRequestException("Bạn không thể gửi tin nhắn cho chuyến đi này");
             }
         }
     }
