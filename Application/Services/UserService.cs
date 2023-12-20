@@ -34,6 +34,16 @@ namespace Application.Services
                     result.Add(d);
                 }
             }
+            //check trip type 2
+            List<Trip> trips = await unitOfWork.TripRepository.GetOnGoingTripBookForDepWithNoPhone(UserId);
+            foreach (var trip in trips)
+            {
+                DependentTripInfo d = new DependentTripInfo();
+                d.Id = trip.Id;
+                d.Name = trip.PassengerName;
+                d.DependentId = trip.PassengerId;
+                result.Add(d);
+            }
             return result;
         }
     }

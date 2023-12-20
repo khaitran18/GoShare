@@ -36,7 +36,8 @@ namespace Infrastructure.Repositories
 
         public async Task<Trip?> GetCurrentTripByUserId(Guid id)
         {
-            var list = await _context.Trips.Where(t => t.PassengerId == id || t.DriverId==id).ToListAsync();
+            var list = await _context.Trips.Where(t => (t.Passenger.Id == id || t.DriverId==id)
+                                                        && !t.Type.Equals(TripType.BOOK_FOR_DEP_NO_APP)).ToListAsync();
             return list.FirstOrDefault(t => t.Status != TripStatus.COMPLETED &&
                                           t.Status != TripStatus.CANCELED &&
                                           t.Status != TripStatus.TIMEDOUT);
@@ -235,6 +236,15 @@ namespace Infrastructure.Repositories
             var trips = await query.ToListAsync();
 
             return (trips, totalCount);
+        }
+
+        public Task<List<Trip>> GetOnGoingTripBookForDepWithNoPhone(Guid userId)
+        {
+            return _context.Trips.Where(t => t.Passenger.Id == userId
+                                           && t.Type.Equals(TripType.BOOK_FOR_DEP_NO_APP)
+                                           && t.Status != TripStatus.COMPLETED
+                                           && t.Status != TripStatus.CANCELED
+                                           && t.Status != TripStatus.TIMEDOUT).ToListAsync();
         }
     }
 }
