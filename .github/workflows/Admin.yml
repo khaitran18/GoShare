@@ -32,6 +32,7 @@ jobs:
        Jwt: ${{ secrets.Jwt }}
        Admin: ${{ secrets.Admin }}
        Google: ${{ secrets.Google }}
+       Twilio: ${{ secrets.Twilio }}
 
 
     - name: Build
