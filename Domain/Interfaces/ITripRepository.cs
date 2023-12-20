@@ -18,6 +18,6 @@ namespace Domain.Interfaces
         Task<(List<Trip>, int)> GetTrips(TripStatus? status, PaymentMethod? paymentMethod, TripType? type, string? sortBy, int page, int pageSize);
         Task<List<Trip>> GetPastCompletedTripsByPassengerIdAsync(Guid passengerId);
         Task<List<Trip>> GetTripHistoryByDriverId(Guid driverId);
-        Task<List<Trip>> GetOnGoingTripBookForDepWithNoPhone(Guid userId)
+        Task<List<Trip>> GetOnGoingTripBookForDepWithNoPhone(Guid userId);
     }
 }
