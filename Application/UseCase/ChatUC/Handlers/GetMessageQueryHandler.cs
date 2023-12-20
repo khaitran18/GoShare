@@ -1,4 +1,5 @@
 ﻿using Application.Common.Dtos;
+using Application.Common.Exceptions;
 using Application.SignalR;
 using Application.UseCase.ChatUC.Queries;
 using AutoMapper;
@@ -32,10 +33,22 @@ namespace Application.UseCase.ChatUC.Handlers
         public async Task<List<ChatDto>> Handle(GetMessagesQuery request, CancellationToken cancellationToken)
         {
             List<ChatDto> response = new List<ChatDto>();
-            List<Chat> list = _unitOfWork.ChatRepository.GetChatByTripId(request.TripId);
-            response = _mapper.Map<List<ChatDto>>(list);
-//            await _hubContext.Clients.Group(_claims.id.ToString()).SendAsync("GetMessages", response);
-            return response;
+            Guid userId = (Guid)_claims.id!;
+            var t = await _unitOfWork.TripRepository.GetByIdAsync(request.TripId);
+            if (t is null) throw new BadRequestException("Trip doesn't exist");
+            else
+            {
+                if (t.Booker.Id.CompareTo(userId) == 0
+                    || t.Passenger.Id.CompareTo(userId) == 0
+                    || t.Driver?.Id.CompareTo(userId) == 0)
+                {
+                    List<Chat> list = _unitOfWork.ChatRepository.GetChatByTripId(request.TripId);
+                    response = _mapper.Map<List<ChatDto>>(list);
+                    //            await _hubContext.Clients.Group(_claims.id.ToString()).SendAsync("GetMessages", response);
+                    return response;
+                }
+                else throw new BadRequestException("User cant send message to this trip");
+            }
         }
     }
 }
