@@ -33,6 +33,7 @@ jobs:
        Admin: ${{ secrets.Admin }}
        Google: ${{ secrets.Google }}
 
+
     - name: Build
       run: dotnet build ./Api_Admin/Api_Admin.csproj --configuration Release --no-restore
 
