@@ -24,7 +24,7 @@ namespace Api_Mobile.Controllers
             var response = await _mediator.Send(command);
             return Ok(response);
         }
-        [HttpGet("get/{id}")]
+        [HttpGet("get/{TripId}")]
         public async Task<IActionResult> GetMessages([FromRoute] GetMessagesQuery query)
         {
             var response = await _mediator.Send(query);

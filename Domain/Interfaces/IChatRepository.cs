@@ -11,5 +11,6 @@ namespace Domain.Interfaces
     {
         List<Chat> GetChatByReceiver(Guid id);
         List<Chat> GetChatBySenderAndReceiver(Guid guid, Guid receiverId);
+        List<Chat> GetChatByTripId(Guid tripId);
     }
 }

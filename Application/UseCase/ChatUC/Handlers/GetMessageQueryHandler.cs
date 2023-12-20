@@ -31,11 +31,10 @@ namespace Application.UseCase.ChatUC.Handlers
 
         public async Task<List<ChatDto>> Handle(GetMessagesQuery request, CancellationToken cancellationToken)
         {
-            List<ChatDto> response;
-            Guid.TryParse(request.id, out Guid receiverId);
-            List<Chat> list = _unitOfWork.ChatRepository.GetChatBySenderAndReceiver((Guid)_claims.id!, receiverId);
+            List<ChatDto> response = new List<ChatDto>();
+            List<Chat> list = _unitOfWork.ChatRepository.GetChatByTripId(request.TripId);
             response = _mapper.Map<List<ChatDto>>(list);
-            await _hubContext.Clients.Group(_claims.id.ToString()).SendAsync("GetMessages", response);
+//            await _hubContext.Clients.Group(_claims.id.ToString()).SendAsync("GetMessages", response);
             return response;
         }
     }

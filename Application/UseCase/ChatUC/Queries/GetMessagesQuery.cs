@@ -10,6 +10,6 @@ namespace Application.UseCase.ChatUC.Queries
 {
     public class GetMessagesQuery : IRequest<List<ChatDto>>
     {
-        public string id { get; set; } = null!;
+        public Guid TripId { get; set; } 
     }
 }

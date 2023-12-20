@@ -174,6 +174,8 @@ namespace Infrastructure.Data
 
                 entity.Property(e => e.Sender).HasColumnName("sender");
 
+                entity.Property(e => e.TripId).HasColumnName("trip_id");
+
                 entity.Property(e => e.Time)
                     .HasColumnType("timestamp without time zone")
                     .HasColumnName("time");
@@ -189,6 +191,12 @@ namespace Infrastructure.Data
                     .HasForeignKey(d => d.Sender)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("fk_user_sender");
+
+                entity.HasOne(d=>d.Trip)
+                    .WithMany(p=>p.Chats)
+                    .HasForeignKey(d => d.TripId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("fk_trip_chat");
             });
 
             modelBuilder.Entity<Driverdocument>(entity =>

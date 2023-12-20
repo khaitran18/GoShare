@@ -334,8 +334,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<LoggingMiddleware>();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<GetUserClaimsMiddleware>();
 app.UseMiddleware<CheckUserVerificationMiddleware>();
 

@@ -1,4 +1,5 @@
 ﻿using Application.Common.Dtos;
+using Application.Common.Exceptions;
 using Application.Common.Utilities;
 using Application.SignalR;
 using Application.UseCase.ChatUC.Commands;
@@ -29,16 +30,22 @@ namespace Application.UseCase.ChatUC.Handlers
 
         public async Task<Task> Handle(SendMessageCommand request, CancellationToken cancellationToken)
         {
-            await _unitOfWork.ChatRepository.AddAsync(new Chat
+            var t = await _unitOfWork.TripRepository.GetByIdAsync(request.TripId);
+            if (t is null) throw new BadRequestException("Trip for chat is not found");
+            else
             {
-                Id = Guid.NewGuid(),
-                Content = request.Content,
-                Receiver = request.Receiver,
-                Sender = (Guid)_claims.id!,
-                Time = DateTimeUtilities.GetDateTimeVnNow()
-            });
-            await _unitOfWork.Save();
-            return _hubContext.Clients.Group(request.Receiver.ToString()).SendAsync("ReceiveSMSMessages", request.Content);
+                await _unitOfWork.ChatRepository.AddAsync(new Chat
+                {
+                    Id = Guid.NewGuid(),
+                    Content = request.Content,
+                    Receiver = request.Receiver,
+                    Sender = (Guid)_claims.id!,
+                    TripId = t.Id,
+                    Time = DateTimeUtilities.GetDateTimeVnNow()
+                });
+                await _unitOfWork.Save();
+                return _hubContext.Clients.Group(request.Receiver.ToString()).SendAsync("ReceiveSMSMessages", request.Content);
+            }
         }
     }
 }

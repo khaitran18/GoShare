@@ -27,5 +27,10 @@ namespace Infrastructure.Repositories
         {
             return _context.Chats.Where(c => (c.Sender.CompareTo(senderId) == 0) || (c.Sender.CompareTo(receiverId) == 0)).ToList();
         }
+
+        public List<Chat> GetChatByTripId(Guid tripId)
+        {
+            return _context.Chats.Where(c => c.TripId.CompareTo(tripId) == 0).ToList();
+        }
     }
 }
