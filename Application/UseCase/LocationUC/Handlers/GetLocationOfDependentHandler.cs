@@ -63,6 +63,13 @@ namespace Application.UseCase.LocationUC.Handlers
                 throw new BadRequestException("The user is not the guardian of the dependent.");
             }
 
+            // Remove old location
+            var oldDependentLocation = KeyValueStore.Instance.Get<string>($"CurrentLocation_{request.DependentId}");
+            if (!string.IsNullOrEmpty(oldDependentLocation))
+            {
+                KeyValueStore.Instance.Remove($"CurrentLocation_{request.DependentId})");
+            }
+
             // Request the location from the dependent's device
             await _hubContext.Clients.Group(request.DependentId.ToString()).SendAsync("RequestLocation");
 
