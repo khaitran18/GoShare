@@ -270,6 +270,7 @@ namespace Application.Services
                     }
                 }
 
+
                 bool isSelfBooking = false;
                 bool isNotificationForGuardian = true;
                 await _hubContext.Clients.Group(trip.Passenger.GuardianId.ToString())
