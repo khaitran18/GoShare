@@ -67,7 +67,7 @@ namespace Application.UseCase.LocationUC.Handlers
             var oldDependentLocation = KeyValueStore.Instance.Get<string>($"CurrentLocation_{request.DependentId}");
             if (!string.IsNullOrEmpty(oldDependentLocation))
             {
-                KeyValueStore.Instance.Remove($"CurrentLocation_{request.DependentId})");
+                KeyValueStore.Instance.Remove($"CurrentLocation_{request.DependentId}");
             }
 
             // Request the location from the dependent's device
