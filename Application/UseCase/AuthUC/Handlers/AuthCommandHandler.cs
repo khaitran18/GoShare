@@ -35,7 +35,7 @@ namespace Application.UseCase.AuthUC.Handlers
                 throw new UnauthorizedAccessException("User is not verified");
             }
             else if (await _unitOfWork.UserRepository.IsBanned(user.Id, out string? reason))
-                throw new ForbiddenAccessException("User is banned: " + reason);
+                throw new UnauthorizedAccessException("User is banned: " + reason);
             else
             {
                 if (!PasswordHasher.Validate(user.Passcode!, request.Passcode))
