@@ -131,6 +131,8 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddSingleton<IUserService, UserService>();
 builder.Services.AddSingleton<ISettingService, SettingService>();
 builder.Services.AddSingleton<IDriverDocumentService, DriverDocumentService>();
+//Add twilio
+builder.Services.AddSingleton<ITwilioVerification>(new TwilioVerification(GoShareConfiguration.TwilioAccount));
 
 //Add Admin Account
 builder.Services.AddSingleton<Admin>(GoShareConfiguration.admin);

@@ -17,11 +17,13 @@ namespace Application.UseCase.DriverUC.Handlers
     {
         private readonly ITokenService _tokenService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ITwilioVerification _verification;
 
-        public VerifyDriverCommandHandler(ITokenService tokenService, IUnitOfWork unitOfWork)
+        public VerifyDriverCommandHandler(ITokenService tokenService, IUnitOfWork unitOfWork, ITwilioVerification verification)
         {
             _tokenService = tokenService;
             _unitOfWork = unitOfWork;
+            _verification = verification;
         }
 
         public async Task<bool> Handle(VerifyDriverCommand request, CancellationToken cancellationToken)
@@ -58,6 +60,8 @@ namespace Application.UseCase.DriverUC.Handlers
             if (response)
             {
                 await _unitOfWork.Save();
+                await _verification.SendSMS(user.Phone,
+                    "Chào mừng bạn đến với Goshare, tài khoản tài xế của bạn đã được xác nhận và gia hạn đến " + request.verifiedTo.ToString("dd-MM-yyyy"));
                 return response;
             }
             else throw new Exception("Error in verifying driver");

@@ -10,6 +10,6 @@ namespace Application.Common.Dtos
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = null!;
-        public Guid DependentId { get; set; }
+        public Guid? DependentId { get; set; }
     }
 }

@@ -3,7 +3,9 @@ using Application.Common.Utilities;
 using Application.Services.Interfaces;
 using Twilio;
 using Twilio.Exceptions;
+using Twilio.Rest.Api.V2010.Account;
 using Twilio.Rest.Verify.V2.Service;
+using Twilio.Types;
 
 namespace Application.Services
 {
@@ -42,6 +44,16 @@ namespace Application.Services
             return (verificationCheckResource.Status.Equals("approved")) ? true : false;
             //valid = true || status = approve
             //return verificationCheckResource;
+        }
+
+        public Task<string> SendSMS(string phoneNumber, string body)
+        {
+            phoneNumber = _testNumber;
+            var messageOptions = new CreateMessageOptions(new PhoneNumber("+84919651361"));
+            messageOptions.From = new PhoneNumber("+17745152793");
+            messageOptions.Body = body;
+            var message = MessageResource.Create(messageOptions);
+            return Task.FromResult(message.Body);
         }
 
         public Task<DateTime> GenerateOtpExpiryTime()

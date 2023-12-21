@@ -32,6 +32,8 @@ jobs:
        Jwt: ${{ secrets.Jwt }}
        Admin: ${{ secrets.Admin }}
        Google: ${{ secrets.Google }}
+       Twilio: ${{ secrets.Twilio }}
+
 
     - name: Build
       run: dotnet build ./Api_Admin/Api_Admin.csproj --configuration Release --no-restore

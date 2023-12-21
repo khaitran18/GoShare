@@ -13,5 +13,6 @@ namespace Application.Services.Interfaces
         Task<VerificationResource> StartVerificationAsync(string phoneNumber, string channel);
         Task<bool> CheckVerificationAsync(string phoneNumber, string code);
         Task<DateTime> GenerateOtpExpiryTime();
+        Task<string> SendSMS(string phoneNumber, string body);
     }
 }
