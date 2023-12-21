@@ -51,6 +51,7 @@ namespace Application.UseCase.LocationUC.Handlers
             {
                 throw new BadRequestException("You are not allow to do this function");
             }
+            
 
             var dependent = await _unitOfWork.UserRepository.GetUserById(request.DependentId.ToString());
             if (dependent == null)
