@@ -304,7 +304,7 @@ namespace Application.UseCase.DriverUC.Handlers
             else // Selfbook and book for dep no app
             {
                 bool isSelfBooking = true;
-                bool isNotificationForGuardian = false;
+                bool isNotificationForGuardian = true;
                 await _hubContext.Clients.Group(trip.PassengerId.ToString())
                     .SendAsync("NotifyPassengerTripEnded", _mapper.Map<TripDto>(trip), isSelfBooking, isNotificationForGuardian);
             }
