@@ -112,6 +112,34 @@ namespace Application.UseCase.DriverUC.Handlers
                     };
 
                     await _unitOfWork.WallettransactionRepository.AddAsync(userTransaction);
+
+                    // Get system wallet
+                    var systemWallet = await _unitOfWork.WalletRepository.GetSystemWalletAsync();
+                    if (systemWallet == null)
+                    {
+                        throw new NotFoundException(nameof(Wallet), "System");
+                    }
+
+                    // Add trip price to system wallet
+                    systemWallet.Balance += trip.Price;
+                    systemWallet.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
+                    await _unitOfWork.WalletRepository.UpdateAsync(systemWallet);
+
+                    // New transaction for system's wallet
+                    var systemTransaction = new Wallettransaction
+                    {
+                        Id = Guid.NewGuid(),
+                        WalletId = systemWallet.Id,
+                        TripId = trip.Id,
+                        Amount = trip.Price,
+                        PaymentMethod = PaymentMethod.WALLET,
+                        Status = WalletTransactionStatus.SUCCESSFULL,
+                        Type = WalletTransactionType.SYSTEM_COMMISSION,
+                        CreateTime = DateTimeUtilities.GetDateTimeVnNow(),
+                        UpdatedTime = DateTimeUtilities.GetDateTimeVnNow()
+                    };
+
+                    await _unitOfWork.WallettransactionRepository.AddAsync(systemTransaction);
                 }
 
                 await _unitOfWork.Save();

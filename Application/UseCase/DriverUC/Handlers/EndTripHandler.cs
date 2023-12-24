@@ -181,7 +181,6 @@ namespace Application.UseCase.DriverUC.Handlers
             else if (trip.PaymentMethod == PaymentMethod.WALLET)
             {
                 // Wallet transaction
-
                 var driverTransaction = new Wallettransaction
                 {
                     Id = Guid.NewGuid(),
@@ -201,12 +200,18 @@ namespace Application.UseCase.DriverUC.Handlers
                 driverWallet.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
                 await _unitOfWork.WalletRepository.UpdateAsync(driverWallet);
 
+                // Deduct driver wage from system wallet
+                systemWallet.Balance -= driverWage;
+                systemWallet.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
+                await _unitOfWork.WalletRepository.UpdateAsync(systemWallet);
+
+                // New transaction for system's wallet
                 var systemTransaction = new Wallettransaction
                 {
                     Id = Guid.NewGuid(),
                     WalletId = systemWallet.Id,
                     TripId = trip.Id,
-                    Amount = systemCommission,
+                    Amount = -driverWage,
                     PaymentMethod = PaymentMethod.WALLET,
                     Status = WalletTransactionStatus.SUCCESSFULL,
                     Type = WalletTransactionType.SYSTEM_COMMISSION,
@@ -215,10 +220,6 @@ namespace Application.UseCase.DriverUC.Handlers
                 };
 
                 await _unitOfWork.WallettransactionRepository.AddAsync(systemTransaction);
-
-                systemWallet.Balance += systemCommission;
-                systemWallet.UpdatedTime = DateTimeUtilities.GetDateTimeVnNow();
-                await _unitOfWork.WalletRepository.UpdateAsync(systemWallet);
             }
 
             // Check driver wallet after it has been updated
